@@ -1,7 +1,7 @@
 {
-  "homepage": "https://kope-pepchain.github.io/pepchainlab/",
+  "homepage": "https://pepchainlab.com/",
   "name": "pep-chain-build",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
