@@ -66,7 +66,7 @@ const FEATURES = [
 ];
 
 // ─── COMPONENTS ───
-function Navbar() {
+function Navbar({ cartCount }) {
   return (
     <nav className="navbar">
       <a href="#" className="nav-logo">
@@ -78,7 +78,9 @@ function Navbar() {
         <li><a href="#research">Research</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
-      <button className="nav-cta">Shop Now</button>
+      <button className="nav-cta">
+        Cart {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+      </button>
     </nav>
   );
 }
@@ -122,7 +124,7 @@ function TrustBar() {
   );
 }
 
-function ProductCard({ product }) {
+function ProductCard({ product, addToCart }) {
   const [selected, setSelected] = useState(0);
   const active = product.variants[selected];
 
@@ -152,13 +154,13 @@ function ProductCard({ product }) {
       <p className="research-note">For research use only · Not for human consumption</p>
       <div className="product-footer">
         <span className="product-price">{active.price}</span>
-        <button className="add-btn">Add to Cart</button>
+        <button className="add-btn" onClick={() => addToCart(product, active)}>Add to Cart</button>
       </div>
     </div>
   );
 }
 
-function Products() {
+function Products({ addToCart }) {
   return (
     <section className="section" id="products">
       <div className="section-inner">
@@ -168,7 +170,7 @@ function Products() {
           Every compound is rigorously tested for purity and potency before it reaches your lab.
         </p>
         <div className="products-grid">
-          {PRODUCTS.map((p) => <ProductCard key={p.id} product={p} />)}
+          {PRODUCTS.map((p) => <ProductCard key={p.id} product={p} addToCart={addToCart} />)}
         </div>
       </div>
     </section>
@@ -251,14 +253,27 @@ function Footer() {
 
 // ─── APP ───
 export default function App() {
+  const [cart, setCart] = useState([]);
+
+  const addToCart = (product, variant) => {
+    const key = `${product.id}-${variant.dose}`;
+    setCart(prev => {
+      const existing = prev.find(i => i.key === key);
+      if (existing) return prev.map(i => i.key === key ? { ...i, qty: i.qty + 1 } : i);
+      return [...prev, { key, name: product.name, dose: variant.dose, price: variant.price, qty: 1 }];
+    });
+  };
+
+  const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
+
   return (
     <>
       <div className="noise-overlay" />
-      <Navbar />
+      <Navbar cartCount={cartCount} />
       <main>
         <Hero />
         <TrustBar />
-        <Products />
+        <Products addToCart={addToCart} />
         <Features />
         <Banner />
       </main>
