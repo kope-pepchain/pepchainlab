@@ -51,7 +51,7 @@ const PRODUCTS = [
   { id: 2, name: 'GHK-Cu',      variants: [{ dose: '50mg', price: '$24.99', image: '/ghk_cu_50mg.png' }], badge: 'Research' },
   { id: 3, name: 'Wolverine',   variants: [{ dose: '10mg', price: '$99.99', image: '/wolverine_10mg.png' }], badge: 'Best Seller' },
   { id: 4, name: 'Mots-C',      variants: [{ dose: '10mg', price: '$28.99', image: '/mots_c_10mg.png' }], badge: 'Research' },
-  //{ id: 5, name: 'Glow',        variants: [{ dose: '50mg', price: '$99.99', image: '/glow_50mg.png' }], badge: 'Popular' },
+  { id: 5, name: 'Glow',        variants: [{ dose: '50mg', price: '$99.99', image: '/glow_50mg.png' }], badge: 'Popular' },
   { id: 6, name: 'BAC Water',   variants: [
     { dose: '3ml', price: '$8.99', image: '/bac_water_3ml.png' }, 
     { dose: '10ml', price: '$13.99', image: '/bac_water_10ml.png' }
