@@ -23,7 +23,7 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "dist/*"
-          target: "/var/www/html"
+          target: "/var/www/html/wp-content/themes/pepchain"
           strip_components: 1
           timeout: 60s
           command_timeout: 10m
