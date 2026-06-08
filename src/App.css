@@ -740,3 +740,122 @@
   border-radius: 10px;
   margin-left: 0.4rem;
 }
+/* ─── CART DRAWER ─── */
+.cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 150;
+}
+
+.cart-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 340px;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border);
+  z-index: 151;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  gap: 1rem;
+}
+
+.cart-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-drawer-header h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cart-close-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--white-muted);
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.cart-empty {
+  color: var(--white-dim);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.cart-items {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.cart-item-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.cart-item-dose {
+  font-size: 0.78rem;
+  color: var(--white-dim);
+  margin-top: 0.2rem;
+}
+
+.cart-item-right {
+  text-align: right;
+}
+
+.cart-item-price {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--blue-bright);
+  font-weight: 700;
+}
+
+.cart-item-qty {
+  font-size: 0.78rem;
+  color: var(--white-dim);
+  margin-top: 0.2rem;
+}
+
+.cart-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.cart-total span:last-child {
+  color: var(--blue-bright);
+}

@@ -66,7 +66,54 @@ const FEATURES = [
 ];
 
 // ─── COMPONENTS ───
-function Navbar({ cartCount }) {
+function CartDrawer({ cart, onClose }) {
+  const total = cart.reduce((sum, i) => {
+    const price = parseFloat(i.price.replace('$', ''));
+    return sum + price * i.qty;
+  }, 0);
+
+  return (
+    <>
+      <div className="cart-overlay" onClick={onClose} />
+      <div className="cart-drawer">
+        <div className="cart-drawer-header">
+          <h3>Your Cart</h3>
+          <button className="cart-close-btn" onClick={onClose}>✕</button>
+        </div>
+        {cart.length === 0 ? (
+          <p className="cart-empty">Your cart is empty</p>
+        ) : (
+          <>
+            <div className="cart-items">
+              {cart.map((item) => (
+                <div className="cart-item" key={item.key}>
+                  <div className="cart-item-info">
+                    <p className="cart-item-name">{item.name}</p>
+                    <p className="cart-item-dose">{item.dose}</p>
+                  </div>
+                  <div className="cart-item-right">
+                    <p className="cart-item-price">{item.price}</p>
+                    <p className="cart-item-qty">x{item.qty}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="cart-footer">
+              <div className="cart-total">
+                <span>Total</span>
+                <span>${total.toFixed(2)}</span>
+              </div>
+              <button className="btn-primary" style={{ width: '100%' }}>
+                Checkout
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+function Navbar({ cartCount, onCartOpen }) {
   return (
     <nav className="navbar">
       <a href="#" className="nav-logo">
@@ -78,7 +125,7 @@ function Navbar({ cartCount }) {
         <li><a href="#research">Research</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
-      <button className="nav-cta">
+      <button className="nav-cta" onClick={onCartOpen}>
         Cart {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
       </button>
     </nav>
@@ -254,6 +301,7 @@ function Footer() {
 // ─── APP ───
 export default function App() {
   const [cart, setCart] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
 
   const addToCart = (product, variant) => {
     const key = `${product.id}-${variant.dose}`;
@@ -269,7 +317,8 @@ export default function App() {
   return (
     <>
       <div className="noise-overlay" />
-      <Navbar cartCount={cartCount} />
+      <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} />
+        {cartOpen && <CartDrawer cart={cart} onClose={() => setCartOpen(false)} />}
       <main>
         <Hero />
         <TrustBar />
