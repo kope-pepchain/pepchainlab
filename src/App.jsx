@@ -129,7 +129,7 @@ function AgeGate({ onConfirm }) {
     </>
   );
 }
-function CartDrawer({ cart, onClose }) {
+function CartDrawer({ cart, onClose, onQtyChange }) {
   const total = cart.reduce((sum, i) => {
     const price = parseFloat(i.price.replace('$', ''));
     return sum + price * i.qty;
@@ -148,18 +148,20 @@ function CartDrawer({ cart, onClose }) {
         ) : (
           <>
             <div className="cart-items">
-              {cart.map((item) => (
-                <div className="cart-item" key={item.key}>
-                  <div className="cart-item-info">
-                    <p className="cart-item-name">{item.name}</p>
-                    <p className="cart-item-dose">{item.dose}</p>
-                  </div>
-                  <div className="cart-item-right">
-                    <p className="cart-item-price">{item.price}</p>
-                    <p className="cart-item-qty">x{item.qty}</p>
-                  </div>
-                </div>
-              ))}
+{cart.map((item) => (
+  <div className="cart-item" key={item.key}>
+    <div className="cart-item-info">
+      <p className="cart-item-name">{item.name}</p>
+      <p className="cart-item-dose">{item.dose}</p>
+      <p className="cart-item-price">{item.price}</p>
+    </div>
+    <div className="cart-item-qty-controls">
+      <button className="qty-btn" onClick={() => onQtyChange(item.key, -1)}>−</button>
+      <span>{item.qty}</span>
+      <button className="qty-btn" onClick={() => onQtyChange(item.key, 1)}>+</button>
+    </div>
+  </div>
+))}
             </div>
             <div className="cart-footer">
               <div className="cart-total">
@@ -286,6 +288,12 @@ function ProductCard({ product, addToCart, onOpenModal }) {
       : '';
     addToCart(product, { dose: variantLabel, price });
   };
+  const handleQtyChange = (key, delta) => {
+  setCart(prev => prev
+    .map(i => i.key === key ? { ...i, qty: i.qty + delta } : i)
+    .filter(i => i.qty > 0)
+  );
+};
 
   return (
     <div className="product-card">
@@ -476,7 +484,7 @@ export default function App() {
       <div className="noise-overlay" />
       {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
       <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} />
-      {cartOpen && <CartDrawer cart={cart} onClose={() => setCartOpen(false)} />}
+      {cartOpen && <CartDrawer cart={cart} onClose={() => setCartOpen(false)} onQtyChange={handleQtyChange} />}
       <main>
         <Hero />
         <TrustBar />
