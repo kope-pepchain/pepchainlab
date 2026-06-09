@@ -188,7 +188,8 @@ onClick={async () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: item.key.split('-')[0],
-          quantity: String(item.qty)
+          quantity: String(item.qty),
+          ...(item.variation_id && { variation_id: item.variation_id, variation: item.variation })
         })
       });
     }
@@ -282,17 +283,24 @@ function ProductCard({ product, addToCart, onOpenModal }) {
       : `$${parseFloat(product.price).toFixed(2)}`
     : `$${parseFloat(product.price).toFixed(2)}`;
 
-  const handleAdd = () => {
-    const variantLabel = isVariable && selectedVariant
-      ? selectedVariant.attributes?.map(a => a.option).join(', ')
-      : '';
-    addToCart(product, { dose: variantLabel, price });
-  };
-  const handleQtyChange = (key, delta) => {
-  setCart(prev => prev
-    .map(i => i.key === key ? { ...i, qty: i.qty + delta } : i)
-    .filter(i => i.qty > 0)
-  );
+const handleAdd = () => {
+  const variantLabel = isVariable && selectedVariant
+    ? selectedVariant.attributes?.map(a => a.option).join(', ')
+    : '';
+  
+  const variation = isVariable && selectedVariant
+    ? selectedVariant.attributes?.reduce((acc, a) => {
+        acc[`attribute_${a.name.toLowerCase().replace(' ', '_')}`] = a.option;
+        return acc;
+      }, {})
+    : null;
+
+  addToCart(product, { 
+    dose: variantLabel, 
+    price,
+    variation_id: isVariable && selectedVariant ? selectedVariant.id : null,
+    variation
+  });
 };
 
   return (
@@ -487,7 +495,8 @@ export default function App() {
     setCart(prev => {
       const existing = prev.find(i => i.key === key);
       if (existing) return prev.map(i => i.key === key ? { ...i, qty: i.qty + 1 } : i);
-      return [...prev, { key, name: product.name, dose: variant.dose, price: variant.price, qty: 1 }];
+      return [...prev, { key, name: product.name, dose: variant.dose, price: variant.price, qty: 1, 
+        variation_id: variant.variation_id || null, variation: variant.variation || null }];
     });
   };
   const handleQtyChange = (key, delta) => {
