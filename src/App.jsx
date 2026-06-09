@@ -114,9 +114,31 @@ function CartDrawer({ cart, onClose }) {
                 <span>Total</span>
                 <span>${total.toFixed(2)}</span>
               </div>
-              <button className="btn-primary" style={{ width: '100%' }} onClick={() => window.location.href = `${import.meta.env.VITE_WC_URL}/checkout`}>
-                Checkout
-              </button>
+<button
+  className="btn-primary"
+  style={{ width: '100%' }}
+  onClick={async () => {
+    try {
+      for (const item of cart) {
+        await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            id: item.key.split('-')[0],
+            quantity: item.qty
+          })
+        });
+      }
+      window.location.href = `${import.meta.env.VITE_WC_URL}/checkout`;
+    } catch (err) {
+      console.error('Cart sync failed', err);
+      window.location.href = `${import.meta.env.VITE_WC_URL}/checkout`;
+    }
+  }}
+>
+  Checkout
+</button>
             </div>
           </>
         )}
