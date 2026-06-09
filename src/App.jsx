@@ -476,7 +476,12 @@ export default function App() {
       return [...prev, { key, name: product.name, dose: variant.dose, price: variant.price, qty: 1 }];
     });
   };
-
+  const handleQtyChange = (key, delta) => {
+  setCart(prev => prev
+    .map(i => i.key === key ? { ...i, qty: i.qty + delta } : i)
+    .filter(i => i.qty > 0)
+  );
+};
   const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
 
   return (
