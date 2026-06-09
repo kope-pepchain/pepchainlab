@@ -1,7 +1,16 @@
 import './App.css';
 import { useState } from 'react';
+import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
+
+const api = new WooCommerceRestApi({
+  url: import.meta.env.VITE_WC_URL,
+  consumerKey: import.meta.env.VITE_WC_KEY,
+  consumerSecret: import.meta.env.VITE_WC_SECRET,
+  version: "wc/v3",
+});
 
 // ─── ICONS (inline SVG so no extra packages needed) ───
+
 const IconFlask = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <path d="M9 3h6M9 3v6l-4 9a1 1 0 0 0 .9 1.4h12.2A1 1 0 0 0 19 18l-4-9V3"/>
