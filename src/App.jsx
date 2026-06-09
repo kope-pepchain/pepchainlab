@@ -120,7 +120,7 @@ function CartDrawer({ cart, onClose }) {
   onClick={async () => {
     try {
       for (const item of cart) {
-        await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/checkout/add-item`, {
+        await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
