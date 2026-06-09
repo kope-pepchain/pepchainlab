@@ -105,6 +105,30 @@ function ProductModal({ product, onClose }) {
     </>
   );
 }
+function AgeGate({ onConfirm }) {
+  return (
+    <>
+      <div className="modal-overlay" />
+      <div className="age-gate">
+        <img src="/logo.png" alt="Pep-Chain" className="age-gate-logo" />
+        <h2 className="age-gate-title">Age Verification</h2>
+        <p className="age-gate-text">
+          This website contains research compounds intended for qualified professionals only.
+          You must be 18 or older to enter.
+        </p>
+        <div className="age-gate-buttons">
+          <button className="btn-primary" onClick={onConfirm}>I am 18 or older</button>
+          <button className="btn-secondary" onClick={() => window.location.href = 'https://google.com'}>
+            I am under 18
+          </button>
+        </div>
+        <p className="age-gate-disclaimer">
+          By entering you confirm you are a qualified research professional and agree to our terms.
+        </p>
+      </div>
+    </>
+  );
+}
 function CartDrawer({ cart, onClose }) {
   const total = cart.reduce((sum, i) => {
     const price = parseFloat(i.price.replace('$', ''));
@@ -427,6 +451,14 @@ function Footer() {
 export default function App() {
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [ageVerified, setAgeVerified] = useState(
+    () => sessionStorage.getItem('ageVerified') === 'true'
+  );
+
+  const handleAgeConfirm = () => {
+    sessionStorage.setItem('ageVerified', 'true');
+    setAgeVerified(true);
+  };
 
   const addToCart = (product, variant) => {
     const key = `${product.id}-${variant.dose}`;
@@ -442,8 +474,9 @@ export default function App() {
   return (
     <>
       <div className="noise-overlay" />
+      {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
       <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} />
-        {cartOpen && <CartDrawer cart={cart} onClose={() => setCartOpen(false)} />}
+      {cartOpen && <CartDrawer cart={cart} onClose={() => setCartOpen(false)} />}
       <main>
         <Hero />
         <TrustBar />
