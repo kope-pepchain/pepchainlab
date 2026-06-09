@@ -1,5 +1,5 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 const WC_URL = import.meta.env.VITE_WC_URL;
 const WC_KEY = import.meta.env.VITE_WC_KEY;
 const WC_SECRET = import.meta.env.VITE_WC_SECRET;
@@ -183,42 +183,44 @@ function TrustBar() {
 }
 
 function ProductCard({ product, addToCart }) {
-  const [selected, setSelected] = useState(0);
-  const active = product.variants[selected];
+  const image = product.images?.[0]?.src || '/placeholder.png';
+  const badge = product.tags?.[0]?.name || 'Research';
+  const price = product.price ? `$${parseFloat(product.price).toFixed(2)}` : '—';
 
   return (
     <div className="product-card">
-      <span className="product-badge">{product.badge}</span>
-      <img src={active.image} alt={product.name} className="product-img" />
+      <span className="product-badge">{badge}</span>
+      <img src={image} alt={product.name} className="product-img" />
       <div>
         <p className="product-name">{product.name}</p>
-        {product.variants.length > 1 && (
-          <div className="variant-selector">
-            {product.variants.map((v, i) => (
-              <button
-                key={i}
-                className={`variant-btn ${i === selected ? 'active' : ''}`}
-                onClick={() => setSelected(i)}
-              >
-                {v.dose}
-              </button>
-            ))}
-          </div>
-        )}
-        {product.variants.length === 1 && (
-          <p className="product-dose">{active.dose} / vial</p>
-        )}
       </div>
       <p className="research-note">For research use only · Not for human consumption</p>
       <div className="product-footer">
-        <span className="product-price">{active.price}</span>
-        <button className="add-btn" onClick={() => addToCart(product, active)}>Add to Cart</button>
+        <span className="product-price">{price}</span>
+        <button className="add-btn" onClick={() => addToCart(product, { dose: '', price })}>
+          Add to Cart
+        </button>
       </div>
     </div>
   );
 }
 
 function Products({ addToCart }) {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    wcFetch('products?per_page=50&status=publish')
+      .then(data => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <section className="section" id="products">
       <div className="section-inner">
@@ -227,8 +229,9 @@ function Products({ addToCart }) {
         <p className="section-sub">
           Every compound is rigorously tested for purity and potency before it reaches your lab.
         </p>
+        {loading && <p style={{ color: 'var(--white-dim)', textAlign: 'center', padding: '3rem 0' }}>Loading products…</p>}
         <div className="products-grid">
-          {PRODUCTS.map((p) => <ProductCard key={p.id} product={p} addToCart={addToCart} />)}
+          {products.map((p) => <ProductCard key={p.id} product={p} addToCart={addToCart} />)}
         </div>
       </div>
     </section>
