@@ -114,12 +114,12 @@ function AgeGate({ onConfirm }) {
         <h2 className="age-gate-title">Age Verification</h2>
         <p className="age-gate-text">
           This website contains research compounds intended for qualified professionals only.
-          You must be 18 or older to enter.
+          You must be 21 or older to enter.
         </p>
         <div className="age-gate-buttons">
-          <button className="btn-primary" onClick={onConfirm}>I am 18 or older</button>
+          <button className="btn-primary" onClick={onConfirm}>I am 21 or older</button>
           <button className="btn-secondary" onClick={() => window.location.href = 'https://google.com'}>
-            I am under 18
+            I am under 21
           </button>
         </div>
         <p className="age-gate-disclaimer">
