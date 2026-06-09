@@ -1,13 +1,15 @@
 import './App.css';
 import { useState } from 'react';
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
+const WC_URL = import.meta.env.VITE_WC_URL;
+const WC_KEY = import.meta.env.VITE_WC_KEY;
+const WC_SECRET = import.meta.env.VITE_WC_SECRET;
 
-const api = new WooCommerceRestApi({
-  url: import.meta.env.VITE_WC_URL,
-  consumerKey: import.meta.env.VITE_WC_KEY,
-  consumerSecret: import.meta.env.VITE_WC_SECRET,
-  version: "wc/v3",
-});
+const wcFetch = (endpoint) => {
+  const credentials = btoa(`${WC_KEY}:${WC_SECRET}`);
+  return fetch(`${WC_URL}/wp-json/wc/v3/${endpoint}`, {
+    headers: { Authorization: `Basic ${credentials}` }
+  }).then(r => r.json());
+};
 
 // ─── ICONS (inline SVG so no extra packages needed) ───
 
