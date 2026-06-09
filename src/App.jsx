@@ -79,6 +79,7 @@ const FEATURES = [
 // ─── COMPONENTS ───
 function ProductModal({ product, onClose }) {
   const image = product.images?.[0]?.src || '/placeholder.png';
+  const shortName = product.name.split('|')[0].trim();
   const price = product.price ? `$${parseFloat(product.price).toFixed(2)}` : '—';
   const stripHtml = (html) => {
     const tmp = document.createElement('div');
@@ -95,7 +96,7 @@ function ProductModal({ product, onClose }) {
         <img src={image} alt={product.name} className="modal-image" />
         <div className="modal-details">
           <p className="modal-label">Research Peptide</p>
-          <h2 className="modal-title">{product.name}</h2>
+          <h2 className="modal-title">{shortName}</h2>
           <p className="modal-price">{price}</p>
           <p className="modal-desc">{description}</p>
           <p className="research-note">For research use only · Not for human consumption</p>
@@ -244,22 +245,52 @@ function TrustBar() {
 function ProductCard({ product, addToCart, onOpenModal }) {
   const image = product.images?.[0]?.src || '/placeholder.png';
   const badge = product.tags?.[0]?.name || 'Research';
-  const price = product.price ? `$${parseFloat(product.price).toFixed(2)}` : '—';
+  const shortName = product.name.split('|')[0].trim();
+  const isVariable = product.type === 'variable';
+  const variants = product.variation_data || [];
+  const [selectedVariant, setSelectedVariant] = useState(variants[0] || null);
+
+  const price = isVariable
+    ? selectedVariant
+      ? `$${parseFloat(selectedVariant.price).toFixed(2)}`
+      : `$${parseFloat(product.price).toFixed(2)}`
+    : `$${parseFloat(product.price).toFixed(2)}`;
+
+  const handleAdd = () => {
+    const variantLabel = isVariable && selectedVariant
+      ? selectedVariant.attributes?.map(a => a.option).join(', ')
+      : '';
+    addToCart(product, { dose: variantLabel, price });
+  };
 
   return (
     <div className="product-card">
       <span className="product-badge">{badge}</span>
       <button className="product-zoom-btn" onClick={() => onOpenModal(product)}>🔍</button>
-      <img src={image} alt={product.name} className="product-img" />
+      <img src={image} alt={shortName} className="product-img" />
       <div>
-        <p className="product-name">{product.name}</p>
+        <p className="product-name">{shortName}</p>
+        {isVariable && variants.length > 0 && (
+          <div className="variant-selector">
+            {variants.map((v) => {
+              const label = v.attributes?.map(a => a.option).join(' / ') || v.id;
+              return (
+                <button
+                  key={v.id}
+                  className={`variant-btn ${selectedVariant?.id === v.id ? 'active' : ''}`}
+                  onClick={() => setSelectedVariant(v)}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
       <p className="research-note">For research use only · Not for human consumption</p>
       <div className="product-footer">
         <span className="product-price">{price}</span>
-        <button className="add-btn" onClick={() => addToCart(product, { dose: '', price })}>
-          Add to Cart
-        </button>
+        <button className="add-btn" onClick={handleAdd}>Add to Cart</button>
       </div>
     </div>
   );
@@ -270,10 +301,19 @@ function Products({ addToCart }) {
   const [loading, setLoading] = useState(true);
   const [modalProduct, setModalProduct] = useState(null);
 
-  useEffect(() => {
+useEffect(() => {
     wcFetch('products?per_page=50&status=publish')
-      .then(data => {
-        setProducts(data);
+      .then(async (data) => {
+        const hydrated = await Promise.all(
+          data.map(async (product) => {
+            if (product.type === 'variable' && product.variations.length > 0) {
+              const vars = await wcFetch(`products/${product.id}/variations?per_page=100`);
+              return { ...product, variation_data: vars };
+            }
+            return { ...product, variation_data: [] };
+          })
+        );
+        setProducts(hydrated);
         setLoading(false);
       })
       .catch(err => {
