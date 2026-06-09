@@ -114,7 +114,7 @@ function CartDrawer({ cart, onClose }) {
                 <span>Total</span>
                 <span>${total.toFixed(2)}</span>
               </div>
-              <button className="btn-primary" style={{ width: '100%' }}>
+              <button className="btn-primary" style={{ width: '100%' }} onClick={() => window.location.href = `${import.meta.env.VITE_WC_URL}/checkout`}>
                 Checkout
               </button>
             </div>
