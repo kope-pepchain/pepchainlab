@@ -403,7 +403,21 @@ function Features() {
     </section>
   );
 }
-
+function Disclaimer() {
+  return (
+    <section className="disclaimer-section">
+      <div className="disclaimer-inner">
+        <div className="disclaimer-icon">⚠</div>
+        <div className="disclaimer-content">
+          <p className="disclaimer-title">FDA Disclaimer & Research Use Notice</p>
+          <p className="disclaimer-body">
+            All products sold by Pep-Chain are intended for research purposes only. These products are not intended for human or animal consumption, diagnosis, treatment, or prevention of any disease or condition. Products are not FDA approved and have not been evaluated by the Food and Drug Administration. By purchasing, you confirm you are a qualified research professional and will use these compounds in a controlled laboratory setting in compliance with all applicable local, state, and federal laws and regulations. Pep-Chain makes no claims regarding the safety or efficacy of any compound sold on this site.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
 function Banner() {
   return (
     <div className="banner">
@@ -495,6 +509,7 @@ export default function App() {
         <TrustBar />
         <Products addToCart={addToCart} />
         <Features />
+        <Disclaimer />
         <Banner />
       </main>
       <Footer />
