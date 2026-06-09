@@ -117,35 +117,25 @@ function CartDrawer({ cart, onClose }) {
 <button
   className="btn-primary"
   style={{ width: '100%' }}
-  onClick={async () => {
-    try {
-      // Step 1: Create a fresh CoCart session
-      const createRes = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`, {
-        method: 'GET',
+onClick={async () => {
+  try {
+    for (const item of cart) {
+      await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          id: item.key.split('-')[0],
+          quantity: String(item.qty)
+        })
       });
-      const cartData = await createRes.json();
-      const cartKey = cartData.cart_key;
-
-      // Step 2: Add all items using that cart key
-      for (const item of cart) {
-        await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: item.key.split('-')[0],
-            quantity: String(item.qty)
-          })
-        });
-      }
-
-      // Step 3: Redirect to checkout with cart key
-      window.location.href = `${import.meta.env.VITE_WC_URL}/checkout/?cocart-load-cart=${cartKey}`;
-    } catch (err) {
-      console.error('Cart sync failed', err);
-      alert('Something went wrong. Please try again.');
     }
-  }}
+    window.location.href = `${import.meta.env.VITE_WC_URL}/checkout/`;
+  } catch (err) {
+    console.error('Cart sync failed', err);
+    alert('Something went wrong. Please try again.');
+  }
+}}
 >
   Checkout
 </button>
