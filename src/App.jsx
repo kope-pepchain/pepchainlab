@@ -313,7 +313,7 @@ useEffect(() => {
             return { ...product, variation_data: [] };
           })
         );
-        setProducts(hydrated);
+        setProducts(hydrated.reverse());
         setLoading(false);
       })
       .catch(err => {
