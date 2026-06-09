@@ -77,6 +77,33 @@ const FEATURES = [
 ];
 
 // ─── COMPONENTS ───
+function ProductModal({ product, onClose }) {
+  const image = product.images?.[0]?.src || '/placeholder.png';
+  const price = product.price ? `$${parseFloat(product.price).toFixed(2)}` : '—';
+  const stripHtml = (html) => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html || '';
+    return tmp.textContent || tmp.innerText || 'No description available.';
+  };
+  const description = stripHtml(product.description || product.short_description);
+
+  return (
+    <>
+      <div className="modal-overlay" onClick={onClose} />
+      <div className="modal">
+        <button className="modal-close-btn" onClick={onClose}>✕</button>
+        <img src={image} alt={product.name} className="modal-image" />
+        <div className="modal-details">
+          <p className="modal-label">Research Peptide</p>
+          <h2 className="modal-title">{product.name}</h2>
+          <p className="modal-price">{price}</p>
+          <p className="modal-desc">{description}</p>
+          <p className="research-note">For research use only · Not for human consumption</p>
+        </div>
+      </div>
+    </>
+  );
+}
 function CartDrawer({ cart, onClose }) {
   const total = cart.reduce((sum, i) => {
     const price = parseFloat(i.price.replace('$', ''));
@@ -214,7 +241,7 @@ function TrustBar() {
   );
 }
 
-function ProductCard({ product, addToCart }) {
+function ProductCard({ product, addToCart, onOpenModal }) {
   const image = product.images?.[0]?.src || '/placeholder.png';
   const badge = product.tags?.[0]?.name || 'Research';
   const price = product.price ? `$${parseFloat(product.price).toFixed(2)}` : '—';
@@ -222,6 +249,7 @@ function ProductCard({ product, addToCart }) {
   return (
     <div className="product-card">
       <span className="product-badge">{badge}</span>
+      <button className="product-zoom-btn" onClick={() => onOpenModal(product)}>🔍</button>
       <img src={image} alt={product.name} className="product-img" />
       <div>
         <p className="product-name">{product.name}</p>
@@ -240,6 +268,7 @@ function ProductCard({ product, addToCart }) {
 function Products({ addToCart }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalProduct, setModalProduct] = useState(null);
 
   useEffect(() => {
     wcFetch('products?per_page=50&status=publish')
@@ -263,9 +292,19 @@ function Products({ addToCart }) {
         </p>
         {loading && <p style={{ color: 'var(--white-dim)', textAlign: 'center', padding: '3rem 0' }}>Loading products…</p>}
         <div className="products-grid">
-          {products.map((p) => <ProductCard key={p.id} product={p} addToCart={addToCart} />)}
+          {products.map((p) => (
+            <ProductCard
+              key={p.id}
+              product={p}
+              addToCart={addToCart}
+              onOpenModal={setModalProduct}
+            />
+          ))}
         </div>
       </div>
+      {modalProduct && (
+        <ProductModal product={modalProduct} onClose={() => setModalProduct(null)} />
+      )}
     </section>
   );
 }
