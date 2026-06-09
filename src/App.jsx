@@ -274,6 +274,7 @@ function Products({ addToCart }) {
     wcFetch('products?per_page=50&status=publish')
       .then(data => {
         setProducts(data);
+        console.log(data);
         setLoading(false);
       })
       .catch(err => {
