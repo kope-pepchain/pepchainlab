@@ -474,6 +474,7 @@ function Footer() {
           <div className="footer-brand">
             <p className="footer-logo">PEP-<span>CHAIN</span></p>
             <p>PepChain LLC is a chemical supplier of research-grade peptides intended solely for laboratory and scientific research use by qualified professionals.</p>
+<p>2108 N St, Ste N · Sacramento, CA 95816 · compliance@pepchainlab.com</p>
           </div>
           <div className="footer-links">
             <h4>Company</h4>
