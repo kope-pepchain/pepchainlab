@@ -856,7 +856,7 @@ if (path === '/terms') return <TermsOfUse />;
 if (path === '/shipping-policy') return <ShippingPolicy />;
 if (path === '/returns') return <ReturnsPolicy />;
 if (path === '/privacy-policy') return <PrivacyPolicy />;
-if (path === '/') return <NotFound />;
+if (path !== '/' && path !== '') return <NotFound />;
 
   return (
     <>
