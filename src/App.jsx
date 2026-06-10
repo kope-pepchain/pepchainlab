@@ -784,6 +784,28 @@ function PrivacyPolicy() {
     </div>
   );
 }
+function NotFound() {
+  return (
+    <div className="policy-page">
+      <nav className="navbar">
+        <a href="/" className="nav-logo">
+          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+        </a>
+        <a href="/" className="nav-cta">Back to Shop</a>
+      </nav>
+      <div className="policy-content" style={{ textAlign: 'center', paddingTop: '8rem' }}>
+        <p className="section-label">404</p>
+        <h1 className="policy-title">Page Not Found</h1>
+        <p style={{ color: 'var(--white-muted)', marginBottom: '2rem' }}>
+          The page you're looking for doesn't exist.
+        </p>
+        <a href="/" className="btn-primary" style={{ textDecoration: 'none', padding: '0.85rem 2.2rem' }}>
+          Return Home
+        </a>
+      </div>
+    </div>
+  );
+}
 
 // ─── APP ───
 export default function App() {
@@ -834,6 +856,7 @@ if (path === '/terms') return <TermsOfUse />;
 if (path === '/shipping-policy') return <ShippingPolicy />;
 if (path === '/returns') return <ReturnsPolicy />;
 if (path === '/privacy-policy') return <PrivacyPolicy />;
+if (path === '/') return <NotFound />;
 
   return (
     <>
