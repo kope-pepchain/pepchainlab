@@ -563,32 +563,43 @@ function COALibrary() {
         <p className="section-label">Transparency</p>
         <h1 className="policy-title">Certificate of Analysis Library</h1>
         <p className="policy-intro">All Pep-Chain LLC products are independently tested by accredited third-party laboratories. Certificates of Analysis (COAs) are available below for each product batch. COAs confirm identity, purity, and concentration via HPLC and mass spectrometry.</p>
-        <div className="coa-grid">
-          <div className="coa-card">
-            <p className="coa-product">Retatrutide</p>
-            <p className="coa-detail">Coming Soon</p>
-          </div>
-          <div className="coa-card">
-            <p className="coa-product">GHK-Cu</p>
-            <p className="coa-detail">Coming Soon</p>
-          </div>
-          <div className="coa-card">
-            <p className="coa-product">Wolverine Blend</p>
-            <p className="coa-detail">Coming Soon</p>
-          </div>
-          <div className="coa-card">
-            <p className="coa-product">MOTS-c</p>
-            <p className="coa-detail">Coming Soon</p>
-          </div>
-          <div className="coa-card">
-            <p className="coa-product">Glow Blend</p>
-            <p className="coa-detail">Coming Soon</p>
-          </div>
-          <div className="coa-card">
-            <p className="coa-product">Bacteriostatic Water</p>
-            <p className="coa-detail">Coming Soon</p>
-          </div>
-        </div>
+<div className="coa-grid">
+  <div className="coa-card">
+    <p className="coa-product">Retatrutide 10mg</p>
+    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
+    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_r10.pdf" target="_blank" className="coa-link">View COA</a>
+  </div>
+  <div className="coa-card">
+    <p className="coa-product">Retatrutide 20mg</p>
+    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
+    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_r20.pdf" target="_blank" className="coa-link">View COA</a>
+  </div>
+  <div className="coa-card">
+    <p className="coa-product">Retatrutide 30mg</p>
+    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
+    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_r30.pdf" target="_blank" className="coa-link">View COA</a>
+  </div>
+  <div className="coa-card">
+    <p className="coa-product">GHK-Cu 50mg</p>
+    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
+    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_ghkcu50.pdf" target="_blank" className="coa-link">View COA</a>
+  </div>
+  <div className="coa-card">
+    <p className="coa-product">MOTS-c 10mg</p>
+    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
+    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_motsc10.pdf" target="_blank" className="coa-link">View COA</a>
+  </div>
+  <div className="coa-card">
+    <p className="coa-product">Glow Blend 50mg</p>
+    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
+    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_glow50.pdf" target="_blank" className="coa-link">View COA</a>
+  </div>
+  <div className="coa-card">
+    <p className="coa-product">Bacteriostatic Water</p>
+    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
+    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_bacwater3.pdf" target="_blank" className="coa-link">View COA</a>
+  </div>
+</div>
         <p className="coa-note">COA documents are updated with each new batch. For COA requests contact <a href="mailto:compliance@pepchainlab.com">compliance@pepchainlab.com</a></p>
       </div>
     </div>
