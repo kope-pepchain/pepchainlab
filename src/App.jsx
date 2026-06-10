@@ -73,7 +73,7 @@ const FEATURES = [
   { icon: <IconFlask />, title: 'Research Driven',   desc: 'Every peptide backed by peer-reviewed science and rigorous in-house validation.' },
   { icon: <IconShield />, title: 'Quality Tested',   desc: '3rd-party HPLC and mass-spec testing on every batch. COAs available on request.' },
   { icon: <IconLink />,   title: 'Peptide Experts',  desc: 'Our team has decades of combined biochemistry and formulation experience.' },
-  { icon: <IconChart />,  title: 'Performance Focused', desc: 'Formulated for researchers who demand precision and reproducibility.' },
+  { icon: <IconChart />,  title: 'Precision Formulated', desc: 'Formulated for researchers who demand precision and reproducibility.' },
 ];
 
 // ─── COMPONENTS ───
@@ -239,8 +239,8 @@ function Hero() {
         <div className="hero-badge">Research Grade Peptides</div>
         <img src="/pep-chain-banner.png" alt="Pep-Chain" className="hero-banner-img" />
         <p className="hero-desc">
-          Premium research peptides formulated for precision. Every vial tested,
-          verified, and delivered with confidence.
+          Research-grade peptides for qualified professionals. Every compound independently tested, verified,
+          and supplied strictly for scientific research purposes.
         </p>
         <div className="hero-actions">
           <button className="btn-primary">Browse Products</button>
@@ -439,7 +439,8 @@ function Banner() {
   return (
     <div className="banner">
       <div className="banner-inner">
-        <h2 className="banner-title">Ready to Elevate Your Research?</h2>
+        <h2 className="banner-title">Browse our full catalog of research-grade peptides — independently tested,
+                                   purity verified, for qualified researchers only</h2>
         <p className="banner-sub">
           Browse our full catalog of research-grade peptides — purity verified, fast shipping, no compromises.
         </p>
@@ -456,30 +457,30 @@ function Footer() {
         <div className="footer-top">
           <div className="footer-brand">
             <p className="footer-logo">PEP-<span>CHAIN</span></p>
-            <p>Premium research peptides for professionals who demand purity, precision, and results.</p>
+            <p>PepChain LLC is a chemical supplier of research-grade peptides intended solely for laboratory and scientific research use by qualified professionals.</p>
           </div>
           <div className="footer-links">
             <h4>Company</h4>
             <ul>
               <li><a href="#">About</a></li>
-              <li><a href="#">Research</a></li>
-              <li><a href="#">Blog</a></li>
+              <li><a href="/ruo-policy">RUO Policy</a></li>
+              <li><a href="/coa-library">COA Library</a></li>
               <li><a href="#">Contact</a></li>
             </ul>
           </div>
           <div className="footer-links">
-            <h4>Support</h4>
+            <h4>Legal</h4>
             <ul>
-              <li><a href="#">FAQ</a></li>
+              <li><a href="/terms">Terms of Use</a></li>
               <li><a href="#">Shipping Policy</a></li>
               <li><a href="#">Returns</a></li>
-              <li><a href="#">COA Requests</a></li>
+              <li><a href="#">Privacy Policy</a></li>
             </ul>
           </div>
         </div>
-        <div className="footer-bottom">
-          <p>© 2025 Pep-Chain. All rights reserved.</p>
-          <p className="disclaimer">All products sold for research use only. Not for human consumption.</p>
+        <div className="footer-legal">
+          <p>PepChain LLC is not a 503A compounding pharmacy or a 503B outsourcing facility as defined under Section 503A and 503B of the Federal Food, Drug, and Cosmetic Act (FD&amp;C Act). All products are sold as research chemicals only. These products are not drugs and have not been approved by the U.S. Food and Drug Administration (FDA). They are not intended for human or animal consumption, diagnosis, treatment, mitigation, or prevention of any disease or condition. By purchasing, you represent that you are a qualified research professional and that all use will occur in a controlled laboratory environment in full compliance with applicable federal, state, and local laws.</p>
+          <p className="footer-copy">© 2026 PepChain LLC. All rights reserved. For research use only. Not for human consumption.</p>
         </div>
       </div>
     </footer>

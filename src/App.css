@@ -1109,3 +1109,22 @@
 .out-of-stock-btn:hover {
   box-shadow: none;
 }
+.footer-legal {
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.footer-legal p {
+  font-size: 0.72rem;
+  color: var(--white-dim);
+  font-weight: 300;
+  line-height: 1.8;
+}
+
+.footer-copy {
+  font-size: 0.72rem;
+  color: var(--white-dim);
+}
