@@ -201,7 +201,7 @@ onClick={async () => {
     }
 
     // Step 3: Redirect WITH the cart key
-    window.location.href = `${import.meta.env.VITE_WC_URL}/checkout/?cocart-load-cart=${cartKey}`;
+    window.location.href = `${import.meta.env.VITE_WC_URL}/checkout/?cocart-load-cart=${cartKey}&keep-cart=false`;
   } catch (err) {
     console.error('Cart sync failed', err);
     alert('Something went wrong. Please try again.');
