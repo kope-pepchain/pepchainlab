@@ -486,6 +486,97 @@ function Footer() {
     </footer>
   );
 }
+function RUOPolicy() {
+  return (
+    <div className="policy-page">
+      <nav className="navbar">
+        <a href="/" className="nav-logo">
+          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+        </a>
+        <ul className="nav-links">
+          <li><a href="/#products">Products</a></li>
+          <li><a href="/coa-library">COA Library</a></li>
+          <li><a href="/#contact">Contact</a></li>
+        </ul>
+        <a href="/" className="nav-cta">Back to Shop</a>
+      </nav>
+      <div className="policy-content">
+        <p className="section-label">Legal</p>
+        <h1 className="policy-title">Research Use Only Policy</h1>
+        <div className="policy-body">
+          <p>All products sold by Pep-Chain LLC are intended exclusively for in vitro laboratory research and scientific study by qualified research professionals. These products are research chemicals only.</p>
+
+          <h3>Not for Human or Animal Use</h3>
+          <p>No product sold by Pep-Chain LLC is intended for human or animal consumption, injection, or any form of in vivo use. These products are not drugs, supplements, or medications. They have not been evaluated or approved by the U.S. Food and Drug Administration (FDA) or any other regulatory body for use in humans or animals.</p>
+
+          <h3>Qualified Purchasers Only</h3>
+          <p>By placing an order with Pep-Chain LLC, you represent and warrant that you are a qualified research professional operating within a controlled laboratory environment, and that all purchased compounds will be used solely for lawful scientific research purposes in full compliance with all applicable federal, state, and local laws and regulations.</p>
+
+          <h3>Not a Pharmacy or Compounding Facility</h3>
+          <p>Pep-Chain LLC is not a 503A compounding pharmacy or a 503B outsourcing facility as defined under Sections 503A and 503B of the Federal Food, Drug, and Cosmetic Act (FD&C Act). We do not compound, dispense, or manufacture drugs intended for human use.</p>
+
+          <h3>No Medical Claims</h3>
+          <p>Pep-Chain LLC makes no claims regarding the therapeutic, diagnostic, or preventive properties of any product. Nothing on this website constitutes medical advice. Any research findings referenced are provided for informational purposes only and do not imply efficacy or safety in humans.</p>
+
+          <h3>Compliance</h3>
+          <p>It is the sole responsibility of the purchaser to ensure that the acquisition, possession, and use of any product complies with all applicable laws in their jurisdiction. Pep-Chain LLC reserves the right to refuse service to any individual or entity that cannot demonstrate legitimate research intent.</p>
+
+          <h3>Contact</h3>
+          <p>For questions regarding this policy please contact us at <a href="mailto:compliance@pepchainlab.com">compliance@pepchainlab.com</a></p>
+        </div>
+      </div>
+    </div>
+  );
+}
+function COALibrary() {
+  return (
+    <div className="policy-page">
+      <nav className="navbar">
+        <a href="/" className="nav-logo">
+          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+        </a>
+        <ul className="nav-links">
+          <li><a href="/#products">Products</a></li>
+          <li><a href="/ruo-policy">RUO Policy</a></li>
+          <li><a href="/#contact">Contact</a></li>
+        </ul>
+        <a href="/" className="nav-cta">Back to Shop</a>
+      </nav>
+      <div className="policy-content">
+        <p className="section-label">Transparency</p>
+        <h1 className="policy-title">Certificate of Analysis Library</h1>
+        <p className="policy-intro">All Pep-Chain LLC products are independently tested by accredited third-party laboratories. Certificates of Analysis (COAs) are available below for each product batch. COAs confirm identity, purity, and concentration via HPLC and mass spectrometry.</p>
+        <div className="coa-grid">
+          <div className="coa-card">
+            <p className="coa-product">Retatrutide</p>
+            <p className="coa-detail">Coming Soon</p>
+          </div>
+          <div className="coa-card">
+            <p className="coa-product">GHK-Cu</p>
+            <p className="coa-detail">Coming Soon</p>
+          </div>
+          <div className="coa-card">
+            <p className="coa-product">Wolverine Blend</p>
+            <p className="coa-detail">Coming Soon</p>
+          </div>
+          <div className="coa-card">
+            <p className="coa-product">MOTS-c</p>
+            <p className="coa-detail">Coming Soon</p>
+          </div>
+          <div className="coa-card">
+            <p className="coa-product">Glow Blend</p>
+            <p className="coa-detail">Coming Soon</p>
+          </div>
+          <div className="coa-card">
+            <p className="coa-product">Bacteriostatic Water</p>
+            <p className="coa-detail">Coming Soon</p>
+          </div>
+        </div>
+        <p className="coa-note">COA documents are updated with each new batch. For COA requests contact <a href="mailto:compliance@pepchainlab.com">compliance@pepchainlab.com</a></p>
+      </div>
+    </div>
+  );
+}
 
 // ─── APP ───
 export default function App() {
@@ -516,6 +607,11 @@ export default function App() {
   );
 };
   const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
+
+  const path = window.location.pathname;
+
+if (path === '/ruo-policy') return <RUOPolicy />;
+if (path === '/coa-library') return <COALibrary />;
 
   return (
     <>
