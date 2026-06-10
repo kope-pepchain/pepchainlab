@@ -599,6 +599,10 @@ function COALibrary() {
     <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
     <a href="https://pepchainlab.com/wp-content/uploads/janoshik_bacwater3.pdf" target="_blank" className="coa-link">View COA</a>
   </div>
+  <div className="coa-card">
+    <p className="coa-product">Wolverine Blend 50mg</p>
+    <p className="coa-detail">Coming Soon</p>
+    </div>
 </div>
         <p className="coa-note">COA documents are updated with each new batch. For COA requests contact <a href="mailto:compliance@pepchainlab.com">compliance@pepchainlab.com</a></p>
       </div>
