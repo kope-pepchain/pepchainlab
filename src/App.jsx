@@ -781,7 +781,14 @@ function PrivacyPolicy() {
 
 // ─── APP ───
 export default function App() {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+  try {
+    const saved = localStorage.getItem('cart');
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+});
   const [cartOpen, setCartOpen] = useState(false);
   const [ageVerified, setAgeVerified] = useState(
     () => sessionStorage.getItem('ageVerified') === 'true'
@@ -807,6 +814,10 @@ export default function App() {
     .filter(i => i.qty > 0)
   );
 };
+useEffect(() => {
+  localStorage.setItem('cart', JSON.stringify(cart));
+}, [cart]);
+
   const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
 
   const path = window.location.pathname;
