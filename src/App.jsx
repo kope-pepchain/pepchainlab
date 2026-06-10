@@ -273,11 +273,13 @@ function ProductCard({ product, addToCart, onOpenModal }) {
   const image = product.images?.[0]?.src || '/placeholder.png';
   const badge = product.tags?.[0]?.name || 'Research';
   const shortName = product.name.split('|')[0].trim();
-  const inStock = product.stock_status === 'instock';
   const isVariable = product.type === 'variable';
   const variants = product.variation_data || [];
   const [selectedVariant, setSelectedVariant] = useState(variants[0] || null);
-
+  const inStock = isVariable && selectedVariant
+    ? selectedVariant.stock_status === 'instock'
+    : product.stock_status === 'instock';
+    
   const price = isVariable
     ? selectedVariant
       ? `$${parseFloat(selectedVariant.price).toFixed(2)}`
