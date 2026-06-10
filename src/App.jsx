@@ -179,13 +179,19 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
   style={{ width: '100%' }}
 onClick={async () => {
   try {
-    // Step 1: Get a cart key from CoCart
-    const createRes = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const cartData = await createRes.json();
-    const cartKey = cartData.cart_key;
+// Step 1: Get a fresh cart key
+const createRes = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`, {
+  method: 'GET',
+  headers: { 'Content-Type': 'application/json' },
+});
+const cartData = await createRes.json();
+const cartKey = cartData.cart_key;
+
+// Clear any existing items in that cart
+await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/clear?cart_key=${cartKey}`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+});
 
     // Step 2: Add items to that cart key
     for (const item of cart) {
