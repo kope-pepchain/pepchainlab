@@ -489,9 +489,9 @@ function Footer() {
             <h4>Legal</h4>
             <ul>
               <li><a href="/terms">Terms of Use</a></li>
-              <li><a href="#">Shipping Policy</a></li>
-              <li><a href="#">Returns</a></li>
-              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="/shipping-policy">Shipping Policy</a></li>
+              <li><a href="/returns">Returns</a></li>
+              <li><a href="/privacy-policy">Privacy Policy</a></li>
             </ul>
           </div>
         </div>
@@ -601,6 +601,183 @@ function COALibrary() {
     </div>
   );
 }
+function TermsOfUse() {
+  return (
+    <div className="policy-page">
+      <nav className="navbar">
+        <a href="/" className="nav-logo">
+          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+        </a>
+        <ul className="nav-links">
+          <li><a href="/#products">Products</a></li>
+          <li><a href="/ruo-policy">RUO Policy</a></li>
+          <li><a href="/coa-library">COA Library</a></li>
+        </ul>
+        <a href="/" className="nav-cta">Back to Shop</a>
+      </nav>
+      <div className="policy-content">
+        <p className="section-label">Legal</p>
+        <h1 className="policy-title">Terms of Use</h1>
+        <div className="policy-body">
+          <p>By accessing or using pepchainlab.com, you agree to be bound by these Terms of Use. If you do not agree, do not use this site.</p>
+
+          <h3>Eligibility</h3>
+          <p>You must be at least 21 years of age and a qualified research professional to purchase from PepChain LLC. By placing an order you represent that you meet these requirements.</p>
+
+          <h3>Research Use Only</h3>
+          <p>All products sold by PepChain LLC are strictly for in vitro laboratory and scientific research use only. They are not intended for human or animal consumption, clinical use, or any other purpose. See our full RUO Policy at pepchainlab.com/ruo-policy.</p>
+
+          <h3>Intellectual Property</h3>
+          <p>All content on this site including text, images, logos, and design is the property of PepChain LLC and may not be reproduced without written permission.</p>
+
+          <h3>Limitation of Liability</h3>
+          <p>PepChain LLC shall not be liable for any direct, indirect, incidental, or consequential damages arising from the use or inability to use our products or website. All products are sold as-is for research purposes only.</p>
+
+          <h3>Governing Law</h3>
+          <p>These terms are governed by the laws of the State of California. Any disputes shall be resolved in the courts of Sacramento County, California.</p>
+
+          <h3>Changes to Terms</h3>
+          <p>PepChain LLC reserves the right to update these Terms of Use at any time. Continued use of the site after changes constitutes acceptance of the new terms.</p>
+
+          <h3>Contact</h3>
+          <p>For questions contact us at <a href="mailto:compliance@pepchainlab.com">compliance@pepchainlab.com</a></p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ShippingPolicy() {
+  return (
+    <div className="policy-page">
+      <nav className="navbar">
+        <a href="/" className="nav-logo">
+          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+        </a>
+        <ul className="nav-links">
+          <li><a href="/#products">Products</a></li>
+          <li><a href="/ruo-policy">RUO Policy</a></li>
+          <li><a href="/coa-library">COA Library</a></li>
+        </ul>
+        <a href="/" className="nav-cta">Back to Shop</a>
+      </nav>
+      <div className="policy-content">
+        <p className="section-label">Shipping</p>
+        <h1 className="policy-title">Shipping Policy</h1>
+        <div className="policy-body">
+          <p>PepChain LLC ships all orders within the continental United States only. We do not ship internationally at this time.</p>
+
+          <h3>Processing Time</h3>
+          <p>Orders are processed within 1-2 business days of payment confirmation. Orders placed on weekends or federal holidays will begin processing the next business day.</p>
+
+          <h3>Carrier</h3>
+          <p>All orders are shipped via USPS. Tracking information will be provided via email once your order has shipped.</p>
+
+          <h3>Shipping Rates</h3>
+          <p>Shipping rates are calculated at checkout based on order weight and destination.</p>
+
+          <h3>Delivery Times</h3>
+          <p>Delivery times vary by destination and are estimated by USPS. PepChain LLC is not responsible for delays caused by the carrier, weather, or other circumstances outside our control.</p>
+
+          <h3>Address Accuracy</h3>
+          <p>It is the customer's responsibility to provide an accurate shipping address. PepChain LLC is not responsible for orders shipped to an incorrect address provided by the customer.</p>
+
+          <h3>Lost or Stolen Packages</h3>
+          <p>If your tracking shows delivered but you have not received your package, please contact your local USPS facility. PepChain LLC is not responsible for packages that are lost or stolen after confirmed delivery.</p>
+
+          <h3>Contact</h3>
+          <p>For shipping questions contact us at <a href="mailto:compliance@pepchainlab.com">compliance@pepchainlab.com</a></p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ReturnsPolicy() {
+  return (
+    <div className="policy-page">
+      <nav className="navbar">
+        <a href="/" className="nav-logo">
+          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+        </a>
+        <ul className="nav-links">
+          <li><a href="/#products">Products</a></li>
+          <li><a href="/ruo-policy">RUO Policy</a></li>
+          <li><a href="/coa-library">COA Library</a></li>
+        </ul>
+        <a href="/" className="nav-cta">Back to Shop</a>
+      </nav>
+      <div className="policy-content">
+        <p className="section-label">Returns</p>
+        <h1 className="policy-title">Returns & Replacements</h1>
+        <div className="policy-body">
+          <p>Due to the nature of research chemicals, PepChain LLC does not accept returns. All sales are final.</p>
+
+          <h3>Damaged or Incorrect Items</h3>
+          <p>If you receive a damaged or incorrect item, we will ship you a replacement at no charge. To qualify for a replacement you must contact us within 7 days of delivery and provide the following:</p>
+          <p>— Photographic evidence of the damaged or incorrect item</p>
+          <p>— Your order number</p>
+          <p>— A brief description of the issue</p>
+
+          <h3>How to Request a Replacement</h3>
+          <p>Email us at <a href="mailto:compliance@pepchainlab.com">compliance@pepchainlab.com</a> with the subject line "Replacement Request — Order #[your order number]" and include the required documentation. We will review your request and respond within 2 business days.</p>
+
+          <h3>Non-Qualifying Claims</h3>
+          <p>Replacements will not be issued for orders where the incorrect shipping address was provided by the customer, orders that show as delivered by the carrier, or claims submitted more than 7 days after the delivery date.</p>
+
+          <h3>No Refunds</h3>
+          <p>PepChain LLC does not issue monetary refunds under any circumstances. Our commitment is to ensure you receive the correct product in good condition — if we fall short of that, we will make it right with a replacement.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PrivacyPolicy() {
+  return (
+    <div className="policy-page">
+      <nav className="navbar">
+        <a href="/" className="nav-logo">
+          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+        </a>
+        <ul className="nav-links">
+          <li><a href="/#products">Products</a></li>
+          <li><a href="/ruo-policy">RUO Policy</a></li>
+          <li><a href="/coa-library">COA Library</a></li>
+        </ul>
+        <a href="/" className="nav-cta">Back to Shop</a>
+      </nav>
+      <div className="policy-content">
+        <p className="section-label">Privacy</p>
+        <h1 className="policy-title">Privacy Policy</h1>
+        <div className="policy-body">
+          <p>PepChain LLC ("we", "us", "our") is committed to protecting your privacy. This policy explains how we collect, use, and protect your information when you use pepchainlab.com.</p>
+
+          <h3>Information We Collect</h3>
+          <p>We collect information you provide when placing an order including your name, email address, shipping address, and payment information. Payment information is processed securely by our payment processor and is not stored by PepChain LLC.</p>
+
+          <h3>How We Use Your Information</h3>
+          <p>We use your information solely to process and fulfill your orders, communicate with you about your orders, and comply with legal obligations. We do not sell, rent, or share your personal information with third parties for marketing purposes.</p>
+
+          <h3>Cookies</h3>
+          <p>Our site uses cookies to maintain your session and improve your browsing experience. By using our site you consent to the use of cookies. You may disable cookies in your browser settings but this may affect site functionality.</p>
+
+          <h3>Data Security</h3>
+          <p>We implement reasonable security measures to protect your personal information. However no method of transmission over the internet is 100% secure and we cannot guarantee absolute security.</p>
+
+          <h3>California Privacy Rights</h3>
+          <p>As a California-based LLC, we comply with the California Consumer Privacy Act (CCPA). California residents have the right to request access to, deletion of, or information about the personal data we hold about them. To exercise these rights contact us at compliance@pepchainlab.com.</p>
+
+          <h3>Changes to This Policy</h3>
+          <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated date.</p>
+
+          <h3>Contact</h3>
+          <p>For privacy questions contact us at <a href="mailto:compliance@pepchainlab.com">compliance@pepchainlab.com</a></p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── APP ───
 export default function App() {
@@ -636,6 +813,10 @@ export default function App() {
 
 if (path === '/ruo-policy') return <RUOPolicy />;
 if (path === '/coa-library') return <COALibrary />;
+if (path === '/terms') return <TermsOfUse />;
+if (path === '/shipping-policy') return <ShippingPolicy />;
+if (path === '/returns') return <ReturnsPolicy />;
+if (path === '/privacy-policy') return <PrivacyPolicy />;
 
   return (
     <>
