@@ -546,8 +546,29 @@ function RUOPolicy() {
   );
 }
 function COALibrary() {
+  const [activePdf, setActivePdf] = useState(null);
+
+  const coas = [
+    { name: 'Retatrutide 10mg', detail: 'Janoshik Laboratory · HPLC Verified', pdf: 'https://pepchainlab.com/wp-content/uploads/janoshik_r10.pdf' },
+    { name: 'Retatrutide 20mg', detail: 'Janoshik Laboratory · HPLC Verified', pdf: 'https://pepchainlab.com/wp-content/uploads/janoshik_r20.pdf' },
+    { name: 'Retatrutide 30mg', detail: 'Janoshik Laboratory · HPLC Verified', pdf: 'https://pepchainlab.com/wp-content/uploads/janoshik_r30.pdf' },
+    { name: 'GHK-Cu 50mg',      detail: 'Janoshik Laboratory · HPLC Verified', pdf: 'https://pepchainlab.com/wp-content/uploads/janoshik_ghkcu50.pdf' },
+    { name: 'MOTS-c 10mg',      detail: 'Janoshik Laboratory · HPLC Verified', pdf: 'https://pepchainlab.com/wp-content/uploads/janoshik_motsc10.pdf' },
+    { name: 'Glow Blend 50mg',  detail: 'Janoshik Laboratory · HPLC Verified', pdf: 'https://pepchainlab.com/wp-content/uploads/janoshik_glow50.pdf' },
+    { name: 'Bacteriostatic Water', detail: 'Janoshik Laboratory · HPLC Verified', pdf: 'https://pepchainlab.com/wp-content/uploads/janoshik_bacwater3.pdf' },
+    { name: 'Wolverine Blend 10mg', detail: 'Coming Soon', pdf: null },
+  ];
+
   return (
     <div className="policy-page">
+      {activePdf && (
+        <div className="pdf-modal-overlay" onClick={() => setActivePdf(null)}>
+          <div className="pdf-modal" onClick={e => e.stopPropagation()}>
+            <button className="pdf-modal-close" onClick={() => setActivePdf(null)}>✕</button>
+            <iframe src={activePdf} className="pdf-iframe" title="Certificate of Analysis" />
+          </div>
+        </div>
+      )}
       <nav className="navbar">
         <a href="/" className="nav-logo">
           <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
@@ -562,48 +583,19 @@ function COALibrary() {
       <div className="policy-content">
         <p className="section-label">Transparency</p>
         <h1 className="policy-title">Certificate of Analysis Library</h1>
-        <p className="policy-intro">All Pep-Chain LLC products are independently tested by accredited third-party laboratories. Certificates of Analysis (COAs) are available below for each product batch. COAs confirm identity, purity, and concentration via HPLC and mass spectrometry.</p>
-<div className="coa-grid">
-  <div className="coa-card">
-    <p className="coa-product">Retatrutide 10mg</p>
-    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
-    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_r10.pdf" target="_blank" className="coa-link">View COA</a>
-  </div>
-  <div className="coa-card">
-    <p className="coa-product">Retatrutide 20mg</p>
-    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
-    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_r20.pdf" target="_blank" className="coa-link">View COA</a>
-  </div>
-  <div className="coa-card">
-    <p className="coa-product">Retatrutide 30mg</p>
-    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
-    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_r30.pdf" target="_blank" className="coa-link">View COA</a>
-  </div>
-  <div className="coa-card">
-    <p className="coa-product">GHK-Cu 50mg</p>
-    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
-    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_ghkcu50.pdf" target="_blank" className="coa-link">View COA</a>
-  </div>
-  <div className="coa-card">
-    <p className="coa-product">MOTS-c 10mg</p>
-    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
-    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_motsc10.pdf" target="_blank" className="coa-link">View COA</a>
-  </div>
-  <div className="coa-card">
-    <p className="coa-product">Glow Blend 50mg</p>
-    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
-    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_glow50.pdf" target="_blank" className="coa-link">View COA</a>
-  </div>
-  <div className="coa-card">
-    <p className="coa-product">Bacteriostatic Water</p>
-    <p className="coa-detail">Janoshik Laboratory · HPLC Verified</p>
-    <a href="https://pepchainlab.com/wp-content/uploads/janoshik_bacwater3.pdf" target="_blank" className="coa-link">View COA</a>
-  </div>
-  <div className="coa-card">
-    <p className="coa-product">Wolverine Blend 50mg</p>
-    <p className="coa-detail">Coming Soon</p>
-    </div>
-</div>
+        <p className="policy-intro">All PepChain LLC products are independently tested by accredited third-party laboratories. Certificates of Analysis are available below for each product batch, confirming identity, purity, and concentration via HPLC and mass spectrometry.</p>
+        <div className="coa-grid">
+          {coas.map((coa) => (
+            <div className="coa-card" key={coa.name}>
+              <p className="coa-product">{coa.name}</p>
+              <p className="coa-detail">{coa.detail}</p>
+              {coa.pdf
+                ? <button className="coa-link" onClick={() => setActivePdf(coa.pdf)}>View COA</button>
+                : <p className="coa-detail">Available Soon</p>
+              }
+            </div>
+          ))}
+        </div>
         <p className="coa-note">COA documents are updated with each new batch. For COA requests contact <a href="mailto:compliance@pepchainlab.com">compliance@pepchainlab.com</a></p>
       </div>
     </div>
