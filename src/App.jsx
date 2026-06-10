@@ -243,8 +243,14 @@ function Hero() {
           and supplied strictly for scientific research purposes.
         </p>
         <div className="hero-actions">
-          <button className="btn-primary">Browse Products</button>
-          <button className="btn-secondary">Learn More</button>
+          <button className="btn-primary" onClick={() => {
+            const el = document.getElementById('products');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}>Browse Products</button>
+          <button className="btn-secondary" onClick={() => {
+            const el = document.getElementById('about');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}>Learn More</button>
         </div>
       </div>
     </section>
@@ -439,11 +445,10 @@ function Banner() {
   return (
     <div className="banner">
       <div className="banner-inner">
-        <h2 className="banner-title">Browse our full catalog of research-grade peptides — independently tested,
-                                   purity verified, for qualified researchers only</h2>
-        <p className="banner-sub">
-          Browse our full catalog of research-grade peptides — purity verified, fast shipping, no compromises.
-        </p>
+<h2 className="banner-title">Ready to Elevate Your Research?</h2>
+<p className="banner-sub">
+  Browse our full catalog of research-grade peptides — independently tested, purity verified, for qualified researchers only.
+</p>
         <button className="btn-white">Shop the Catalog</button>
       </div>
     </div>
@@ -494,9 +499,9 @@ function RUOPolicy() {
           <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
         </a>
         <ul className="nav-links">
-          <li><a href="/#products">Products</a></li>
+          <li><a href="#products">Products</a></li>
           <li><a href="/coa-library">COA Library</a></li>
-          <li><a href="/#contact">Contact</a></li>
+          <li><a href="#contact">Contact</a></li>
         </ul>
         <a href="/" className="nav-cta">Back to Shop</a>
       </nav>
