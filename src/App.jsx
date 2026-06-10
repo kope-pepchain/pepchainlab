@@ -220,7 +220,7 @@ function Navbar({ cartCount, onCartOpen }) {
       <ul className="nav-links">
         <li><a href="#products">Products</a></li>
         <li><a href="#about">About</a></li>
-        <li><a href="#research">Research</a></li>
+        <li><a href="#coa-library">CoA Library</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
       <button className="nav-cta" onClick={onCartOpen}>
