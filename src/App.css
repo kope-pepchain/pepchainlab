@@ -1233,3 +1233,27 @@
   color: var(--blue-bright);
   text-decoration: none;
 }
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nav-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--white-muted);
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.nav-icon-btn:hover {
+  color: var(--white);
+  border-color: var(--blue-bright);
+}

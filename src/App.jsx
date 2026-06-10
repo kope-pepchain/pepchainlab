@@ -49,6 +49,12 @@ const IconVial = () => (
     <line x1="6.2" y1="15" x2="17.8" y2="15"/>
   </svg>
 );
+const IconUser = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </svg>
+);
 
 
 
@@ -214,18 +220,23 @@ onClick={async () => {
 function Navbar({ cartCount, onCartOpen }) {
   return (
     <nav className="navbar">
-      <a href="#" className="nav-logo">
+      <a href="/" className="nav-logo">
         <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
       </a>
       <ul className="nav-links">
         <li><a href="#products">Products</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="/coa-library">COA Library</a></li>
-        <li><a href="contact">Contact</a></li>
+        <li><a href="#contact">Contact</a></li>
       </ul>
-      <button className="nav-cta" onClick={onCartOpen}>
-        Cart {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
-      </button>
+      <div className="nav-right">
+        <a href="/my-account" className="nav-icon-btn" title="My Account">
+          <IconUser />
+        </a>
+        <button className="nav-cta" onClick={onCartOpen}>
+          Cart {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+        </button>
+      </div>
     </nav>
   );
 }
