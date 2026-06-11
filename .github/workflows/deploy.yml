@@ -15,8 +15,6 @@ jobs:
 
       - name: Build
         env:
-          VITE_WC_KEY: ${{ secrets.VITE_WC_KEY }}
-          VITE_WC_SECRET: ${{ secrets.VITE_WC_SECRET }}
           VITE_WC_URL: ${{ secrets.VITE_WC_URL }}
         run: npm run build
 
