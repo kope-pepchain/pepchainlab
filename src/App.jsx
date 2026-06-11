@@ -881,6 +881,9 @@ function ProductPage({ slug, addToCart }) {
         <div className="product-page-details">
           <p className="section-label">Research Peptide</p>
           <h1 className="product-page-title">{shortName}</h1>
+          {(product.short_description || product.description) && (
+            <div className="product-page-desc" dangerouslySetInnerHTML={{ __html: product.short_description || product.description }} />
+          )}
           {isVariable && variants.length > 0 && (
             <div className="variant-selector">
               {variants.map((v) => {
