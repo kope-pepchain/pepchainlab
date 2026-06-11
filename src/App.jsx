@@ -990,7 +990,14 @@ useEffect(() => {
             price,
             qty: it.quantity?.value ?? it.quantity ?? 1,
             variation_id: hasVariation ? it.id : null,
-            variation: hasVariation ? variation : null,
+            variation: hasVariation
+              ? Object.fromEntries(
+                  Object.entries(variation).map(([k, v]) => [
+                    `attribute_pa_${k.toLowerCase().replace(/\s+/g, '_')}`,
+                    v,
+                  ])
+                )
+              : null,
           };
         });
         setCart(synced);
