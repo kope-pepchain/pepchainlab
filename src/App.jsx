@@ -174,14 +174,18 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
   style={{ width: '100%' }}
 onClick={async () => {
   try {
-    // Step 1: Get a fresh cart key
-    const createRes = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-    });
-    const cartData = await createRes.json();
-    const cartKey = cartData.cart_key;
+// Step 1: Reuse our persistent cart key, or get one from CoCart
+        let cartKey = localStorage.getItem('wcCartKey');
+        if (!cartKey) {
+          const createRes = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          });
+          const cartData = await createRes.json();
+          cartKey = cartData.cart_key;
+        }
+        localStorage.setItem('wcCartKey', cartKey);
 
     // Step 2: Clear any existing items in that cart
     await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/clear?cart_key=${cartKey}`, {
@@ -956,20 +960,21 @@ export default function App() {
 useEffect(() => {
   localStorage.setItem('cart', JSON.stringify(cart));
 }, [cart]);
-// Sync cart FROM the WooCommerce session (picks up edits made on the WP cart page)
+// Sync cart FROM WooCommerce by explicit cart key (CoCart REST is stateless)
 useEffect(() => {
   (async () => {
+    const cartKey = localStorage.getItem('wcCartKey');
+    if (!cartKey) return; // never handed off — local cart is authoritative
     try {
-      const res = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`, {
-        credentials: 'include',
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart?cart_key=${cartKey}`,
+        { credentials: 'include' }
+      );
       if (!res.ok) return;
       const data = await res.json();
       const items = data.items || [];
-      const handedOff = localStorage.getItem('wcHandoff') === '1';
 
       if (items.length > 0) {
-        // WooCommerce cart has contents — it is the source of truth
         const synced = items.map((it) => {
           const variation = it.meta?.variation || null;
           const hasVariation = variation && Object.keys(variation).length > 0;
@@ -989,6 +994,10 @@ useEffect(() => {
           };
         });
         setCart(synced);
+      } else {
+        // Our handed-off cart is now empty: purchased or emptied on the WP side
+        setCart([]);
+        localStorage.removeItem('wcCartKey');
       }
     } catch {
       /* API hiccup — keep local cart */
