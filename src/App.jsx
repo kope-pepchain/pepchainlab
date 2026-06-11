@@ -185,7 +185,9 @@ const createRes = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/
   headers: { 'Content-Type': 'application/json' },
 });
 const cartData = await createRes.json();
+console.log('Cart response:', cartData);
 const cartKey = cartData.cart_key;
+console.log('Cart key:', cartKey);
 
 // Clear any existing items in that cart
 await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/clear?cart_key=${cartKey}`, {
