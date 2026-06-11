@@ -532,11 +532,16 @@ function RUOPolicy() {
           <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
         </a>
         <ul className="nav-links">
-          <li><a href="#products">Products</a></li>
+          <li><a href="/#products">Products</a></li>
           <li><a href="/coa-library">COA Library</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
-        <a href="/" className="nav-cta">Back to Shop</a>
+        <div className="nav-right">
+          <a href="/my-account" className="nav-icon-btn" title="My Account">
+            <IconUser />
+          </a>
+          <a href="/" className="nav-cta">Back to Shop</a>
+        </div>
       </nav>
       <div className="policy-content">
         <p className="section-label">Legal</p>
@@ -599,7 +604,12 @@ function COALibrary() {
           <li><a href="/ruo-policy">RUO Policy</a></li>
           <li><a href="/#contact">Contact</a></li>
         </ul>
-        <a href="/" className="nav-cta">Back to Shop</a>
+        <div className="nav-right">
+          <a href="/my-account" className="nav-icon-btn" title="My Account">
+            <IconUser />
+          </a>
+          <a href="/" className="nav-cta">Back to Shop</a>
+        </div>
       </nav>
       <div className="policy-content">
         <p className="section-label">Transparency</p>
@@ -634,7 +644,12 @@ function TermsOfUse() {
           <li><a href="/ruo-policy">RUO Policy</a></li>
           <li><a href="/coa-library">COA Library</a></li>
         </ul>
-        <a href="/" className="nav-cta">Back to Shop</a>
+        <div className="nav-right">
+          <a href="/my-account" className="nav-icon-btn" title="My Account">
+            <IconUser />
+          </a>
+          <a href="/" className="nav-cta">Back to Shop</a>
+        </div>
       </nav>
       <div className="policy-content">
         <p className="section-label">Legal</p>
@@ -680,7 +695,12 @@ function ShippingPolicy() {
           <li><a href="/ruo-policy">RUO Policy</a></li>
           <li><a href="/coa-library">COA Library</a></li>
         </ul>
-        <a href="/" className="nav-cta">Back to Shop</a>
+        <div className="nav-right">
+          <a href="/my-account" className="nav-icon-btn" title="My Account">
+            <IconUser />
+          </a>
+          <a href="/" className="nav-cta">Back to Shop</a>
+        </div>
       </nav>
       <div className="policy-content">
         <p className="section-label">Shipping</p>
@@ -726,7 +746,12 @@ function ReturnsPolicy() {
           <li><a href="/ruo-policy">RUO Policy</a></li>
           <li><a href="/coa-library">COA Library</a></li>
         </ul>
-        <a href="/" className="nav-cta">Back to Shop</a>
+        <div className="nav-right">
+          <a href="/my-account" className="nav-icon-btn" title="My Account">
+            <IconUser />
+          </a>
+          <a href="/" className="nav-cta">Back to Shop</a>
+        </div>
       </nav>
       <div className="policy-content">
         <p className="section-label">Returns</p>
@@ -766,7 +791,12 @@ function PrivacyPolicy() {
           <li><a href="/ruo-policy">RUO Policy</a></li>
           <li><a href="/coa-library">COA Library</a></li>
         </ul>
-        <a href="/" className="nav-cta">Back to Shop</a>
+        <div className="nav-right">
+          <a href="/my-account" className="nav-icon-btn" title="My Account">
+            <IconUser />
+          </a>
+          <a href="/" className="nav-cta">Back to Shop</a>
+        </div>
       </nav>
       <div className="policy-content">
         <p className="section-label">Privacy</p>
@@ -806,7 +836,12 @@ function NotFound() {
         <a href="/" className="nav-logo">
           <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
         </a>
-        <a href="/" className="nav-cta">Back to Shop</a>
+        <div className="nav-right">
+          <a href="/my-account" className="nav-icon-btn" title="My Account">
+            <IconUser />
+          </a>
+          <a href="/" className="nav-cta">Back to Shop</a>
+        </div>
       </nav>
       <div className="policy-content" style={{ textAlign: 'center', paddingTop: '8rem' }}>
         <p className="section-label">404</p>
