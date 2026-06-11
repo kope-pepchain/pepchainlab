@@ -202,7 +202,7 @@ onClick={async () => {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          id: item.key.split('-')[0],
+          id: String(item.variation_id || item.key.split('-')[0]),
           quantity: String(item.qty),
           ...(item.variation_id && { variation_id: item.variation_id, variation: item.variation })
         })
