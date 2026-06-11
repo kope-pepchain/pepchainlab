@@ -179,36 +179,28 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
   style={{ width: '100%' }}
 onClick={async () => {
   try {
-// Step 1: Get a fresh cart key
-const createRes = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`, {
-  method: 'GET',
-  headers: { 'Content-Type': 'application/json' },
-});
-const cartData = await createRes.json();
-console.log('Cart response:', cartData);
-const cartKey = cartData.cart_key;
-console.log('Cart key:', cartKey);
+    // Step 1: Get a fresh cart key
+    const createRes = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+    const cartData = await createRes.json();
+    const cartKey = cartData.cart_key;
 
-// Clear any existing items in that cart
-console.log('Cart key before clear:', cartKey);
-console.log('Clear URL:', `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/clear?cart_key=${cartKey}`);
-await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/clear?cart_key=${cartKey}`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-});
+    // Step 2: Clear any existing items in that cart
+    await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/clear?cart_key=${cartKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
 
-    // Step 2: Add items to that cart key
+    // Step 3: Add items to that cart key
     for (const item of cart) {
-      console.log('item:', item.key, item.variation_id, item.variation);
-      console.log('Add item URL:', `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`);
-console.log('Body:', JSON.stringify({
-  id: item.key.split('-')[0],
-  quantity: String(item.qty),
-  ...(item.variation_id && { variation_id: item.variation_id, variation: item.variation })
-}));
       await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           id: item.key.split('-')[0],
           quantity: String(item.qty),
@@ -217,7 +209,7 @@ console.log('Body:', JSON.stringify({
       });
     }
 
-    // Step 3: Redirect WITH the cart key
+    // Step 4: Redirect WITH the cart key
     window.location.href = `${import.meta.env.VITE_WC_URL}/checkout/?cocart-load-cart=${cartKey}&keep-cart=false`;
   } catch (err) {
     console.error('Cart sync failed', err);
