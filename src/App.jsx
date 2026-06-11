@@ -195,6 +195,7 @@ await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/clear?cart_ke
 
     // Step 2: Add items to that cart key
     for (const item of cart) {
+      console.log('item:', item.key, item.variation_id, item.variation);
       await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
