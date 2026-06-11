@@ -327,7 +327,7 @@ const handleAdd = () => {
   
   const variation = isVariable && selectedVariant
     ? selectedVariant.attributes?.reduce((acc, a) => {
-        acc[`attribute_${a.name.toLowerCase().replace(' ', '_')}`] = a.option;
+        acc[`attribute_pa_${a.name.toLowerCase().replace(' ', '_')}`] = a.option;
         return acc;
       }, {})
     : null;
