@@ -989,10 +989,6 @@ useEffect(() => {
           };
         });
         setCart(synced);
-      } else if (handedOff) {
-        // Cart was handed to WP and is now empty (purchased or emptied there)
-        setCart([]);
-        localStorage.removeItem('wcHandoff');
       }
     } catch {
       /* API hiccup — keep local cart */
