@@ -205,6 +205,7 @@ onClick={async () => {
     }
 
     // Step 4: Redirect WITH the cart key
+    localStorage.setItem('wcHandoff', '1');
     window.location.href = `${import.meta.env.VITE_WC_URL}/checkout/?cocart-load-cart=${cartKey}&keep-cart=false`;
   } catch (err) {
     console.error('Cart sync failed', err);
@@ -955,6 +956,49 @@ export default function App() {
 useEffect(() => {
   localStorage.setItem('cart', JSON.stringify(cart));
 }, [cart]);
+// Sync cart FROM the WooCommerce session (picks up edits made on the WP cart page)
+useEffect(() => {
+  (async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`, {
+        credentials: 'include',
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const items = data.items || [];
+      const handedOff = localStorage.getItem('wcHandoff') === '1';
+
+      if (items.length > 0) {
+        // WooCommerce cart has contents — it is the source of truth
+        const synced = items.map((it) => {
+          const variation = it.meta?.variation || null;
+          const hasVariation = variation && Object.keys(variation).length > 0;
+          const dose = hasVariation ? Object.values(variation)[0] : '';
+          const raw = String(it.price ?? '0');
+          const price = raw.includes('.')
+            ? `$${parseFloat(raw).toFixed(2)}`
+            : `$${(parseInt(raw, 10) / 100).toFixed(2)}`;
+          return {
+            key: `${it.id}-${dose}`,
+            name: it.name,
+            dose,
+            price,
+            qty: it.quantity?.value ?? it.quantity ?? 1,
+            variation_id: hasVariation ? it.id : null,
+            variation: hasVariation ? variation : null,
+          };
+        });
+        setCart(synced);
+      } else if (handedOff) {
+        // Cart was handed to WP and is now empty (purchased or emptied there)
+        setCart([]);
+        localStorage.removeItem('wcHandoff');
+      }
+    } catch {
+      /* API hiccup — keep local cart */
+    }
+  })();
+}, []);
 
   const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
 
