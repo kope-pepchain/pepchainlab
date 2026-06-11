@@ -819,6 +819,7 @@ function NotFound() {
 function ProductPage({ slug, addToCart }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedVariant, setSelectedVariant] = useState(null);
 
   useEffect(() => {
     wcFetch(`products?slug=${slug}`)
@@ -828,6 +829,7 @@ function ProductPage({ slug, addToCart }) {
         if (p.type === 'variable' && p.variations.length > 0) {
           const vars = await wcFetch(`products/${p.id}/variations?per_page=100`);
           setProduct({ ...p, variation_data: vars });
+          setSelectedVariant(vars[0] || null);
         } else {
           setProduct({ ...p, variation_data: [] });
         }
@@ -839,15 +841,72 @@ function ProductPage({ slug, addToCart }) {
   if (loading) return <div className="policy-page"><p style={{ color: 'var(--white-dim)', textAlign: 'center', padding: '6rem 0' }}>Loading…</p></div>;
   if (!product) return <NotFound />;
 
+  const image = product.images?.[0]?.src || '/placeholder.png';
+  const badge = product.tags?.[0]?.name || 'Research';
+  const shortName = product.name.split('|')[0].trim();
+  const isVariable = product.type === 'variable';
+  const variants = product.variation_data || [];
+  const inStock = isVariable && selectedVariant
+    ? selectedVariant.stock_status === 'instock'
+    : product.stock_status === 'instock';
+  const price = isVariable
+    ? (selectedVariant ? `$${parseFloat(selectedVariant.price).toFixed(2)}` : `$${parseFloat(product.price).toFixed(2)}`)
+    : `$${parseFloat(product.price).toFixed(2)}`;
+
+  const handleAdd = () => {
+    const variantLabel = isVariable && selectedVariant
+      ? selectedVariant.attributes?.map(a => a.option).join(', ')
+      : '';
+    const variation = isVariable && selectedVariant
+      ? selectedVariant.attributes?.reduce((acc, a) => {
+          acc[`attribute_pa_${a.name.toLowerCase().replace(' ', '_')}`] = a.option;
+          return acc;
+        }, {})
+      : null;
+    addToCart(product, {
+      dose: variantLabel,
+      price,
+      variation_id: isVariable && selectedVariant ? selectedVariant.id : null,
+      variation
+    });
+  };
+
   return (
     <div className="product-page">
       <div className="product-page-inner">
-        <img src={product.images?.[0]?.src || '/placeholder.png'} alt={product.name} className="product-page-img" />
+        <div className="product-page-media">
+          <span className="product-badge">{badge}</span>
+          <img src={image} alt={shortName} className="product-page-img" />
+        </div>
         <div className="product-page-details">
           <p className="section-label">Research Peptide</p>
-          <h1 className="policy-title">{product.name.split('|')[0].trim()}</h1>
-          {/* Reuse your existing ProductCard variant/price/add-to-cart logic here */}
-          <ProductCard product={product} addToCart={addToCart} onOpenModal={() => {} } full={true} />
+          <h1 className="product-page-title">{shortName}</h1>
+          {isVariable && variants.length > 0 && (
+            <div className="variant-selector">
+              {variants.map((v) => {
+                const label = v.attributes?.map(a => a.option).join(' / ') || v.id;
+                return (
+                  <button
+                    key={v.id}
+                    className={`variant-btn ${selectedVariant?.id === v.id ? 'active' : ''}`}
+                    onClick={() => setSelectedVariant(v)}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <div className="product-page-buy">
+            <span className="product-price">{price}</span>
+            <button
+              className={`add-btn ${!inStock ? 'out-of-stock-btn' : ''}`}
+              onClick={handleAdd}
+              disabled={!inStock}
+            >
+              {inStock ? 'Add to Cart' : 'Out of Stock'}
+            </button>
+          </div>
           <p className="research-note">For research use only · Not for human consumption</p>
         </div>
       </div>
