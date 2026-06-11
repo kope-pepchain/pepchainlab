@@ -190,6 +190,8 @@ const cartKey = cartData.cart_key;
 console.log('Cart key:', cartKey);
 
 // Clear any existing items in that cart
+console.log('Cart key before clear:', cartKey);
+console.log('Clear URL:', `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/clear?cart_key=${cartKey}`);
 await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/clear?cart_key=${cartKey}`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
