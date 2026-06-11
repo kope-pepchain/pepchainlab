@@ -1416,3 +1416,9 @@
   max-width: 60ch;
 }
 .product-page-desc p { margin: 0 0 0.75rem; }
+/* Mobile: smaller product image, tighter panel */
+@media (max-width: 768px) {
+  .product-page-media { padding: 1.25rem; }
+  .product-page-img { max-width: 200px; }
+  .product-page { padding: 6rem 1.25rem 3rem; }
+}
