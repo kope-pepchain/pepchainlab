@@ -1,16 +1,11 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 const WC_URL = import.meta.env.VITE_WC_URL;
-const WC_KEY = import.meta.env.VITE_WC_KEY;
-const WC_SECRET = import.meta.env.VITE_WC_SECRET;
 
 const wcFetch = (endpoint) => {
-  const credentials = btoa(`${WC_KEY}:${WC_SECRET}`);
-  return fetch(`${WC_URL}/wp-json/wc/v3/${endpoint}`, {
-    headers: { Authorization: `Basic ${credentials}` }
-  }).then(r => r.json());
+  return fetch(`${import.meta.env.VITE_WC_URL}/wp-content/themes/storefront/proxy.php?endpoint=${encodeURIComponent(endpoint)}`)
+    .then(r => r.json());
 };
-
 // ─── ICONS (inline SVG so no extra packages needed) ───
 
 const IconFlask = () => (
