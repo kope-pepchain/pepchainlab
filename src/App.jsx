@@ -397,7 +397,8 @@ useEffect(() => {
           data.map(async (product) => {
             if (product.type === 'variable' && product.variations.length > 0) {
               const vars = await wcFetch(`products/${product.id}/variations?per_page=100`);
-              return { ...product, variation_data: vars };
+vars.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+return { ...product, variation_data: vars };
             }
             return { ...product, variation_data: [] };
           })
