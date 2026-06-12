@@ -1306,43 +1306,43 @@ function NotifyModal({ product, variationId, onClose }) {
   const [status, setStatus] = useState("idle");
   const shortName = product.name.split("|")[0].trim();
 
-const handleSubmit = async () => {
-  if (!email) return;
-  setStatus("submitting");
-  try {
-    const nonceRes = await fetch(
-      `${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/bisnonce/${product.id}`,
-      { credentials: "include" }
-    );
-    const { nonce } = await nonceRes.json();
+  const handleSubmit = async () => {
+    if (!email) return;
+    setStatus("submitting");
+    try {
+      const nonceRes = await fetch(
+        `${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/bisnonce/${product.id}`,
+        { credentials: "include" }
+      );
+      const { nonce } = await nonceRes.json();
 
-    const formData = new FormData();
-    formData.append("action", "cwginstock_product_subscribe");
-    formData.append("wcb_product_id", String(product.id));
-    formData.append("wcb_variation_id", String(variationId || 0));
-    formData.append("wcb_email", email);
-    formData.append("wcb_fname", name || "");
-    formData.append("security", nonce);
+      const formData = new FormData();
+      formData.append("action", "cwginstock_product_subscribe");
+      formData.append("product_id", String(product.id));
+      formData.append("variation_id", String(variationId || 0));
+      formData.append("user_email", email);
+      formData.append("wcb_fname", name || "");
+      formData.append("security", nonce);
 
-    const res = await fetch(
-      `${import.meta.env.VITE_WC_URL}/wp-admin/admin-ajax.php`,
-      {
-        method: "POST",
-        credentials: "include",
-        body: formData,
+      const res = await fetch(
+        `${import.meta.env.VITE_WC_URL}/wp-admin/admin-ajax.php`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        }
+      );
+      const text = await res.text();
+      if (res.ok && text !== "0" && text !== "") {
+        setStatus("success");
+        setTimeout(() => onClose(), 1500);
+      } else {
+        setStatus("error");
       }
-    );
-    const text = await res.text();
-    if (res.ok && text !== "0" && text !== "") {
-      setStatus("success");
-      setTimeout(() => onClose(), 1500);
-    } else {
+    } catch {
       setStatus("error");
     }
-  } catch {
-    setStatus("error");
-  }
-};
+  };
   return (
     <>
       <div className="modal-overlay" onClick={onClose} />
