@@ -79,7 +79,9 @@ const FEATURES = [
 
 // ─── COMPONENTS ───
 function ProductModal({ product, onClose }) {
-  const image = product.images?.[0]?.src || '/placeholder.png';
+  const image = (isVariable && selectedVariant?.image?.src)
+  ? selectedVariant.image.src
+  : product.images?.[0]?.src || '/placeholder.png';
   const shortName = product.name.split('|')[0].trim();
   const price = product.price ? `$${parseFloat(product.price).toFixed(2)}` : '—';
   const stripHtml = (html) => {
