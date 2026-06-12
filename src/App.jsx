@@ -1310,23 +1310,24 @@ const handleSubmit = async () => {
   if (!email) return;
   setStatus("submitting");
   try {
+    const formData = new FormData();
+    formData.append("action", "cwginstock_product_subscribe");
+    formData.append("wcb_product_id", String(product.id));
+    formData.append("wcb_variation_id", String(variationId || 0));
+    formData.append("wcb_email", email);
+    formData.append("wcb_fname", name || "");
+
     const res = await fetch(
-      `${import.meta.env.VITE_WC_URL}/wp-json/wc-instocknotifier/v3/create_subscriber`,
+      `${import.meta.env.VITE_WC_URL}/wp-admin/admin-ajax.php`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          product_id: product.id,
-          variation_id: variationId || 0,
-          email: email,
-          subscriber_name: name || "Subscriber",
-          status: "subscribe",
-          subscriber_phone: "0000000000",
-          custom_quantity: "1",
-        }),
+        credentials: "include",
+        body: formData,
       },
     );
-    if (res.ok) {
+    const text = await res.text();
+    // Plugin returns "1" or a success JSON on success, "0" or error on fail
+    if (res.ok && text !== "0" && text !== "") {
       setStatus("success");
       setTimeout(() => onClose(), 1500);
     } else {
@@ -1336,7 +1337,6 @@ const handleSubmit = async () => {
     setStatus("error");
   }
 };
-
   return (
     <>
       <div className="modal-overlay" onClick={onClose} />
