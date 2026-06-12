@@ -7,10 +7,19 @@ const wcFetch = (endpoint) => {
     `${import.meta.env.VITE_WC_URL}/wp-content/themes/storefront/proxy.php?endpoint=${encodeURIComponent(endpoint)}`,
   ).then((r) => r.json());
 };
-const checkLoggedIn = () => {
-  return document.cookie
-    .split(";")
-    .some((c) => c.trim().startsWith("wordpress_logged_in_"));
+const checkLoggedIn = async () => {
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/me`,
+      {
+        credentials: "include",
+      },
+    );
+    const data = await res.json();
+    return data.logged_in === true;
+  } catch {
+    return false;
+  }
 };
 
 // ─── ICONS (inline SVG so no extra packages needed) ───
@@ -1382,12 +1391,13 @@ function ProductPage({ slug, addToCart }) {
   const [showNotify, setShowNotify] = useState(false);
 
   useEffect(() => {
-    const loggedIn = checkLoggedIn();
-    if (!loggedIn) {
-      window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
-      return;
-    }
-    setAuthChecked(true);
+    checkLoggedIn().then((loggedIn) => {
+      if (!loggedIn) {
+        window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
+      setAuthChecked(true);
+    });
   }, []);
 
   useEffect(() => {
