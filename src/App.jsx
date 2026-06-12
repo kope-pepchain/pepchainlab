@@ -7,6 +7,24 @@ const wcFetch = (endpoint) => {
     `${import.meta.env.VITE_WC_URL}/wp-content/themes/storefront/proxy.php?endpoint=${encodeURIComponent(endpoint)}`,
   ).then((r) => r.json());
 };
+const checkLoggedIn = async () => {
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_WC_URL}/wp-json/wp/v2/users/me`,
+      {
+        credentials: "include",
+      },
+    );
+    if (res.ok) {
+      const user = await res.json();
+      return user;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
+
 // ─── ICONS (inline SVG so no extra packages needed) ───
 
 const IconFlask = () => (
@@ -1386,8 +1404,22 @@ function ProductPage({ slug, addToCart }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState(null);
+  const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
+    checkLoggedIn().then((u) => {
+      if (!u) {
+        window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
+      setUser(u);
+      setAuthChecked(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!authChecked) return;
     wcFetch(`products?slug=${slug}`)
       .then(async (data) => {
         const p = data[0];
@@ -1399,20 +1431,18 @@ function ProductPage({ slug, addToCart }) {
           const vars = await wcFetch(
             `products/${p.id}/variations?per_page=100`,
           );
-          const sorted = vars.sort(
-            (a, b) => parseFloat(a.price) - parseFloat(b.price),
-          );
-          setProduct({ ...p, variation_data: sorted });
-          setSelectedVariant(sorted[0] || null);
+          vars.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+          setProduct({ ...p, variation_data: vars });
+          setSelectedVariant(vars[0] || null);
         } else {
           setProduct({ ...p, variation_data: [] });
         }
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [slug]);
+  }, [slug, authChecked]);
 
-  if (loading)
+  if (!authChecked || loading)
     return (
       <div className="policy-page">
         <p
