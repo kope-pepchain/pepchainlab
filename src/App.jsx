@@ -911,6 +911,17 @@ function ProductPage({ slug, addToCart }) {
     });
   };
 
+  // Find COA link if one exists
+  const coaMap = {
+    'retatrutide': 'janoshik_r10.pdf',
+    'ghk-cu': 'janoshik_ghkcu50.pdf',
+    'mots-c': 'janoshik_motsc10.pdf',
+    'glow': 'janoshik_glow50.pdf',
+    'bacteriostatic-water': 'janoshik_bacwater3.pdf',
+  };
+  const coaFile = Object.entries(coaMap).find(([key]) => slug.toLowerCase().includes(key));
+  const coaUrl = coaFile ? `https://pepchainlab.com/wp-content/uploads/${coaFile[1]}` : null;
+
   return (
     <div className="product-page">
       <div className="product-page-inner">
@@ -921,24 +932,27 @@ function ProductPage({ slug, addToCart }) {
         <div className="product-page-details">
           <p className="section-label">Research Peptide</p>
           <h1 className="product-page-title">{shortName}</h1>
-          {(product.short_description || product.description) && (
-            <div className="product-page-desc" dangerouslySetInnerHTML={{ __html: product.short_description || product.description }} />
+          {product.short_description && (
+            <div className="product-page-desc" dangerouslySetInnerHTML={{ __html: product.short_description }} />
           )}
           {isVariable && variants.length > 0 && (
-            <div className="variant-selector">
-              {variants.map((v) => {
-                const label = v.attributes?.map(a => a.option).join(' / ') || v.id;
-                return (
-                  <button
-                    key={v.id}
-                    className={`variant-btn ${selectedVariant?.id === v.id ? 'active' : ''}`}
-                    onClick={() => setSelectedVariant(v)}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
+            <>
+              <p className="product-page-variant-label">Select Variant:</p>
+              <div className="variant-selector">
+                {variants.map((v) => {
+                  const label = v.attributes?.map(a => a.option).join(' / ') || v.id;
+                  return (
+                    <button
+                      key={v.id}
+                      className={`variant-btn ${selectedVariant?.id === v.id ? 'active' : ''}`}
+                      onClick={() => setSelectedVariant(v)}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
           )}
           <div className="product-page-buy">
             <span className="product-price">{price}</span>
@@ -951,6 +965,42 @@ function ProductPage({ slug, addToCart }) {
             </button>
           </div>
           <p className="research-note">For research use only · Not for human consumption</p>
+          {coaUrl && (
+            <a href="/coa-library" className="product-page-coa-link">View Certificate of Analysis →</a>
+          )}
+        </div>
+      </div>
+
+      {/* Full-width content sections below the hero */}
+      <div className="product-page-content">
+        {product.description && (
+          <div className="product-page-section">
+            <div className="product-page-section-body" dangerouslySetInnerHTML={{ __html: product.description }} />
+          </div>
+        )}
+
+        <div className="product-page-section">
+          <h2 className="product-page-section-title">Research Use</h2>
+          <div className="product-page-section-body">
+            <p>{shortName} is commonly studied in controlled laboratory and research settings. This product is supplied strictly for in vitro research purposes by qualified professionals.</p>
+            <p>No medical, clinical, therapeutic, cosmetic, veterinary, dietary, weight-loss, appetite-control, metabolic, wellness, performance, or personal-use claims are made for this product.</p>
+          </div>
+        </div>
+
+        <div className="product-page-section">
+          <h2 className="product-page-section-title">Handling & Storage</h2>
+          <div className="product-page-section-body">
+            <p>{shortName} is supplied as a lyophilised powder in a sealed glass vial for controlled handling, storage, and analytical use in appropriate research environments.</p>
+            <p>Store in a cool, dry place away from direct sunlight. For long-term storage, keep refrigerated at 2–8°C. Once reconstituted, use within a reasonable timeframe and store refrigerated. Avoid repeated freeze-thaw cycles.</p>
+          </div>
+        </div>
+
+        <div className="product-page-disclaimer">
+          <div className="disclaimer-icon">⚠</div>
+          <div className="disclaimer-content">
+            <p className="disclaimer-title">Research Use Only</p>
+            <p className="disclaimer-body">This product is not intended for human or animal consumption. It has not been evaluated or approved by the FDA. By purchasing, you confirm you are a qualified research professional and will use this compound in compliance with all applicable laws.</p>
+          </div>
         </div>
       </div>
     </div>

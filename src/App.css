@@ -1422,3 +1422,121 @@
   .product-page-img { max-width: 200px; }
   .product-page { padding: 6rem 1.25rem 3rem; }
 }
+/* ─── PRODUCT PAGE CONTENT SECTIONS ─── */
+.product-page-variant-label {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  margin-top: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.product-page-coa-link {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--blue-bright);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.product-page-coa-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.product-page-content {
+  margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.product-page-section {
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.product-page-section-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.25rem;
+  color: var(--white);
+}
+
+.product-page-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-page-section-body p {
+  font-size: 0.92rem;
+  color: var(--white-muted);
+  line-height: 1.8;
+  font-weight: 300;
+}
+
+.product-page-section-body h2,
+.product-page-section-body h3 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--white);
+  margin-top: 0.5rem;
+}
+
+.product-page-section-body strong {
+  color: var(--white);
+  font-weight: 600;
+}
+
+.product-page-section-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+}
+
+.product-page-section-body table td,
+.product-page-section-body table th {
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border);
+  font-size: 0.88rem;
+  color: var(--white-muted);
+  font-weight: 300;
+  text-align: left;
+}
+
+.product-page-section-body table td:first-child,
+.product-page-section-body table th:first-child {
+  font-weight: 600;
+  color: var(--white);
+  width: 40%;
+  background: rgba(46, 127, 255, 0.05);
+}
+
+.product-page-disclaimer {
+  margin-top: 1rem;
+  padding: 2rem;
+  background: rgba(180, 60, 40, 0.06);
+  border: 1px solid rgba(200, 80, 60, 0.25);
+  border-radius: 6px;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+  .product-page-content { margin-top: 2.5rem; }
+  .product-page-section { padding: 2rem 0; }
+}
