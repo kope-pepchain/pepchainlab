@@ -7,22 +7,10 @@ const wcFetch = (endpoint) => {
     `${import.meta.env.VITE_WC_URL}/wp-content/themes/storefront/proxy.php?endpoint=${encodeURIComponent(endpoint)}`,
   ).then((r) => r.json());
 };
-const checkLoggedIn = async () => {
-  try {
-    const res = await fetch(
-      `${import.meta.env.VITE_WC_URL}/wp-json/wp/v2/users/me`,
-      {
-        credentials: "include",
-      },
-    );
-    if (res.ok) {
-      const user = await res.json();
-      return user;
-    }
-    return null;
-  } catch {
-    return null;
-  }
+const checkLoggedIn = () => {
+  return document.cookie
+    .split(";")
+    .some((c) => c.trim().startsWith("wordpress_logged_in_"));
 };
 
 // ─── ICONS (inline SVG so no extra packages needed) ───
@@ -1390,19 +1378,16 @@ function ProductPage({ slug, addToCart }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState(null);
-  const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [showNotify, setShowNotify] = useState(false);
 
   useEffect(() => {
-    checkLoggedIn().then((u) => {
-      if (!u) {
-        window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
-        return;
-      }
-      setUser(u);
-      setAuthChecked(true);
-    });
+    const loggedIn = checkLoggedIn();
+    if (!loggedIn) {
+      window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
+    setAuthChecked(true);
   }, []);
 
   useEffect(() => {
