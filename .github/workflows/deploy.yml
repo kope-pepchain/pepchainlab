@@ -1,28 +1,23 @@
 name: Deploy to Server
-
 on:
   push:
     branches: [main]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Install dependencies
-        run: npm install
-
+        run: npm ci
       - name: Build
         env:
           VITE_WC_URL: ${{ secrets.VITE_WC_URL }}
         run: npm run build
-
       - name: Deploy to server
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: 198.199.122.63
-          username: root
+          username: deploy
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "dist/*"
           target: "/var/www/html/app"
