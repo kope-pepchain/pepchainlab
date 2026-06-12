@@ -1306,33 +1306,36 @@ function NotifyModal({ product, variationId, onClose }) {
   const [status, setStatus] = useState("idle");
   const shortName = product.name.split("|")[0].trim();
 
-  const handleSubmit = async () => {
-    if (!email) return;
-    setStatus("submitting");
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/bis-subscribe`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            product_id: product.id,
-            variation_id: variationId || null,
-            email,
-            name,
-          }),
-        },
-      );
-      if (res.ok) {
-        setStatus("success");
-        setTimeout(() => onClose(), 1500);
-      } else {
-        setStatus("error");
-      }
-    } catch {
+const handleSubmit = async () => {
+  if (!email) return;
+  setStatus("submitting");
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_WC_URL}/wp-json/wc-instocknotifier/v3/create_subscriber`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_id: product.id,
+          variation_id: variationId || 0,
+          email: email,
+          subscriber_name: name || "Subscriber",
+          status: "subscribe",
+          subscriber_phone: "0000000000",
+          custom_quantity: "1",
+        }),
+      },
+    );
+    if (res.ok) {
+      setStatus("success");
+      setTimeout(() => onClose(), 1500);
+    } else {
       setStatus("error");
     }
-  };
+  } catch {
+    setStatus("error");
+  }
+};
 
   return (
     <>
