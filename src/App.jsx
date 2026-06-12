@@ -1320,7 +1320,7 @@ function NotifyModal({ product, variationId, onClose }) {
     setStatus("submitting");
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_WC_URL}/wp-json/back-in-stock/v1/subscriber/create/`,
+        `${import.meta.env.VITE_WC_URL}/wp-json/wc-instocknotifier/v3/create_subscriber`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1328,7 +1328,10 @@ function NotifyModal({ product, variationId, onClose }) {
             product_id: product.id,
             variation_id: variationId || 0,
             email: email,
-            subscriber_name: name || "",
+            subscriber_name: name || "Subscriber",
+            status: "subscribe",
+            subscriber_phone: "0000000000",
+            custom_quantity: "1",
           }),
         }
       );
