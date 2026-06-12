@@ -291,7 +291,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(
                           err.message ||
-                            `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
                         );
                       }
                     }
@@ -435,10 +435,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
 
     addToCart(product, {
@@ -1319,30 +1319,20 @@ function NotifyModal({ product, variationId, onClose }) {
     if (!email) return;
     setStatus("submitting");
     try {
-      const nonceRes = await fetch(
-        `${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/bisnonce/${product.id}`,
-        { credentials: "include" },
-      );
-      const { nonce } = await nonceRes.json();
-
-      const formData = new FormData();
-      formData.append("action", "cwginstock_product_subscribe");
-      formData.append("product_id", String(product.id));
-      formData.append("variation_id", String(variationId || 0));
-      formData.append("user_email", email);
-      formData.append("wcb_fname", name || "");
-      formData.append("security", nonce);
-
       const res = await fetch(
-        `${import.meta.env.VITE_WC_URL}/wp-admin/admin-ajax.php`,
+        `${import.meta.env.VITE_WC_URL}/wp-json/back-in-stock/v1/subscriber/create/`,
         {
           method: "POST",
-          credentials: "include",
-          body: formData,
-        },
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product_id: product.id,
+            variation_id: variationId || 0,
+            email: email,
+            subscriber_name: name || "",
+          }),
+        }
       );
-      const text = await res.text();
-      if (res.ok && text !== "0" && text !== "") {
+      if (res.ok) {
         setStatus("success");
         setTimeout(() => onClose(), 1500);
       } else {
@@ -1488,10 +1478,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
@@ -1735,11 +1725,11 @@ export default function App() {
               variation_id: hasVariation ? it.id : null,
               variation: hasVariation
                 ? Object.fromEntries(
-                    Object.entries(variation).map(([k, v]) => [
-                      `attribute_pa_${k.toLowerCase().replace(/\s+/g, "_")}`,
-                      v,
-                    ]),
-                  )
+                  Object.entries(variation).map(([k, v]) => [
+                    `attribute_pa_${k.toLowerCase().replace(/\s+/g, "_")}`,
+                    v,
+                  ]),
+                )
                 : null,
             };
           });
