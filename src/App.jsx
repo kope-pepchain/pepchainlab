@@ -125,52 +125,6 @@ const IconUser = () => (
 );
 
 // ─── DATA ───
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Retatrutide",
-    variants: [
-      { dose: "10mg", price: "$59.99", image: "/retatrutide_10mg.png" },
-      { dose: "20mg", price: "$89.99", image: "/retatrutide_20mg.png" },
-      { dose: "30mg", price: "$119.99", image: "/retatrutide_30mg.png" },
-    ],
-    badge: "Best Seller",
-  },
-  {
-    id: 2,
-    name: "GHK-Cu",
-    variants: [{ dose: "50mg", price: "$24.99", image: "/ghk_cu_50mg.png" }],
-    badge: "Research",
-  },
-  {
-    id: 3,
-    name: "Wolverine",
-    variants: [{ dose: "10mg", price: "$99.99", image: "/wolverine_10mg.png" }],
-    badge: "Best Seller",
-  },
-  {
-    id: 4,
-    name: "Mots-C",
-    variants: [{ dose: "10mg", price: "$28.99", image: "/mots_c_10mg.png" }],
-    badge: "Research",
-  },
-  {
-    id: 5,
-    name: "Glow",
-    variants: [{ dose: "50mg", price: "$99.99", image: "/glow_50mg.png" }],
-    badge: "Popular",
-  },
-  {
-    id: 6,
-    name: "BAC Water",
-    variants: [
-      { dose: "3ml", price: "$8.99", image: "/bac_water_3ml.png" },
-      { dose: "10ml", price: "$13.99", image: "/bac_water_10ml.png" },
-    ],
-    badge: "Research",
-  },
-];
-
 const FEATURES = [
   {
     icon: <IconFlask />,
@@ -195,45 +149,7 @@ const FEATURES = [
 ];
 
 // ─── COMPONENTS ───
-function ProductModal({ product, onClose }) {
-  const image =
-    isVariable && selectedVariant?.image?.src
-      ? selectedVariant.image.src
-      : product.images?.[0]?.src || "/placeholder.png";
-  const shortName = product.name.split("|")[0].trim();
-  const price = product.price
-    ? `$${parseFloat(product.price).toFixed(2)}`
-    : "—";
-  const stripHtml = (html) => {
-    const tmp = document.createElement("div");
-    tmp.innerHTML = html || "";
-    return tmp.textContent || tmp.innerText || "No description available.";
-  };
-  const description = stripHtml(
-    product.description || product.short_description,
-  );
 
-  return (
-    <>
-      <div className="modal-overlay" onClick={onClose} />
-      <div className="modal">
-        <button className="modal-close-btn" onClick={onClose}>
-          ✕
-        </button>
-        <img src={image} alt={product.name} className="modal-image" />
-        <div className="modal-details">
-          <p className="modal-label">Research Peptide</p>
-          <h2 className="modal-title">{shortName}</h2>
-          <p className="modal-price">{price}</p>
-          <p className="modal-desc">{description}</p>
-          <p className="research-note">
-            For research use only · Not for human consumption
-          </p>
-        </div>
-      </div>
-    </>
-  );
-}
 function AgeGate({ onConfirm }) {
   return (
     <>
@@ -479,7 +395,7 @@ function TrustBar() {
   );
 }
 
-function ProductCard({ product, addToCart, onOpenModal, full = false }) {
+function ProductCard({ product, addToCart, full = false }) {
   const image = product.images?.[0]?.src || "/placeholder.png";
   const badge = product.tags?.[0]?.name || "Research";
   const shortName = product.name.split("|")[0].trim();
@@ -523,14 +439,6 @@ function ProductCard({ product, addToCart, onOpenModal, full = false }) {
   return (
     <div className="product-card">
       <span className="product-badge">{badge}</span>
-      {!full && (
-        <button
-          className="product-zoom-btn"
-          onClick={() => onOpenModal(product)}
-        >
-          🔍
-        </button>
-      )}
       <img src={image} alt={shortName} className="product-img" />
       <div>
         <p className="product-name">{shortName}</p>
@@ -579,7 +487,6 @@ function ProductCard({ product, addToCart, onOpenModal, full = false }) {
 function Products({ addToCart }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [modalProduct, setModalProduct] = useState(null);
 
   useEffect(() => {
     wcFetch("products?per_page=50&status=publish")
@@ -629,21 +536,10 @@ function Products({ addToCart }) {
         )}
         <div className="products-grid">
           {products.map((p) => (
-            <ProductCard
-              key={p.id}
-              product={p}
-              addToCart={addToCart}
-              onOpenModal={setModalProduct}
-            />
+            <ProductCard key={p.id} product={p} addToCart={addToCart} />
           ))}
         </div>
       </div>
-      {modalProduct && (
-        <ProductModal
-          product={modalProduct}
-          onClose={() => setModalProduct(null)}
-        />
-      )}
     </section>
   );
 }
@@ -1400,12 +1296,103 @@ function NotFound() {
     </div>
   );
 }
+function NotifyModal({ product, variationId, onClose }) {
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [status, setStatus] = useState("idle");
+  const shortName = product.name.split("|")[0].trim();
+
+  const handleSubmit = async () => {
+    if (!email) return;
+    setStatus("submitting");
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/bis-subscribe`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product_id: product.id,
+            variation_id: variationId || null,
+            email,
+            name,
+          }),
+        },
+      );
+      if (res.ok) {
+        setStatus("success");
+        setTimeout(() => onClose(), 1500);
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  return (
+    <>
+      <div className="modal-overlay" onClick={onClose} />
+      <div className="notify-modal">
+        <button className="modal-close-btn" onClick={onClose}>
+          ✕
+        </button>
+        {status === "success" ? (
+          <div className="notify-success">
+            <p className="notify-success-icon">✓</p>
+            <p className="notify-success-text">You're on the list!</p>
+            <p className="notify-success-sub">
+              We'll email you when {shortName} is back in stock.
+            </p>
+          </div>
+        ) : (
+          <>
+            <p className="section-label">Back in Stock Notification</p>
+            <h3 className="notify-title">{shortName}</h3>
+            <p className="notify-desc">
+              Enter your email and we'll notify you when this product is
+              available again.
+            </p>
+            <input
+              type="email"
+              placeholder="Email address *"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="notify-input"
+            />
+            <input
+              type="text"
+              placeholder="Name (optional)"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="notify-input"
+            />
+            <button
+              className="btn-primary"
+              style={{ width: "100%" }}
+              onClick={handleSubmit}
+              disabled={status === "submitting" || !email}
+            >
+              {status === "submitting"
+                ? "Subscribing…"
+                : status === "error"
+                  ? "Try Again"
+                  : "Notify Me"}
+            </button>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
 function ProductPage({ slug, addToCart }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [showNotify, setShowNotify] = useState(false);
 
   useEffect(() => {
     checkLoggedIn().then((u) => {
@@ -1555,6 +1542,16 @@ function ProductPage({ slug, addToCart }) {
               {inStock ? "Add to Cart" : "Out of Stock"}
             </button>
           </div>
+          {!inStock && (
+            <button
+              className="btn-secondary"
+              style={{ marginTop: "0.75rem", width: "100%" }}
+              onClick={() => setShowNotify(true)}
+            >
+              Notify Me When Available
+            </button>
+          )}
+
           <p className="research-note">
             For research use only · Not for human consumption
           </p>
@@ -1623,6 +1620,15 @@ function ProductPage({ slug, addToCart }) {
           </div>
         </div>
       </div>
+      {showNotify && (
+        <NotifyModal
+          product={product}
+          variationId={
+            isVariable && selectedVariant ? selectedVariant.id : null
+          }
+          onClose={() => setShowNotify(false)}
+        />
+      )}
     </div>
   );
 }
