@@ -1310,12 +1310,19 @@ const handleSubmit = async () => {
   if (!email) return;
   setStatus("submitting");
   try {
+    const nonceRes = await fetch(
+      `${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/bisnonce/${product.id}`,
+      { credentials: "include" }
+    );
+    const { nonce } = await nonceRes.json();
+
     const formData = new FormData();
     formData.append("action", "cwginstock_product_subscribe");
     formData.append("wcb_product_id", String(product.id));
     formData.append("wcb_variation_id", String(variationId || 0));
     formData.append("wcb_email", email);
     formData.append("wcb_fname", name || "");
+    formData.append("security", nonce);
 
     const res = await fetch(
       `${import.meta.env.VITE_WC_URL}/wp-admin/admin-ajax.php`,
@@ -1323,10 +1330,9 @@ const handleSubmit = async () => {
         method: "POST",
         credentials: "include",
         body: formData,
-      },
+      }
     );
     const text = await res.text();
-    // Plugin returns "1" or a success JSON on success, "0" or error on fail
     if (res.ok && text !== "0" && text !== "") {
       setStatus("success");
       setTimeout(() => onClose(), 1500);
