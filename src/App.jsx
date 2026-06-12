@@ -870,8 +870,9 @@ function ProductPage({ slug, addToCart }) {
         if (!p) { setLoading(false); return; }
         if (p.type === 'variable' && p.variations.length > 0) {
           const vars = await wcFetch(`products/${p.id}/variations?per_page=100`);
-          setProduct({ ...p, variation_data: vars });
-          setSelectedVariant(vars[0] || null);
+const sorted = vars.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+setProduct({ ...p, variation_data: sorted });
+setSelectedVariant(sorted[0] || null);
         } else {
           setProduct({ ...p, variation_data: [] });
         }
