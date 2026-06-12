@@ -13,6 +13,13 @@ jobs:
         env:
           VITE_WC_URL: ${{ secrets.VITE_WC_URL }}
         run: npm run build
+      - name: Clean old assets
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 198.199.122.63
+          username: deploy
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: rm -rf /var/www/html/app/assets/*
       - name: Deploy to server
         uses: appleboy/scp-action@v0.1.7
         with:
