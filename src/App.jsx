@@ -4,7 +4,7 @@ const WC_URL = import.meta.env.VITE_WC_URL;
 
 const wcFetch = (endpoint) => {
   return fetch(
-    `${import.meta.env.VITE_WC_URL}/wp-content/themes/storefront/proxy.php?endpoint=${encodeURIComponent(endpoint)}`,
+    `${import.meta.env.VITE_WC_URL}/wp-content/themes/storefront-child/proxy.php?endpoint=${encodeURIComponent(endpoint)}`,
   ).then((r) => r.json());
 };
 const checkLoggedIn = async () => {
@@ -244,13 +244,15 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                           credentials: "include",
                         },
                       );
+                      if (!createRes.ok) throw new Error("Could not start checkout session.");
                       const cartData = await createRes.json();
                       cartKey = cartData.cart_key;
+                      if (!cartKey) throw new Error("Could not start checkout session.");
                     }
                     localStorage.setItem("wcCartKey", cartKey);
 
                     // Step 2: Clear any existing items in that cart
-                    await fetch(
+                    const clearRes = await fetch(
                       `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/clear?cart_key=${cartKey}`,
                       {
                         method: "POST",
@@ -258,19 +260,18 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                         credentials: "include",
                       },
                     );
+                    if (!clearRes.ok) throw new Error("Could not prepare your cart. Please try again.");
 
-                    // Step 3: Add items to that cart key
+                    // Step 3: Add items, verifying each one succeeded
                     for (const item of cart) {
-                      await fetch(
+                      const res = await fetch(
                         `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`,
                         {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           credentials: "include",
                           body: JSON.stringify({
-                            id: String(
-                              item.variation_id || item.key.split("-")[0],
-                            ),
+                            id: String(item.variation_id || item.key.split("-")[0]),
                             quantity: String(item.qty),
                             ...(item.variation_id && {
                               variation_id: item.variation_id,
@@ -279,14 +280,20 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                           }),
                         },
                       );
+                      if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        throw new Error(
+                          err.message ||
+                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                        );
+                      }
                     }
 
-                    // Step 4: Redirect WITH the cart key
-                    localStorage.setItem("wcHandoff", "1");
+                    // Step 4: Redirect only after every item confirmed
                     window.location.href = `${import.meta.env.VITE_WC_URL}/checkout/?cocart-load-cart=${cartKey}&keep-cart=false`;
                   } catch (err) {
                     console.error("Cart sync failed", err);
-                    alert("Something went wrong. Please try again.");
+                    alert(err.message || "Something went wrong. Please try again.");
                   }
                 }}
               >
@@ -419,10 +426,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(" ", "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
 
     addToCart(product, {
@@ -1463,10 +1470,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(" ", "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
@@ -1710,11 +1717,11 @@ export default function App() {
               variation_id: hasVariation ? it.id : null,
               variation: hasVariation
                 ? Object.fromEntries(
-                    Object.entries(variation).map(([k, v]) => [
-                      `attribute_pa_${k.toLowerCase().replace(/\s+/g, "_")}`,
-                      v,
-                    ]),
-                  )
+                  Object.entries(variation).map(([k, v]) => [
+                    `attribute_pa_${k.toLowerCase().replace(/\s+/g, "_")}`,
+                    v,
+                  ]),
+                )
                 : null,
             };
           });
