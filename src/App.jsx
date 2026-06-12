@@ -244,10 +244,12 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                           credentials: "include",
                         },
                       );
-                      if (!createRes.ok) throw new Error("Could not start checkout session.");
+                      if (!createRes.ok)
+                        throw new Error("Could not start checkout session.");
                       const cartData = await createRes.json();
                       cartKey = cartData.cart_key;
-                      if (!cartKey) throw new Error("Could not start checkout session.");
+                      if (!cartKey)
+                        throw new Error("Could not start checkout session.");
                     }
                     localStorage.setItem("wcCartKey", cartKey);
 
@@ -260,7 +262,10 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                         credentials: "include",
                       },
                     );
-                    if (!clearRes.ok) throw new Error("Could not prepare your cart. Please try again.");
+                    if (!clearRes.ok)
+                      throw new Error(
+                        "Could not prepare your cart. Please try again.",
+                      );
 
                     // Step 3: Add items, verifying each one succeeded
                     for (const item of cart) {
@@ -271,7 +276,9 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                           headers: { "Content-Type": "application/json" },
                           credentials: "include",
                           body: JSON.stringify({
-                            id: String(item.variation_id || item.key.split("-")[0]),
+                            id: String(
+                              item.variation_id || item.key.split("-")[0],
+                            ),
                             quantity: String(item.qty),
                             ...(item.variation_id && {
                               variation_id: item.variation_id,
@@ -284,7 +291,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(
                           err.message ||
-                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                            `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
                         );
                       }
                     }
@@ -293,7 +300,9 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                     window.location.href = `${import.meta.env.VITE_WC_URL}/checkout/?cocart-load-cart=${cartKey}&keep-cart=false`;
                   } catch (err) {
                     console.error("Cart sync failed", err);
-                    alert(err.message || "Something went wrong. Please try again.");
+                    alert(
+                      err.message || "Something went wrong. Please try again.",
+                    );
                   }
                 }}
               >
@@ -314,7 +323,7 @@ function Navbar({ cartCount, onCartOpen }) {
       </a>
       <ul className="nav-links">
         <li>
-          <a href="#products">Products</a>
+          <a href="/#products">Products</a>
         </li>
         <li>
           <a href="#about">About</a>
@@ -426,10 +435,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-            a.option;
-          return acc;
-        }, {})
+            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+              a.option;
+            return acc;
+          }, {})
         : null;
 
     addToCart(product, {
@@ -1312,7 +1321,7 @@ function NotifyModal({ product, variationId, onClose }) {
     try {
       const nonceRes = await fetch(
         `${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/bisnonce/${product.id}`,
-        { credentials: "include" }
+        { credentials: "include" },
       );
       const { nonce } = await nonceRes.json();
 
@@ -1330,7 +1339,7 @@ function NotifyModal({ product, variationId, onClose }) {
           method: "POST",
           credentials: "include",
           body: formData,
-        }
+        },
       );
       const text = await res.text();
       if (res.ok && text !== "0" && text !== "") {
@@ -1479,10 +1488,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-            a.option;
-          return acc;
-        }, {})
+            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+              a.option;
+            return acc;
+          }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
@@ -1726,11 +1735,11 @@ export default function App() {
               variation_id: hasVariation ? it.id : null,
               variation: hasVariation
                 ? Object.fromEntries(
-                  Object.entries(variation).map(([k, v]) => [
-                    `attribute_pa_${k.toLowerCase().replace(/\s+/g, "_")}`,
-                    v,
-                  ]),
-                )
+                    Object.entries(variation).map(([k, v]) => [
+                      `attribute_pa_${k.toLowerCase().replace(/\s+/g, "_")}`,
+                      v,
+                    ]),
+                  )
                 : null,
             };
           });
