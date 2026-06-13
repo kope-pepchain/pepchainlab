@@ -507,24 +507,22 @@ function ProductGrid({ addToCart }) {
 
   useEffect(() => {
     wcFetch("products?per_page=50&status=publish")
-      .then(async (data) => {
-        const hydrated = [];
-        for (const product of data) {
-          if (product.type === "variable" && product.variations.length > 0) {
-            const vars = await wcFetch(
-              `products/${product.id}/variations?per_page=100`,
-            );
-            if (Array.isArray(vars)) {
-              vars.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-              hydrated.push({ ...product, variation_data: vars });
-            } else {
-              console.error(`Variations fetch failed for product ${product.id}:`, vars);
-              hydrated.push({ ...product, variation_data: [] });
-            }
-          } else {
-            hydrated.push({ ...product, variation_data: [] });
+      .then((data) => {
+        const hydrated = data.map((product) => {
+          if (product.type === "variable" && product.variations?.length > 0) {
+            const variation_data = product.variations.map((v) => ({
+              id: v.id,
+              attributes: (v.attributes || []).map((a) => ({
+                name: a.name,
+                option: a.value,
+              })),
+              price: (parseInt(product.prices.price, 10) / 100).toFixed(2),
+              stock_status: product.is_in_stock ? "instock" : "outofstock",
+            }));
+            return { ...product, variation_data };
           }
-        }
+          return { ...product, variation_data: [] };
+        });
         setProducts(hydrated.reverse());
         setLoading(false);
       })
@@ -1418,24 +1416,24 @@ function ProductPage({ slug, addToCart }) {
   useEffect(() => {
     if (!authChecked) return;
     wcFetch(`products?slug=${slug}`)
-      .then(async (data) => {
+      .then((data) => {
         const p = data[0];
         if (!p) {
           setLoading(false);
           return;
         }
-        if (p.type === "variable" && p.variations.length > 0) {
-          const vars = await wcFetch(
-            `products/${p.id}/variations?per_page=100`,
-          );
-          if (Array.isArray(vars)) {
-            vars.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-            setProduct({ ...p, variation_data: vars });
-            setSelectedVariant(vars[0] || null);
-          } else {
-            console.error(`Variations fetch failed for product ${p.id}:`, vars);
-            setProduct({ ...p, variation_data: [] });
-          }
+        if (p.type === "variable" && p.variations?.length > 0) {
+          const variation_data = p.variations.map((v) => ({
+            id: v.id,
+            attributes: (v.attributes || []).map((a) => ({
+              name: a.name,
+              option: a.value,
+            })),
+            price: (parseInt(p.prices.price, 10) / 100).toFixed(2),
+            stock_status: p.is_in_stock ? "instock" : "outofstock",
+          }));
+          setProduct({ ...p, variation_data });
+          setSelectedVariant(variation_data[0] || null);
         } else {
           setProduct({ ...p, variation_data: [] });
         }
