@@ -1680,6 +1680,13 @@ export default function App() {
     sessionStorage.setItem("ageVerified", "true");
     setAgeVerified(true);
   };
+  const handleQtyChange = (key, delta) => {
+    setCart((prev) =>
+      prev
+        .map((i) => (i.key === key ? { ...i, qty: i.qty + delta } : i))
+        .filter((i) => i.qty > 0),
+    );
+  };
 
   const addToCart = (product, variant) => {
     const key = `${product.id}-${variant.dose}`;
