@@ -1845,6 +1845,7 @@ export default function App() {
             onQtyChange={handleQtyChange}
           />
         )}
+        <ShippingBanner />
         <ProductPage
           slug={path.replace("/product/", "")}
           addToCart={addToCart}
