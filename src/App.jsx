@@ -516,10 +516,8 @@ function ProductGrid({ addToCart }) {
         const hydrated = await Promise.all(
           data.map(async (product) => {
             if (product.type === "variable" && product.variations?.length > 0) {
-              const variationDetails = await Promise.all(
-                product.variations.map((v) => wcFetch(`products/${v.id}`)),
-              );
-              const variation_data = variationDetails.map((v) => ({
+              const variationDetails = await wcFetch(`products/${product.id}/variations`);
+              const variation_data = (variationDetails || []).map((v) => ({
                 id: v.id,
                 attributes: (v.attributes || []).map((a) => ({
                   name: a.name,
@@ -1433,10 +1431,8 @@ function ProductPage({ slug, addToCart }) {
           return;
         }
         if (p.type === "variable" && p.variations?.length > 0) {
-          const variationDetails = await Promise.all(
-            p.variations.map((v) => wcFetch(`products/${v.id}`)),
-          );
-          const variation_data = variationDetails.map((v) => ({
+          const variationDetails = await wcFetch(`products/${p.id}/variations`);
+          const variation_data = (variationDetails || []).map((v) => ({
             id: v.id,
             attributes: (v.attributes || []).map((a) => ({
               name: a.name,
