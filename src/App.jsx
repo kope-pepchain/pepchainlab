@@ -1853,13 +1853,3 @@ export default function App() {
   );
 }
 
-.variant-btn-oos {
-  opacity: 0.4;
-  cursor: not-allowed;
-  text-decoration: line-through;
-}
-
-.variant-btn-oos:hover {
-  border-color: var(--border);
-  color: var(--white-muted);
-}
