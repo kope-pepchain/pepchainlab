@@ -481,7 +481,7 @@ function ProductCard({ product, addToCart, full = false }) {
         {isVariable && selectedVariant && selectedVariant.stock_status !== "instock" && (
           <p style={{
             fontSize: "0.75rem",
-            color: "rgba(220, 120, 80, 0.9)",
+            color: "rgba(140, 160, 190, 0.85)",
             fontFamily: "var(--font-display)",
             letterSpacing: "0.1em",
             textTransform: "uppercase",
@@ -543,6 +543,11 @@ function ProductGrid({ addToCart }) {
                 stock_status: v.is_in_stock ? "instock" : "outofstock",
               };
             });
+            variation_data.sort(
+              (a, b) =>
+                (parseFloat(a.attributes[0].option) || 0) -
+                (parseFloat(b.attributes[0].option) || 0),
+            );
             return { ...product, variation_data };
           }
           return { ...product, variation_data: [] };
@@ -1464,6 +1469,11 @@ function ProductPage({ slug, addToCart }) {
               stock_status: v.is_in_stock ? "instock" : "outofstock",
             };
           });
+          variation_data.sort(
+            (a, b) =>
+              (parseFloat(a.attributes[0].option) || 0) -
+              (parseFloat(b.attributes[0].option) || 0),
+          );
           setProduct({ ...p, variation_data });
           const firstInStock = variation_data.find(
             (v) => v.stock_status === "instock",
