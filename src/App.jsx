@@ -323,7 +323,7 @@ function Navbar({ cartCount, onCartOpen }) {
       </a>
       <ul className="nav-links">
         <li>
-          <a href="/#products">Products</a>
+          <a href="/products">Products</a>
         </li>
         <li>
           <a href="#about">About</a>
@@ -378,8 +378,7 @@ function Hero() {
           <button
             className="btn-secondary"
             onClick={() => {
-              const el = document.getElementById("about");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
+              window.location.href = "/products";
             }}
           >
             Learn More
@@ -497,7 +496,7 @@ function ProductCard({ product, addToCart, full = false }) {
   );
 }
 
-function Products({ addToCart }) {
+function ProductGrid({ addToCart }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -525,38 +524,19 @@ function Products({ addToCart }) {
       });
   }, []);
 
+  if (loading)
+    return (
+      <p style={{ color: "var(--white-dim)", padding: "4rem 0" }}>Loading…</p>
+    );
+
   return (
-    <section className="section" id="products">
-      <div className="section-inner">
-        <p className="section-label">Our Catalog</p>
-        <h2 className="section-title">
-          Research <span>Peptides</span>
-        </h2>
-        <p className="section-sub">
-          Every compound is rigorously tested for purity and potency before it
-          reaches your lab.
-        </p>
-        {loading && (
-          <p
-            style={{
-              color: "var(--white-dim)",
-              textAlign: "center",
-              padding: "3rem 0",
-            }}
-          >
-            Loading products…
-          </p>
-        )}
-        <div className="products-grid">
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} addToCart={addToCart} />
-          ))}
-        </div>
-      </div>
-    </section>
+    <div className="products-grid">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} addToCart={addToCart} />
+      ))}
+    </div>
   );
 }
-
 function Features() {
   return (
     <section className="section features-bg" id="about">
@@ -617,7 +597,14 @@ function Banner() {
           Browse our full catalog of research-grade peptides — independently
           tested, purity verified, for qualified researchers only.
         </p>
-        <button className="btn-white">Shop the Catalog</button>
+        <button
+          className="btn-white"
+          onClick={() => {
+            window.location.href = "/products";
+          }}
+        >
+          Shop the Catalog
+        </button>
       </div>
     </div>
   );
@@ -1645,6 +1632,25 @@ function ProductPage({ slug, addToCart }) {
     </div>
   );
 }
+function CatalogPage({ addToCart }) {
+  return (
+    <div style={{ minHeight: "100vh", background: "var(--bg-primary)" }}>
+      <section className="section" style={{ paddingTop: "8rem" }}>
+        <div className="section-inner">
+          <p className="section-label">Our Catalog</p>
+          <h1 className="section-title">
+            Research <span>Peptides</span>
+          </h1>
+          <p className="section-sub">
+            Every compound is rigorously tested for purity and potency before it
+            reaches your lab.
+          </p>
+          <ProductGrid addToCart={addToCart} />
+        </div>
+      </section>
+    </div>
+  );
+}
 
 // ─── APP ───
 export default function App() {
@@ -1731,6 +1737,24 @@ export default function App() {
   if (path === "/shipping-policy") return <ShippingPolicy />;
   if (path === "/returns") return <ReturnsPolicy />;
   if (path === "/privacy-policy") return <PrivacyPolicy />;
+  if (path === "/products") {
+    return (
+      <>
+        <div className="noise-overlay" />
+        {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
+        <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} />
+        {cartOpen && (
+          <CartDrawer
+            cart={cart}
+            onClose={() => setCartOpen(false)}
+            onQtyChange={handleQtyChange}
+          />
+        )}
+        <CatalogPage addToCart={addToCart} />
+        <Footer />
+      </>
+    );
+  }
   if (path.startsWith("/product/")) {
     return (
       <>
@@ -1769,7 +1793,6 @@ export default function App() {
       <main>
         <Hero />
         <TrustBar />
-        <Products addToCart={addToCart} />
         <Features />
         <Disclaimer />
         <Banner />
