@@ -1680,6 +1680,9 @@ export default function App() {
     }
   });
   const [cartOpen, setCartOpen] = useState(false);
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
   const [ageVerified, setAgeVerified] = useState(
     () => sessionStorage.getItem("ageVerified") === "true",
   );
