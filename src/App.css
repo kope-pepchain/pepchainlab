@@ -1691,3 +1691,31 @@
   color: var(--white-muted);
   font-weight: 300;
 }
+/* ─── SHIPPING BANNER ─── */
+.shipping-banner {
+  width: 100%;
+  padding: 0.65rem 2rem;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--white-muted);
+  margin-top: 62px;
+}
+
+.shipping-banner-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue-bright);
+  box-shadow: 0 0 8px var(--blue-bright);
+  flex-shrink: 0;
+  animation: pulse 2s infinite;
+}

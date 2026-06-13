@@ -1632,9 +1632,18 @@ function ProductPage({ slug, addToCart }) {
     </div>
   );
 }
+function ShippingBanner() {
+  return (
+    <div className="shipping-banner">
+      <span className="shipping-banner-dot" />
+      Free shipping on all orders over $100
+    </div>
+  );
+}
 function CatalogPage({ addToCart }) {
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg-primary)" }}>
+      <ShippingBanner />
       <section className="section" style={{ paddingTop: "8rem" }}>
         <div className="section-inner">
           <p className="section-label">Our Catalog</p>
