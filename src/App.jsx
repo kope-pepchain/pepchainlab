@@ -1685,59 +1685,42 @@ export default function App() {
         },
       ];
     });
-  };
-  const handleQtyChange = (key, delta) => {
-    setCart((prev) =>
-      prev
-        .map((i) => (i.key === key ? { ...i, qty: i.qty + delta } : i))
-        .filter((i) => i.qty > 0),
-    );
-  };
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
-  // Sync cart FROM WooCommerce by explicit cart key (CoCart REST is stateless)
-  useEffect(() => {
-    (async () => {
-      const cartKey = localStorage.getItem("wcCartKey");
-      const handoff = localStorage.getItem("wcHandoff");
-      if (!cartKey || handoff !== "1") return; // only sync when returning from WooCommerce
-      localStorage.removeItem("wcHandoff"); // clear flag immediately so it doesn't re-sync
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart?cart_key=${cartKey}`,
-          { credentials: "include" },
-        );
-        if (!res.ok) return;
-        const data = await res.json();
-        const items = data.items || [];
 
-        if (items.length > 0) {
-          const synced = items.map((it) => {
-            const variation = it.meta?.variation || null;
-            const hasVariation = variation && Object.keys(variation).length > 0;
-            const dose = hasVariation ? Object.values(variation)[0] : "";
-            const raw = String(it.price ?? "0");
-            const price = raw.includes(".")
-              ? `$${parseFloat(raw).toFixed(2)}`
-              : `$${(parseInt(raw, 10) / 100).toFixed(2)}`;
-            return {
-              key: `${it.id}-${dose}`,
-              name: it.name,
-              dose,
-              price,
-              qty: it.quantity?.value ?? it.quantity ?? 1,
-              variation_id: hasVariation ? it.id : null,
-              variation: hasVariation ? variation : null,
-            };
-          });
-          setCart(synced);
+    // Background sync to WooCommerce — fire and forget, don't block the UI
+    (async () => {
+      try {
+        let cartKey = localStorage.getItem("wcCartKey");
+        if (!cartKey) {
+          const res = await fetch(
+            `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`,
+            { method: "GET", credentials: "include" },
+          );
+          const data = await res.json();
+          cartKey = data.cart_key;
+          localStorage.setItem("wcCartKey", cartKey);
         }
+
+        await fetch(
+          `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              id: String(variant.variation_id || product.id),
+              quantity: "1",
+              ...(variant.variation_id && {
+                variation_id: variant.variation_id,
+                variation: variant.variation,
+              }),
+            }),
+          },
+        );
       } catch (e) {
-        console.error("Cart sync failed", e);
+        console.warn("Background cart sync failed:", e);
       }
     })();
-  }, []);
+  };
   const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
 
   const path = window.location.pathname;
