@@ -508,21 +508,23 @@ function ProductGrid({ addToCart }) {
   useEffect(() => {
     wcFetch("products?per_page=50&status=publish")
       .then(async (data) => {
-        const hydrated = await Promise.all(
-          data.map(async (product) => {
-            if (product.type === "variable" && product.variations.length > 0) {
-              const vars = await wcFetch(
-                `products/${product.id}/variations?per_page=100`,
-              );
-              if (Array.isArray(vars)) {
-                vars.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-                return { ...product, variation_data: vars };
-              }
+        const hydrated = [];
+        for (const product of data) {
+          if (product.type === "variable" && product.variations.length > 0) {
+            const vars = await wcFetch(
+              `products/${product.id}/variations?per_page=100`,
+            );
+            if (Array.isArray(vars)) {
+              vars.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+              hydrated.push({ ...product, variation_data: vars });
+            } else {
               console.error(`Variations fetch failed for product ${product.id}:`, vars);
-              return { ...product, variation_data: [] };
+              hydrated.push({ ...product, variation_data: [] });
             }
-          })
-        );
+          } else {
+            hydrated.push({ ...product, variation_data: [] });
+          }
+        }
         setProducts(hydrated.reverse());
         setLoading(false);
       })
