@@ -511,26 +511,34 @@ function ProductGrid({ addToCart }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    wcFetch("products?per_page=50&status=publish")
-      .then(async (data) => {
-        const hydrated = await Promise.all(
-          data.map(async (product) => {
-            if (product.type === "variable" && product.variations?.length > 0) {
-              const variationDetails = await wcFetch(`products/${product.id}/variations`);
-              const variation_data = (variationDetails || []).map((v) => ({
+    Promise.all([
+      wcFetch("products?per_page=50&status=publish"),
+      wcFetch("products?type=variation&per_page=100"),
+    ])
+      .then(([data, allVariations]) => {
+        const variationsByParent = {};
+        (allVariations || []).forEach((v) => {
+          if (!variationsByParent[v.parent]) variationsByParent[v.parent] = [];
+          variationsByParent[v.parent].push(v);
+        });
+        const hydrated = data.map((product) => {
+          if (product.type === "variable") {
+            const parentVariations = variationsByParent[product.id] || [];
+            const variation_data = parentVariations.map((v) => {
+              const parts = (v.variation || "").split(":");
+              const attrName = parts[0]?.trim() || "Variant";
+              const attrValue = parts.slice(1).join(":").trim() || "";
+              return {
                 id: v.id,
-                attributes: (v.attributes || []).map((a) => ({
-                  name: a.name,
-                  option: a.value,
-                })),
+                attributes: [{ name: attrName, option: attrValue }],
                 price: (parseInt(v.prices.price, 10) / 100).toFixed(2),
                 stock_status: v.is_in_stock ? "instock" : "outofstock",
-              }));
-              return { ...product, variation_data };
-            }
-            return { ...product, variation_data: [] };
-          }),
-        );
+              };
+            });
+            return { ...product, variation_data };
+          }
+          return { ...product, variation_data: [] };
+        });
         setProducts(hydrated.reverse());
         setLoading(false);
       })
@@ -1423,24 +1431,31 @@ function ProductPage({ slug, addToCart }) {
 
   useEffect(() => {
     if (!authChecked) return;
-    wcFetch(`products?slug=${slug}`)
-      .then(async (data) => {
+    Promise.all([
+      wcFetch(`products?slug=${slug}`),
+      wcFetch("products?type=variation&per_page=100"),
+    ])
+      .then(([data, allVariations]) => {
         const p = data[0];
         if (!p) {
           setLoading(false);
           return;
         }
-        if (p.type === "variable" && p.variations?.length > 0) {
-          const variationDetails = await wcFetch(`products/${p.id}/variations`);
-          const variation_data = (variationDetails || []).map((v) => ({
-            id: v.id,
-            attributes: (v.attributes || []).map((a) => ({
-              name: a.name,
-              option: a.value,
-            })),
-            price: (parseInt(v.prices.price, 10) / 100).toFixed(2),
-            stock_status: v.is_in_stock ? "instock" : "outofstock",
-          }));
+        if (p.type === "variable") {
+          const parentVariations = (allVariations || []).filter(
+            (v) => v.parent === p.id,
+          );
+          const variation_data = parentVariations.map((v) => {
+            const parts = (v.variation || "").split(":");
+            const attrName = parts[0]?.trim() || "Variant";
+            const attrValue = parts.slice(1).join(":").trim() || "";
+            return {
+              id: v.id,
+              attributes: [{ name: attrName, option: attrValue }],
+              price: (parseInt(v.prices.price, 10) / 100).toFixed(2),
+              stock_status: v.is_in_stock ? "instock" : "outofstock",
+            };
+          });
           setProduct({ ...p, variation_data });
           const firstInStock = variation_data.find(
             (v) => v.stock_status === "instock",
