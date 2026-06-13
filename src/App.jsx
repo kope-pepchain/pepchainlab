@@ -369,8 +369,7 @@ function Hero() {
           <button
             className="btn-primary"
             onClick={() => {
-              const el = document.getElementById("products");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
+              window.location.href = "/products";
             }}
           >
             Browse Products
@@ -378,7 +377,8 @@ function Hero() {
           <button
             className="btn-secondary"
             onClick={() => {
-              window.location.href = "/products";
+              const el = document.getElementById("about");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
             }}
           >
             Learn More
