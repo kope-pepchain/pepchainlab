@@ -295,7 +295,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(
                           err.message ||
-                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                            `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
                         );
                       }
                     }
@@ -331,13 +331,13 @@ function Navbar({ cartCount, onCartOpen }) {
           <a href="/products">Products</a>
         </li>
         <li>
-          <a href="#about">About</a>
+          <a href="/about">About</a>
         </li>
         <li>
           <a href="/coa-library">COA Library</a>
         </li>
         <li>
-          <a href="#contact">Contact</a>
+          <a href="/contact">Contact</a>
         </li>
       </ul>
       <div className="nav-right">
@@ -441,10 +441,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-            a.option;
-          return acc;
-        }, {})
+            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+              a.option;
+            return acc;
+          }, {})
         : null;
 
     addToCart(product, {
@@ -478,17 +478,23 @@ function ProductCard({ product, addToCart, full = false }) {
             })}
           </div>
         )}
-        {isVariable && selectedVariant && selectedVariant.stock_status !== "instock" && (
-          <p style={{
-            fontSize: "0.75rem",
-            color: "rgba(140, 160, 190, 0.85)",
-            fontFamily: "var(--font-display)",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            fontWeight: 600,
-            marginTop: "0.5rem",
-          }}>Out of Stock</p>
-        )}
+        {isVariable &&
+          selectedVariant &&
+          selectedVariant.stock_status !== "instock" && (
+            <p
+              style={{
+                fontSize: "0.75rem",
+                color: "rgba(140, 160, 190, 0.85)",
+                fontFamily: "var(--font-display)",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                fontWeight: 600,
+                marginTop: "0.5rem",
+              }}
+            >
+              Out of Stock
+            </p>
+          )}
       </div>
       <div className="product-footer">
         <span className="product-price">{price}</span>
@@ -670,7 +676,7 @@ function Footer() {
             <h4>Company</h4>
             <ul>
               <li>
-                <a href="#">About</a>
+                <a href="/about">About</a>
               </li>
               <li>
                 <a href="/ruo-policy">RUO Policy</a>
@@ -679,7 +685,7 @@ function Footer() {
                 <a href="/coa-library">COA Library</a>
               </li>
               <li>
-                <a href="#">Contact</a>
+                <a href="/contact">Contact</a>
               </li>
             </ul>
           </div>
@@ -1526,10 +1532,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-            a.option;
-          return acc;
-        }, {})
+            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+              a.option;
+            return acc;
+          }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
@@ -1718,6 +1724,136 @@ function CatalogPage({ addToCart }) {
     </div>
   );
 }
+function AboutPage() {
+  return (
+    <div className="policy-page">
+      <nav className="navbar">
+        <a href="/" className="nav-logo">
+          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+        </a>
+        <ul className="nav-links">
+          <li>
+            <a href="/#products">Products</a>
+          </li>
+          <li>
+            <a href="/coa-library">COA Library</a>
+          </li>
+          <li>
+            <a href="/contact">Contact</a>
+          </li>
+        </ul>
+        <div className="nav-right">
+          <a href="/my-account" className="nav-icon-btn" title="My Account">
+            <IconUser />
+          </a>
+          <a href="/" className="nav-cta">
+            Back to Shop
+          </a>
+        </div>
+      </nav>
+      <div className="policy-content">
+        <p className="section-label">Company</p>
+        <h1 className="policy-title">About PepChain</h1>
+        <div className="policy-body">
+          <p>
+            PepChain LLC is a U.S.-based supplier of research-grade peptides and
+            biochemical compounds, founded to meet the growing demand for
+            high-purity, reliably sourced materials in the scientific research
+            community.
+          </p>
+
+          <h3>Our Mission</h3>
+          <p>
+            We exist to support qualified researchers with compounds they can
+            trust. Every product in our catalog is independently tested using
+            HPLC and mass spectrometry, with certificates of analysis available
+            for every batch. Precision, transparency, and integrity are the
+            standards we hold ourselves to.
+          </p>
+
+          <h3>Research First</h3>
+          <p>
+            All products sold by PepChain are intended exclusively for in vitro
+            laboratory research and scientific study. We supply researchers,
+            institutions, and qualified professionals — not the general public.
+            Our catalog is built around compounds that meet the rigorous purity
+            requirements serious research demands.
+          </p>
+
+          <h3>Quality You Can Verify</h3>
+          <p>
+            Third-party lab testing is not optional for us — it is the baseline.
+            Every batch is verified before it ships. COAs are published and
+            available through our COA Library so researchers can review
+            documentation independently.
+          </p>
+
+          <h3>Get in Touch</h3>
+          <p>
+            For questions, compliance inquiries, or support, reach us at{" "}
+            <a href="mailto:support@pepchainlab.com">support@pepchainlab.com</a>
+            .
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ContactPage() {
+  return (
+    <div className="policy-page">
+      <nav className="navbar">
+        <a href="/" className="nav-logo">
+          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+        </a>
+        <ul className="nav-links">
+          <li>
+            <a href="/#products">Products</a>
+          </li>
+          <li>
+            <a href="/about">About</a>
+          </li>
+          <li>
+            <a href="/coa-library">COA Library</a>
+          </li>
+        </ul>
+        <div className="nav-right">
+          <a href="/my-account" className="nav-icon-btn" title="My Account">
+            <IconUser />
+          </a>
+          <a href="/" className="nav-cta">
+            Back to Shop
+          </a>
+        </div>
+      </nav>
+      <div className="policy-content">
+        <p className="section-label">Support</p>
+        <h1 className="policy-title">Contact Us</h1>
+        <div className="policy-body">
+          <p>
+            If you have any questions, concerns, or need assistance with an
+            order, our team is here to help.
+          </p>
+          <h3>Email Support</h3>
+          <p>
+            Reach us at{" "}
+            <a href="mailto:support@pepchainlab.com">support@pepchainlab.com</a>{" "}
+            and we will get back to you as soon as possible.
+          </p>
+          <h3>Compliance & Legal</h3>
+          <p>
+            For compliance-related inquiries, contact us at{" "}
+            <a href="mailto:compliance@pepchainlab.com">
+              compliance@pepchainlab.com
+            </a>
+            .
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── APP ───
 export default function App() {
@@ -1814,6 +1950,8 @@ export default function App() {
   if (path === "/shipping-policy") return <ShippingPolicy />;
   if (path === "/returns") return <ReturnsPolicy />;
   if (path === "/privacy-policy") return <PrivacyPolicy />;
+  if (path === "/about") return <AboutPage />;
+  if (path === "/contact") return <ContactPage />;
   if (path === "/products") {
     return (
       <>
@@ -1879,4 +2017,3 @@ export default function App() {
     </>
   );
 }
-
