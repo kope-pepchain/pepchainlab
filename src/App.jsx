@@ -466,20 +466,28 @@ function ProductCard({ product, addToCart, full = false }) {
             {variants.map((v) => {
               const label =
                 v.attributes?.map((a) => a.option).join(" / ") || v.id;
-              const isOos = v.stock_status !== "instock";
               return (
                 <button
                   key={v.id}
-                  className={`variant-btn ${selectedVariant?.id === v.id ? "active" : ""} ${isOos ? "variant-btn-oos" : ""}`}
-                  onClick={() => !isOos && setSelectedVariant(v)}
-                  disabled={isOos}
-                  title={isOos ? "Out of stock" : ""}
+                  className={`variant-btn ${selectedVariant?.id === v.id ? "active" : ""}`}
+                  onClick={() => setSelectedVariant(v)}
                 >
-                  {label}{isOos && " · OOS"}
+                  {label}
                 </button>
               );
             })}
           </div>
+        )}
+        {isVariable && selectedVariant && selectedVariant.stock_status !== "instock" && (
+          <p style={{
+            fontSize: "0.75rem",
+            color: "rgba(220, 120, 80, 0.9)",
+            fontFamily: "var(--font-display)",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            fontWeight: 600,
+            marginTop: "0.5rem",
+          }}>Out of Stock</p>
         )}
       </div>
       <div className="product-footer">
@@ -1559,16 +1567,13 @@ function ProductPage({ slug, addToCart }) {
                 {variants.map((v) => {
                   const label =
                     v.attributes?.map((a) => a.option).join(" / ") || v.id;
-                  const isOos = v.stock_status !== "instock";
                   return (
                     <button
                       key={v.id}
-                      className={`variant-btn ${selectedVariant?.id === v.id ? "active" : ""} ${isOos ? "variant-btn-oos" : ""}`}
-                      onClick={() => !isOos && setSelectedVariant(v)}
-                      disabled={isOos}
-                      title={isOos ? "Out of stock" : ""}
+                      className={`variant-btn ${selectedVariant?.id === v.id ? "active" : ""}`}
+                      onClick={() => setSelectedVariant(v)}
                     >
-                      {label}{isOos && " · OOS"}
+                      {label}
                     </button>
                   );
                 })}
