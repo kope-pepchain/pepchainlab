@@ -295,7 +295,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(
                           err.message ||
-                            `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
                         );
                       }
                     }
@@ -418,7 +418,9 @@ function ProductCard({ product, addToCart, full = false }) {
   const shortName = product.name.split("|")[0].trim();
   const isVariable = product.type === "variable";
   const variants = product.variation_data || [];
-  const [selectedVariant, setSelectedVariant] = useState(variants[0] || null);
+  const [selectedVariant, setSelectedVariant] = useState(
+    variants.find((v) => v.stock_status === "instock") || variants[0] || null,
+  );
   const inStock =
     isVariable && selectedVariant
       ? selectedVariant.stock_status === "instock"
@@ -439,10 +441,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
 
     addToCart(product, {
@@ -464,13 +466,16 @@ function ProductCard({ product, addToCart, full = false }) {
             {variants.map((v) => {
               const label =
                 v.attributes?.map((a) => a.option).join(" / ") || v.id;
+              const isOos = v.stock_status !== "instock";
               return (
                 <button
                   key={v.id}
-                  className={`variant-btn ${selectedVariant?.id === v.id ? "active" : ""}`}
-                  onClick={() => setSelectedVariant(v)}
+                  className={`variant-btn ${selectedVariant?.id === v.id ? "active" : ""} ${isOos ? "variant-btn-oos" : ""}`}
+                  onClick={() => !isOos && setSelectedVariant(v)}
+                  disabled={isOos}
+                  title={isOos ? "Out of stock" : ""}
                 >
-                  {label}
+                  {label}{isOos && " · OOS"}
                 </button>
               );
             })}
@@ -507,22 +512,27 @@ function ProductGrid({ addToCart }) {
 
   useEffect(() => {
     wcFetch("products?per_page=50&status=publish")
-      .then((data) => {
-        const hydrated = data.map((product) => {
-          if (product.type === "variable" && product.variations?.length > 0) {
-            const variation_data = product.variations.map((v) => ({
-              id: v.id,
-              attributes: (v.attributes || []).map((a) => ({
-                name: a.name,
-                option: a.value,
-              })),
-              price: (parseInt(product.prices.price, 10) / 100).toFixed(2),
-              stock_status: product.is_in_stock ? "instock" : "outofstock",
-            }));
-            return { ...product, variation_data };
-          }
-          return { ...product, variation_data: [] };
-        });
+      .then(async (data) => {
+        const hydrated = await Promise.all(
+          data.map(async (product) => {
+            if (product.type === "variable" && product.variations?.length > 0) {
+              const variationDetails = await Promise.all(
+                product.variations.map((v) => wcFetch(`products/${v.id}`)),
+              );
+              const variation_data = variationDetails.map((v) => ({
+                id: v.id,
+                attributes: (v.attributes || []).map((a) => ({
+                  name: a.name,
+                  option: a.value,
+                })),
+                price: (parseInt(v.prices.price, 10) / 100).toFixed(2),
+                stock_status: v.is_in_stock ? "instock" : "outofstock",
+              }));
+              return { ...product, variation_data };
+            }
+            return { ...product, variation_data: [] };
+          }),
+        );
         setProducts(hydrated.reverse());
         setLoading(false);
       })
@@ -1416,24 +1426,30 @@ function ProductPage({ slug, addToCart }) {
   useEffect(() => {
     if (!authChecked) return;
     wcFetch(`products?slug=${slug}`)
-      .then((data) => {
+      .then(async (data) => {
         const p = data[0];
         if (!p) {
           setLoading(false);
           return;
         }
         if (p.type === "variable" && p.variations?.length > 0) {
-          const variation_data = p.variations.map((v) => ({
+          const variationDetails = await Promise.all(
+            p.variations.map((v) => wcFetch(`products/${v.id}`)),
+          );
+          const variation_data = variationDetails.map((v) => ({
             id: v.id,
             attributes: (v.attributes || []).map((a) => ({
               name: a.name,
               option: a.value,
             })),
-            price: (parseInt(p.prices.price, 10) / 100).toFixed(2),
-            stock_status: p.is_in_stock ? "instock" : "outofstock",
+            price: (parseInt(v.prices.price, 10) / 100).toFixed(2),
+            stock_status: v.is_in_stock ? "instock" : "outofstock",
           }));
           setProduct({ ...p, variation_data });
-          setSelectedVariant(variation_data[0] || null);
+          const firstInStock = variation_data.find(
+            (v) => v.stock_status === "instock",
+          );
+          setSelectedVariant(firstInStock || variation_data[0] || null);
         } else {
           setProduct({ ...p, variation_data: [] });
         }
@@ -1481,10 +1497,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
@@ -1532,13 +1548,16 @@ function ProductPage({ slug, addToCart }) {
                 {variants.map((v) => {
                   const label =
                     v.attributes?.map((a) => a.option).join(" / ") || v.id;
+                  const isOos = v.stock_status !== "instock";
                   return (
                     <button
                       key={v.id}
-                      className={`variant-btn ${selectedVariant?.id === v.id ? "active" : ""}`}
-                      onClick={() => setSelectedVariant(v)}
+                      className={`variant-btn ${selectedVariant?.id === v.id ? "active" : ""} ${isOos ? "variant-btn-oos" : ""}`}
+                      onClick={() => !isOos && setSelectedVariant(v)}
+                      disabled={isOos}
+                      title={isOos ? "Out of stock" : ""}
                     >
-                      {label}
+                      {label}{isOos && " · OOS"}
                     </button>
                   );
                 })}
@@ -1832,4 +1851,15 @@ export default function App() {
       <Footer />
     </>
   );
+}
+
+.variant-btn-oos {
+  opacity: 0.4;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.variant-btn-oos:hover {
+  border-color: var(--border);
+  color: var(--white-muted);
 }
