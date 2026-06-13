@@ -291,7 +291,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(
                           err.message ||
-                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                            `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
                         );
                       }
                     }
@@ -435,10 +435,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-            a.option;
-          return acc;
-        }, {})
+            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+              a.option;
+            return acc;
+          }, {})
         : null;
 
     addToCart(product, {
@@ -1333,7 +1333,7 @@ function NotifyModal({ product, variationId, onClose }) {
             subscriber_phone: "0000000000",
             custom_quantity: "1",
           }),
-        }
+        },
       );
       if (res.ok) {
         setStatus("success");
@@ -1481,10 +1481,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-            a.option;
-          return acc;
-        }, {})
+            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+              a.option;
+            return acc;
+          }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
@@ -1700,7 +1700,9 @@ export default function App() {
   useEffect(() => {
     (async () => {
       const cartKey = localStorage.getItem("wcCartKey");
-      if (!cartKey) return; // never handed off — local cart is authoritative
+      const handoff = localStorage.getItem("wcHandoff");
+      if (!cartKey || handoff !== "1") return; // only sync when returning from WooCommerce
+      localStorage.removeItem("wcHandoff"); // clear flag immediately so it doesn't re-sync
       try {
         const res = await fetch(
           `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart?cart_key=${cartKey}`,
@@ -1726,28 +1728,16 @@ export default function App() {
               price,
               qty: it.quantity?.value ?? it.quantity ?? 1,
               variation_id: hasVariation ? it.id : null,
-              variation: hasVariation
-                ? Object.fromEntries(
-                  Object.entries(variation).map(([k, v]) => [
-                    `attribute_pa_${k.toLowerCase().replace(/\s+/g, "_")}`,
-                    v,
-                  ]),
-                )
-                : null,
+              variation: hasVariation ? variation : null,
             };
           });
           setCart(synced);
-        } else {
-          // Our handed-off cart is now empty: purchased or emptied on the WP side
-          setCart([]);
-          localStorage.removeItem("wcCartKey");
         }
-      } catch {
-        /* API hiccup — keep local cart */
+      } catch (e) {
+        console.error("Cart sync failed", e);
       }
     })();
   }, []);
-
   const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
 
   const path = window.location.pathname;
