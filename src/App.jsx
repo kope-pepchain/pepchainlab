@@ -584,11 +584,16 @@ function Features() {
   return (
     <section className="section features-bg" id="about">
       <div className="section-inner">
-        <p className="section-label">Why Pep-Chain</p>
-        <h2 className="section-title">
+        <p className="section-label" style={{ textAlign: "center" }}>
+          Why Pep-Chain
+        </p>
+        <h2 className="section-title" style={{ textAlign: "center" }}>
           Built on <span>Science</span>
         </h2>
-        <p className="section-sub">
+        <p
+          className="section-sub"
+          style={{ textAlign: "center", maxWidth: "100%" }}
+        >
           We hold every batch to the highest standards so your research never
           has to compromise.
         </p>
