@@ -739,13 +739,13 @@ function RUOPolicy() {
         </a>
         <ul className="nav-links">
           <li>
-            <a href="/#products">Products</a>
+            <a href="/products">Products</a>
           </li>
           <li>
             <a href="/coa-library">COA Library</a>
           </li>
           <li>
-            <a href="#contact">Contact</a>
+            <a href="/contact">Contact</a>
           </li>
         </ul>
         <div className="nav-right">
@@ -891,13 +891,13 @@ function COALibrary() {
         </a>
         <ul className="nav-links">
           <li>
-            <a href="/#products">Products</a>
+            <a href="/products">Products</a>
           </li>
           <li>
             <a href="/ruo-policy">RUO Policy</a>
           </li>
           <li>
-            <a href="/#contact">Contact</a>
+            <a href="/contact">Contact</a>
           </li>
         </ul>
         <div className="nav-right">
@@ -956,7 +956,7 @@ function TermsOfUse() {
         </a>
         <ul className="nav-links">
           <li>
-            <a href="/#products">Products</a>
+            <a href="/products">Products</a>
           </li>
           <li>
             <a href="/ruo-policy">RUO Policy</a>
@@ -1049,7 +1049,7 @@ function ShippingPolicy() {
         </a>
         <ul className="nav-links">
           <li>
-            <a href="/#products">Products</a>
+            <a href="/products">Products</a>
           </li>
           <li>
             <a href="/ruo-policy">RUO Policy</a>
@@ -1139,7 +1139,7 @@ function ReturnsPolicy() {
         </a>
         <ul className="nav-links">
           <li>
-            <a href="/#products">Products</a>
+            <a href="/products">Products</a>
           </li>
           <li>
             <a href="/ruo-policy">RUO Policy</a>
@@ -1217,7 +1217,7 @@ function PrivacyPolicy() {
         </a>
         <ul className="nav-links">
           <li>
-            <a href="/#products">Products</a>
+            <a href="/products">Products</a>
           </li>
           <li>
             <a href="/ruo-policy">RUO Policy</a>
@@ -1733,7 +1733,7 @@ function AboutPage() {
         </a>
         <ul className="nav-links">
           <li>
-            <a href="/#products">Products</a>
+            <a href="/products">Products</a>
           </li>
           <li>
             <a href="/coa-library">COA Library</a>
@@ -1809,7 +1809,7 @@ function ContactPage() {
         </a>
         <ul className="nav-links">
           <li>
-            <a href="/#products">Products</a>
+            <a href="/products">Products</a>
           </li>
           <li>
             <a href="/about">About</a>
