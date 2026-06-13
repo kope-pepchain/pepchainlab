@@ -399,7 +399,7 @@ function TrustBar() {
     <div className="trust-bar">
       {[
         { num: "99%", label: "Purity Guaranteed" },
-        { num: "50+", label: "Peptide Compounds" },
+        { num: "10+", label: "Peptide Compounds" },
         { num: "3rd", label: "Party Lab Tested" },
         { num: "48hr", label: "Fast Shipping" },
       ].map((item) => (
