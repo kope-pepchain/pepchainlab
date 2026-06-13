@@ -178,6 +178,7 @@ function AgeGate({ onConfirm }) {
   );
 }
 function CartDrawer({ cart, onClose, onQtyChange }) {
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const total = cart.reduce((sum, i) => {
     const price = parseFloat(i.price.replace("$", ""));
     return sum + price * i.qty;
@@ -231,7 +232,10 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
               <button
                 className="btn-primary"
                 style={{ width: "100%" }}
+                disabled={isCheckingOut}
                 onClick={async () => {
+                  if (isCheckingOut) return;
+                  setIsCheckingOut(true);
                   try {
                     // Step 1: Reuse our persistent cart key, or get one from CoCart
                     let cartKey = localStorage.getItem("wcCartKey");
@@ -303,10 +307,11 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                     alert(
                       err.message || "Something went wrong. Please try again.",
                     );
+                    setIsCheckingOut(false);
                   }
                 }}
               >
-                Checkout
+                {isCheckingOut ? "Processing…" : "Checkout"}
               </button>
             </div>
           </>
