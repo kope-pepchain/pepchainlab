@@ -214,6 +214,7 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
               </strong>{" "}
               to your wallet
             </p>
+            <div className="paypal-card-wrapper">
             <PayPalScriptProvider
               options={{
                 clientId: PAYPAL_CLIENT_ID,
@@ -276,6 +277,7 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
                 onCancel={() => setStep("amount")}
               />
             </PayPalScriptProvider>
+            </div>
             <button
               className="btn-secondary"
               style={{ width: "100%", marginTop: "0.75rem" }}
