@@ -2237,13 +2237,14 @@
   display: flex;
   animation: ticker 22s linear infinite;
   white-space: nowrap;
+  will-change: transform;
 }
 
 @keyframes ticker {
-  from {
+  0% {
     transform: translateX(0);
   }
-  to {
+  100% {
     transform: translateX(-50%);
   }
 }
@@ -2261,6 +2262,7 @@
   gap: 0.75rem;
   white-space: nowrap;
   flex-shrink: 0;
+  user-select: none;
 }
 
 .ticker-dot {
