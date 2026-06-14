@@ -230,7 +230,7 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
                     purchase_units: [
                       {
                         amount: { value: parsedAmount.toFixed(2) },
-                        description: "PepChain Store Credit",
+                        description: "Store Credit - PepChain LLC",
                       },
                     ],
                     application_context: { shipping_preference: "NO_SHIPPING" },
@@ -481,7 +481,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(
                           err.message ||
-                            `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
                         );
                       }
                     }
@@ -506,7 +506,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
     </>
   );
 }
-function Navbar({ cartCount, onCartOpen, onWalletOpen }) {
+function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance }) {
   return (
     <nav className="navbar">
       <a href="/" className="nav-logo">
@@ -535,7 +535,7 @@ function Navbar({ cartCount, onCartOpen, onWalletOpen }) {
           style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
           onClick={onWalletOpen}
         >
-          Wallet
+          {walletBalance !== null ? `$${parseFloat(walletBalance).toFixed(2)}` : "Wallet"}
         </button>
         <button className="nav-cta" onClick={onCartOpen}>
           Cart{" "}
@@ -568,7 +568,7 @@ function Hero() {
         const img = tenMg?.images?.[0]?.src || product.images?.[0]?.src || null;
         if (img) setVialImg(img);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   return (
@@ -698,10 +698,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
 
     addToCart(product, {
@@ -1870,10 +1870,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
@@ -2227,6 +2227,7 @@ export default function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [walletOpen, setWalletOpen] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [walletBalance, setWalletBalance] = useState(null);
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -2238,7 +2239,10 @@ export default function App() {
           credentials: "include",
         })
           .then((r) => r.json())
-          .then((data) => setCurrentUserId(data.user_id));
+          .then((data) => {
+            setCurrentUserId(data.user_id);
+            setWalletBalance(data.wallet_balance);
+          });
       }
     });
   }, []);
@@ -2333,6 +2337,7 @@ export default function App() {
         <Navbar
           cartCount={cartCount}
           onCartOpen={() => setCartOpen(true)}
+          walletBalance={walletBalance}
           onWalletOpen={async () => {
             const loggedIn = await checkLoggedIn();
             if (!loggedIn) {
@@ -2346,6 +2351,7 @@ export default function App() {
           <WalletTopupModal
             userId={currentUserId}
             onSuccess={(newBalance) => {
+              setWalletBalance(newBalance);
               setWalletOpen(false);
             }}
             onClose={() => setWalletOpen(false)}
@@ -2371,6 +2377,7 @@ export default function App() {
         <Navbar
           cartCount={cartCount}
           onCartOpen={() => setCartOpen(true)}
+          walletBalance={walletBalance}
           onWalletOpen={async () => {
             const loggedIn = await checkLoggedIn();
             if (!loggedIn) {
@@ -2384,6 +2391,7 @@ export default function App() {
           <WalletTopupModal
             userId={currentUserId}
             onSuccess={(newBalance) => {
+              setWalletBalance(newBalance);
               setWalletOpen(false);
             }}
             onClose={() => setWalletOpen(false)}
@@ -2421,6 +2429,7 @@ export default function App() {
       <Navbar
         cartCount={cartCount}
         onCartOpen={() => setCartOpen(true)}
+        walletBalance={walletBalance}
         onWalletOpen={async () => {
           const loggedIn = await checkLoggedIn();
           if (!loggedIn) {
@@ -2434,6 +2443,7 @@ export default function App() {
         <WalletTopupModal
           userId={currentUserId}
           onSuccess={(newBalance) => {
+            setWalletBalance(newBalance);
             setWalletOpen(false);
           }}
           onClose={() => setWalletOpen(false)}
