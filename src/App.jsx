@@ -2206,16 +2206,23 @@ export default function App() {
       <>
         <div className="noise-overlay" />
         {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
-        <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} onWalletOpen={() => setWalletOpen(true)} />
-        {walletOpen && (
-          <WalletTopupModal
-            userId={currentUserId}
-            onSuccess={(newBalance) => {
-              setWalletOpen(false);
-            }}
-            onClose={() => setWalletOpen(false)}
-          />
-        )}
+        <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} onWalletOpen={async () => {
+  const loggedIn = await checkLoggedIn();
+  if (!loggedIn) {
+    window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
+  } else {
+    setWalletOpen(true);
+  }
+}} />
+{walletOpen && (
+  <WalletTopupModal
+    userId={currentUserId}
+    onSuccess={(newBalance) => {
+      setWalletOpen(false);
+    }}
+    onClose={() => setWalletOpen(false)}
+  />
+)}
         {cartOpen && (
           <CartDrawer
             cart={cart}
@@ -2233,7 +2240,14 @@ export default function App() {
       <>
         <div className="noise-overlay" />
         {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
-        <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} onWalletOpen={() => setWalletOpen(true)} />
+        <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} onWalletOpen={async () => {
+          const loggedIn = await checkLoggedIn();
+          if (!loggedIn) {
+            window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
+          } else {
+            setWalletOpen(true);
+          }
+        }} />
         {walletOpen && (
           <WalletTopupModal
             userId={currentUserId}
