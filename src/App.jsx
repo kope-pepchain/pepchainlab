@@ -674,8 +674,7 @@ function Footer() {
               qualified professionals.
             </p>
             <p>
-              2108 N St, Ste N · Sacramento, CA 95816 ·
-              compliance@pepchainlab.com
+              1845 McArthur Place, Oxnard, CA 93033 · compliance@pepchainlab.com
             </p>
           </div>
           <div className="footer-links">
