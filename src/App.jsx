@@ -197,7 +197,7 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
                       body: JSON.stringify({ paypal_order_id: order.id, amount: parsedAmount }),
                     });
                     const result = await res.json();
-                    if (result.success) { setStep("success"); setTimeout(() => { onSuccess(result.new_balance); onClose(); }, 2000); }
+                    if (result.success) { setStep("success"); onSuccess(result.new_balance); }
                     else { setErrorMsg(result.message || "Could not credit wallet."); setStep("error"); }
                   } catch { setErrorMsg("Network error. Contact support with your PayPal receipt."); setStep("error"); }
                 }}
