@@ -414,10 +414,7 @@ function TrustBar() {
 }
 
 function ProductCard({ product, addToCart, full = false }) {
-  const image =
-    selectedVariant?.image?.src ||
-    product.images?.[0]?.src ||
-    "/placeholder.png";
+  const image = product.images?.[0]?.src || "/placeholder.png";
   const badge = product.tags?.[0]?.name || "Research";
   const shortName = product.name.split("|")[0].trim();
   const isVariable = product.type === "variable";
