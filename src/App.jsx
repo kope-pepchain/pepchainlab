@@ -657,7 +657,7 @@ function TrustBar() {
     "US Based",
   ];
 
-  const doubled = [...items, ...items];
+  const doubled = [...items, ...items, ...items];
 
   return (
     <div className="ticker-wrap">
