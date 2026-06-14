@@ -849,35 +849,110 @@ function ProductGrid({ addToCart }) {
 }
 function Features() {
   return (
-    <section className="story-section" id="about">
-      <div className="story-left">
-        <p className="story-eyebrow">Why PepChain</p>
-        <h2 className="story-h2">
-          Built for researchers
-          <br />
-          who demand <span>more</span>
-        </h2>
-        <p className="story-body">
-          We started PepChain because the research community deserved a supplier
-          that held itself to the same standards as the labs it serves. Every
-          batch independently verified. Every COA published. No exceptions.
-        </p>
-        <a className="story-link" href="/coa-library">
-          View COA Library →
-        </a>
-      </div>
-      <div className="story-right">
-        {FEATURES.map((f) => (
-          <div className="story-card" key={f.title}>
-            <div className="story-icon">{f.icon}</div>
-            <p className="story-title">{f.title}</p>
-            <p className="story-desc">{f.desc}</p>
+    <section className="bento-section" id="about">
+      <div className="bento-inner">
+        <div className="bento-card bento-hero">
+          <div className="bento-hero-left">
+            <p className="bento-eyebrow">Why PepChain</p>
+            <h2 className="bento-hero-title">
+              Built for researchers
+              <br />
+              who demand <span>more</span>
+            </h2>
+            <p className="bento-hero-body">
+              We started PepChain because the research community deserved a
+              supplier held to the same standards as the labs it serves. Every
+              batch independently verified. Every COA published. No exceptions.
+            </p>
+            <a className="story-link" href="/coa-library">
+              View COA Library →
+            </a>
           </div>
-        ))}
+          <div className="bento-hero-stats">
+            <div className="bento-stat">
+              <span className="bento-stat-num">99%</span>
+              <span className="bento-stat-lbl">Avg purity</span>
+            </div>
+            <div className="bento-stat">
+              <span className="bento-stat-num">48hr</span>
+              <span className="bento-stat-lbl">Dispatch</span>
+            </div>
+            <div className="bento-stat">
+              <span className="bento-stat-num">100%</span>
+              <span className="bento-stat-lbl">3rd-party verified</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bento-card bento-feat">
+          <div className="bento-feat-icon">
+            <IconFlask />
+          </div>
+          <p className="bento-feat-label">01</p>
+          <p className="bento-feat-title">Research Driven</p>
+          <p className="bento-feat-desc">
+            Every peptide backed by peer-reviewed science and rigorous in-house
+            validation protocols.
+          </p>
+        </div>
+
+        <div className="bento-card bento-feat">
+          <div className="bento-feat-icon">
+            <IconShield />
+          </div>
+          <p className="bento-feat-label">02</p>
+          <p className="bento-feat-title">Quality Tested</p>
+          <p className="bento-feat-desc">
+            3rd-party HPLC and mass-spec testing on every batch. COAs available
+            on every order.
+          </p>
+        </div>
+
+        <div className="bento-card bento-feat">
+          <div className="bento-feat-icon">
+            <IconLink />
+          </div>
+          <p className="bento-feat-label">03</p>
+          <p className="bento-feat-title">Peptide Experts</p>
+          <p className="bento-feat-desc">
+            Decades of combined biochemistry and formulation experience behind
+            every product.
+          </p>
+        </div>
+
+        <div className="bento-card bento-feat" style={{ gridColumn: "span 2" }}>
+          <div className="bento-feat-icon">
+            <IconChart />
+          </div>
+          <p className="bento-feat-label">04</p>
+          <p className="bento-feat-title">Precision Formulated</p>
+          <p className="bento-feat-desc">
+            Formulated for researchers who demand reproducibility at every
+            concentration and every run.
+          </p>
+        </div>
+
+        <div className="bento-card bento-stats-card">
+          <div className="bento-stats-item">
+            <span className="bento-stat-num">99%</span>
+            <span className="bento-stat-lbl">Avg purity</span>
+          </div>
+          <div className="bento-stats-divider" />
+          <div className="bento-stats-item">
+            <span className="bento-stat-num">48hr</span>
+            <span className="bento-stat-lbl">Dispatch</span>
+          </div>
+          <div className="bento-stats-divider" />
+          <div className="bento-stats-item">
+            <span className="bento-stat-num">100%</span>
+            <span className="bento-stat-lbl">3rd-party verified</span>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
+
 function Disclaimer() {
   return (
     <div className="disclaimer-bubble-wrap">
@@ -925,20 +1000,48 @@ function Banner() {
             Shop the Catalog
           </button>
         </div>
-        <div className="dark-cta-right">
-          <div className="dark-cta-stat">
-            <span className="dark-cta-stat-num">99%</span>
-            <span className="dark-cta-stat-lbl">
-              Average purity across all batches
-            </span>
+        <div className="dark-cta-right dark-cta-trust">
+          <div className="trust-badge-item">
+            <div className="trust-badge-icon">
+              <IconFlask />
+            </div>
+            <div>
+              <p className="trust-badge-title">HPLC Verified</p>
+              <p className="trust-badge-sub">Every batch, every compound</p>
+            </div>
           </div>
-          <div className="dark-cta-stat">
-            <span className="dark-cta-stat-num">48hr</span>
-            <span className="dark-cta-stat-lbl">Typical dispatch time</span>
+          <div className="trust-badge-item">
+            <div className="trust-badge-icon">
+              <IconShield />
+            </div>
+            <div>
+              <p className="trust-badge-title">COA on Every Batch</p>
+              <p className="trust-badge-sub">
+                Published, downloadable, transparent
+              </p>
+            </div>
           </div>
-          <div className="dark-cta-stat">
-            <span className="dark-cta-stat-num">100%</span>
-            <span className="dark-cta-stat-lbl">Third-party lab verified</span>
+          <div className="trust-badge-item">
+            <div className="trust-badge-icon">
+              <IconChart />
+            </div>
+            <div>
+              <p className="trust-badge-title">48hr Dispatch</p>
+              <p className="trust-badge-sub">
+                USPS tracked, discreet packaging
+              </p>
+            </div>
+          </div>
+          <div className="trust-badge-item">
+            <div className="trust-badge-icon">
+              <IconLink />
+            </div>
+            <div>
+              <p className="trust-badge-title">US-Based & Compliant</p>
+              <p className="trust-badge-sub">
+                California LLC, RUO policy enforced
+              </p>
+            </div>
           </div>
         </div>
       </div>
