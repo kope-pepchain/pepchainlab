@@ -892,12 +892,12 @@ function COALibrary() {
           <div className="pdf-modal" onClick={(e) => e.stopPropagation()}>
             <button
               className="pdf-modal-close"
-              onClick={() => setActivePdf(coa.pdf + "#zoom=150")}
+              onClick={() => setActivePdf(coa.pdf)}
             >
               ✕
             </button>
             <iframe
-              src={activePdf}
+              src={`https://docs.google.com/viewer?url=${encodeURIComponent(activePdf)}&embedded=true`}
               className="pdf-iframe"
               title="Certificate of Analysis"
             />
