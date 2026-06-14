@@ -414,7 +414,10 @@ function TrustBar() {
 }
 
 function ProductCard({ product, addToCart, full = false }) {
-  const image = product.images?.[0]?.src || "/placeholder.png";
+  const image =
+    selectedVariant?.image?.src ||
+    product.images?.[0]?.src ||
+    "/placeholder.png";
   const badge = product.tags?.[0]?.name || "Research";
   const shortName = product.name.split("|")[0].trim();
   const isVariable = product.type === "variable";
@@ -548,6 +551,7 @@ function ProductGrid({ addToCart }) {
                 attributes: [{ name: attrName, option: attrValue }],
                 price: (parseInt(v.prices.price, 10) / 100).toFixed(2),
                 stock_status: v.is_in_stock ? "instock" : "outofstock",
+                image: v.images?.[0] || null,
               };
             });
             variation_data.sort(
