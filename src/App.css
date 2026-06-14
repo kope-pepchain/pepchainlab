@@ -2255,12 +2255,12 @@
 
 .ticker-item {
   font-family: var(--font-display);
-  font-size: 0.72rem;
-  font-weight: 400; /* WAS 600, now lighter */
-  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(46, 127, 255, 0.6);
-  padding: 0 2rem;
+  color: rgba(255, 255, 255, 0.25);
+  padding: 0 2.5rem;
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
@@ -2270,10 +2270,11 @@
 }
 
 .ticker-dot {
-  width: 3px;
-  height: 3px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  background: rgba(46, 127, 255, 0.4);
+  background: rgba(46, 127, 255, 0.5);
+  box-shadow: 0 0 6px rgba(46, 127, 255, 0.4);
   flex-shrink: 0;
 }
 
