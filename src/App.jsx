@@ -1,5 +1,5 @@
 import "./App.css";
-import { PayPalScriptProvider, PayPalButtons, PayPalHostedFields, PayPalHostedField, usePayPalHostedFields } from "@paypal/react-paypal-js";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 const WC_URL = import.meta.env.VITE_WC_URL;
@@ -149,104 +149,17 @@ const FEATURES = [
 ];
 
 // ─── COMPONENTS ───
-function CardFields({ parsedAmount, onSuccess, onError, onCancel }) {
-  const hostedFields = usePayPalHostedFields();
-  const [submitting, setSubmitting] = useState(false);
-  const [cardError, setCardError] = useState("");
-
-  const fieldStyle = {
-    input: { "font-size": "0.9rem", color: "#ffffff", "font-family": "Inter, sans-serif" },
-    "input::placeholder": { color: "rgba(255,255,255,0.3)" },
-    ".valid": { color: "#4ade80" },
-    ".invalid": { color: "#f87171" },
-  };
-
-  const inputWrap = {
-    width: "100%", height: "42px", background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.12)", borderRadius: "4px",
-    marginBottom: "0.75rem", padding: "0 0.75rem", boxSizing: "border-box",
-  };
-
-  const handlePay = async () => {
-    if (!hostedFields?.cardFields) return;
-    setSubmitting(true);
-    setCardError("");
-    try {
-      const { orderId } = await hostedFields.cardFields.submit({});
-      const res = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/wallet/topup`, {
-        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-        body: JSON.stringify({ paypal_order_id: orderId, amount: parsedAmount }),
-      });
-      const result = await res.json();
-      if (result.success) { onSuccess(result.new_balance); }
-      else { setCardError(result.message || "Could not credit wallet."); onError(result.message); }
-    } catch { setCardError("Payment failed. Please try again."); onError("Payment failed."); }
-    setSubmitting(false);
-  };
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
-      <PayPalHostedField id="card-number" hostedFieldType="number"
-        options={{ selector: "#card-number", placeholder: "Card number", styles: fieldStyle }}
-        style={inputWrap} />
-      <div style={{ display: "flex", gap: "0.75rem" }}>
-        <PayPalHostedField id="expiration-date" hostedFieldType="expirationDate"
-          options={{ selector: "#expiration-date", placeholder: "MM/YY", styles: fieldStyle }}
-          style={{ ...inputWrap, width: "calc(50% - 0.375rem)" }} />
-        <PayPalHostedField id="cvv" hostedFieldType="cvv"
-          options={{ selector: "#cvv", placeholder: "CVV", styles: fieldStyle }}
-          style={{ ...inputWrap, width: "calc(50% - 0.375rem)" }} />
-      </div>
-      {cardError && <p style={{ color: "#f87171", fontSize: "0.82rem", marginBottom: "0.5rem" }}>{cardError}</p>}
-      <button className="btn-primary" style={{ width: "100%", marginTop: "0.25rem" }} onClick={handlePay} disabled={submitting}>
-        {submitting ? "Processing…" : `Pay $${parsedAmount.toFixed(2)}`}
-      </button>
-      <button className="btn-secondary" style={{ width: "100%", marginTop: "0.5rem" }} onClick={onCancel}>← Back</button>
-    </div>
-  );
-}
-
 function WalletTopupModal({ userId, onSuccess, onClose }) {
   const [amount, setAmount] = useState("");
   const [step, setStep] = useState("amount");
   const [errorMsg, setErrorMsg] = useState("");
-  const [clientToken, setClientToken] = useState(null);
-  const [payMethod, setPayMethod] = useState(null);
   const parsedAmount = parseFloat(amount) || 0;
-
-  useEffect(() => {
-    if (step === "pay" && !clientToken) {
-      fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/paypal-client-token`, { credentials: "include" })
-        .then((r) => r.json())
-        .then((data) => { if (data.client_token) setClientToken(data.client_token); })
-        .catch(() => {});
-    }
-  }, [step]);
-
-  const createOrder = (data, actions) => actions.order.create({
-    purchase_units: [{ amount: { value: parsedAmount.toFixed(2) }, description: "Store Credit - PepChain LLC" }],
-    application_context: { shipping_preference: "NO_SHIPPING" },
-  });
-
-  const onApprove = async (data, actions) => {
-    try {
-      const order = await actions.order.capture();
-      const res = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/wallet/topup`, {
-        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-        body: JSON.stringify({ paypal_order_id: order.id, amount: parsedAmount }),
-      });
-      const result = await res.json();
-      if (result.success) { setStep("success"); setTimeout(() => { onSuccess(result.new_balance); onClose(); }, 2000); }
-      else { setErrorMsg(result.message || "Could not credit wallet."); setStep("error"); }
-    } catch { setErrorMsg("Network error. Contact support with your PayPal receipt."); setStep("error"); }
-  };
 
   return (
     <>
       <div className="modal-overlay" onClick={onClose} />
       <div className="modal" style={{ maxWidth: "460px" }}>
         <button className="modal-close-btn" onClick={onClose}>✕</button>
-
         {step === "amount" && (
           <>
             <p className="section-label">Add Funds</p>
@@ -263,47 +176,39 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
             </button>
           </>
         )}
-
         {step === "pay" && (
           <>
             <p className="section-label">Payment</p>
             <p style={{ color: "var(--white-muted)", fontSize: "0.9rem", marginBottom: "1.25rem" }}>
               Adding <strong style={{ color: "var(--blue-bright)" }}>${parsedAmount.toFixed(2)}</strong> to your wallet
             </p>
-            {!clientToken ? (
-              <p style={{ color: "var(--white-dim)", fontSize: "0.85rem", textAlign: "center", padding: "1rem 0" }}>
-                Loading payment options…
-              </p>
-            ) : (
-              <PayPalScriptProvider options={{ clientId: PAYPAL_CLIENT_ID, currency: "USD", intent: "capture", components: "buttons,hosted-fields", dataClientToken: clientToken }}>
-                {payMethod !== "card" && (
-                  <>
-                    <PayPalButtons style={{ layout: "vertical", shape: "rect", label: "pay" }}
-                      forceReRender={[parsedAmount]} createOrder={createOrder} onApprove={onApprove}
-                      onError={() => { setErrorMsg("PayPal encountered an error."); setStep("error"); }}
-                      onCancel={() => setStep("amount")} />
-                    <button className="btn-secondary" style={{ width: "100%", marginTop: "0.5rem" }}
-                      onClick={() => setPayMethod("card")}>
-                      💳 Pay with Card
-                    </button>
-                  </>
-                )}
-                {payMethod === "card" && (
-                  <PayPalHostedFields createOrder={createOrder}>
-                    <CardFields parsedAmount={parsedAmount}
-                      onSuccess={(bal) => { setStep("success"); setTimeout(() => { onSuccess(bal); onClose(); }, 2000); }}
-                      onError={(msg) => { setErrorMsg(msg); setStep("error"); }}
-                      onCancel={() => setPayMethod(null)} />
-                  </PayPalHostedFields>
-                )}
-              </PayPalScriptProvider>
-            )}
+            <PayPalScriptProvider options={{ clientId: PAYPAL_CLIENT_ID, currency: "USD", intent: "capture", components: "buttons" }}>
+              <PayPalButtons style={{ layout: "vertical", shape: "rect", label: "pay" }}
+                forceReRender={[parsedAmount]}
+                createOrder={(data, actions) => actions.order.create({
+                  purchase_units: [{ amount: { value: parsedAmount.toFixed(2) }, description: "Store Credit - PepChain LLC" }],
+                  application_context: { shipping_preference: "NO_SHIPPING" },
+                })}
+                onApprove={async (data, actions) => {
+                  try {
+                    const order = await actions.order.capture();
+                    const res = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/wallet/topup`, {
+                      method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+                      body: JSON.stringify({ paypal_order_id: order.id, amount: parsedAmount }),
+                    });
+                    const result = await res.json();
+                    if (result.success) { setStep("success"); setTimeout(() => { onSuccess(result.new_balance); onClose(); }, 2000); }
+                    else { setErrorMsg(result.message || "Could not credit wallet."); setStep("error"); }
+                  } catch { setErrorMsg("Network error. Contact support with your PayPal receipt."); setStep("error"); }
+                }}
+                onError={() => { setErrorMsg("PayPal encountered an error."); setStep("error"); }}
+                onCancel={() => setStep("amount")} />
+            </PayPalScriptProvider>
             <button className="btn-secondary" style={{ width: "100%", marginTop: "0.75rem" }} onClick={() => setStep("amount")}>
               ← Change Amount
             </button>
           </>
         )}
-
         {step === "success" && (
           <div className="notify-success" style={{ padding: "1.5rem 0" }}>
             <p className="notify-success-icon">✓</p>
@@ -311,7 +216,6 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
             <p className="notify-success-sub">${parsedAmount.toFixed(2)} has been added to your wallet.</p>
           </div>
         )}
-
         {step === "error" && (
           <div style={{ textAlign: "center", padding: "1rem 0" }}>
             <p style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>⚠</p>
