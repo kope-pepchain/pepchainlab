@@ -1520,6 +1520,7 @@ function ProductPage({ slug, addToCart }) {
               attributes: [{ name: attrName, option: attrValue }],
               price: (parseInt(v.prices.price, 10) / 100).toFixed(2),
               stock_status: v.is_in_stock ? "instock" : "outofstock",
+              image: v.image || null,
             };
           });
           variation_data.sort(
