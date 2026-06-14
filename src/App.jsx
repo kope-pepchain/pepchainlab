@@ -642,19 +642,27 @@ function Hero() {
 }
 
 function TrustBar() {
+  const items = [
+    "99% Purity Guaranteed",
+    "HPLC Verified",
+    "48hr Dispatch",
+    "3rd Party Lab Tested",
+    "COA on Every Batch",
+    "10+ Peptide Compounds",
+    "Research Use Only",
+    "US Based",
+  ];
+  const doubled = [...items, ...items];
   return (
-    <div className="trust-bar">
-      {[
-        { num: "99%", label: "Purity Guaranteed" },
-        { num: "10+", label: "Peptide Compounds" },
-        { num: "3rd", label: "Party Lab Tested" },
-        { num: "48hr", label: "Fast Shipping" },
-      ].map((item) => (
-        <div className="trust-item" key={item.label}>
-          <span className="trust-num">{item.num}</span>
-          <span className="trust-label">{item.label}</span>
-        </div>
-      ))}
+    <div className="ticker-wrap">
+      <div className="ticker-track">
+        {doubled.map((item, i) => (
+          <div className="ticker-item" key={i}>
+            <span className="ticker-dot" />
+            {item}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -837,30 +845,31 @@ function ProductGrid({ addToCart }) {
 }
 function Features() {
   return (
-    <section className="section features-bg" id="about">
-      <div className="section-inner">
-        <p className="section-label" style={{ textAlign: "center" }}>
-          Why Pep-Chain
-        </p>
-        <h2 className="section-title" style={{ textAlign: "center" }}>
-          Built on <span>Science</span>
+    <section className="story-section" id="about">
+      <div className="story-left">
+        <p className="story-eyebrow">Why PepChain</p>
+        <h2 className="story-h2">
+          Built for researchers
+          <br />
+          who demand <span>more</span>
         </h2>
-        <p
-          className="section-sub"
-          style={{ textAlign: "center", maxWidth: "100%" }}
-        >
-          We hold every batch to the highest standards so your research never
-          has to compromise.
+        <p className="story-body">
+          We started PepChain because the research community deserved a supplier
+          that held itself to the same standards as the labs it serves. Every
+          batch independently verified. Every COA published. No exceptions.
         </p>
-        <div className="features-grid">
-          {FEATURES.map((f) => (
-            <div className="feature-card" key={f.title}>
-              <div className="feature-icon">{f.icon}</div>
-              <p className="feature-title">{f.title}</p>
-              <p className="feature-desc">{f.desc}</p>
-            </div>
-          ))}
-        </div>
+        <a className="story-link" href="/coa-library">
+          View COA Library →
+        </a>
+      </div>
+      <div className="story-right">
+        {FEATURES.map((f) => (
+          <div className="story-card" key={f.title}>
+            <div className="story-icon">{f.icon}</div>
+            <p className="story-title">{f.title}</p>
+            <p className="story-desc">{f.desc}</p>
+          </div>
+        ))}
       </div>
     </section>
   );
