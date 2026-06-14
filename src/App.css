@@ -2293,8 +2293,10 @@
 .story-right {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: rgba(46, 127, 255, 0.08);
+  gap: 1rem;
+  background: var(--bg-primary);
+  padding: 2rem;
+  align-content: center;
 }
 
 .story-card {
@@ -2304,6 +2306,8 @@
   flex-direction: column;
   gap: 0.6rem;
   transition: background 0.2s;
+  border-radius: 12px;
+  border: 1px solid var(--border);
 }
 
 .story-card:hover {

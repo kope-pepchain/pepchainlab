@@ -2447,8 +2447,8 @@ export default function App() {
         <Hero />
         <TrustBar />
         <Features />
-        <Disclaimer />
         <Banner />
+        <Disclaimer />
       </main>
       <Footer />
     </>
