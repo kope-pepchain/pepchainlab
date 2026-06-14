@@ -2232,12 +2232,14 @@
   border-top: 1px solid rgba(46, 127, 255, 0.1);
   border-bottom: 1px solid rgba(46, 127, 255, 0.1);
   padding: 0.7rem 0;
+  white-space: nowrap;
 }
 
 .ticker-track {
-  display: flex;
+  display: inline-flex;
   white-space: nowrap;
   width: max-content;
+  will-change: transform;
 }
 
 .ticker-animate {
@@ -2261,7 +2263,7 @@
   text-transform: uppercase;
   color: rgba(46, 127, 255, 0.6);
   padding: 0 2rem;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.75rem;
   white-space: nowrap;
