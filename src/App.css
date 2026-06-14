@@ -2458,22 +2458,6 @@
   overflow: hidden;
 }
 
-.bento-hero::before {
-  content: "";
-  position: absolute;
-  top: -80px;
-  left: 30%;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(46, 127, 255, 0.04) 0%,
-    transparent 70%
-  );
-  pointer-events: none;
-}
-
 .bento-hero-left {
   display: flex;
   flex-direction: column;
