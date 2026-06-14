@@ -1062,10 +1062,6 @@ function Footer() {
               intended solely for laboratory and scientific research use by
               qualified professionals.
             </p>
-            <p>
-              1845 MacArthur Place, Oxnard, CA 93033 ·
-              compliance@pepchainlab.com
-            </p>
           </div>
           <div className="footer-links">
             <h4>Company</h4>
