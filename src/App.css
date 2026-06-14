@@ -933,10 +933,9 @@
 }
 .modal:hover {
   box-shadow:
-    0 0 60px rgba(46, 127, 255, 0.2),
-    0 0 120px rgba(46, 127, 255, 0.08),
-    0 24px 60px rgba(0, 0, 0, 0.7);
-  transition: box-shadow 0.3s ease;
+    0 16px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(46, 127, 255, 0.08);
+  transition: box-shadow 0.25s;
 }
 
 .modal-close-btn {
