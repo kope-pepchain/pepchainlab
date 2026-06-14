@@ -658,23 +658,29 @@ function TrustBar() {
   ];
 
   const trackRef = useRef(null);
-  const posRef = useRef(0);
-  const rafRef = useRef(null);
-
+  
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-    const halfWidth = track.scrollWidth / 2;
+
+    let pos = 0;
+    let halfWidth = 0;
+    let raf;
 
     const tick = () => {
-      posRef.current += 0.5;
-      if (posRef.current >= halfWidth) posRef.current = 0;
-      track.style.transform = `translateX(-${posRef.current}px)`;
-      rafRef.current = requestAnimationFrame(tick);
+      if (!halfWidth) {
+        halfWidth = track.scrollWidth / 2;
+      }
+      if (halfWidth > 0) {
+        pos += 0.5;
+        if (pos >= halfWidth) pos = 0;
+        track.style.transform = `translateX(-${pos}px)`;
+      }
+      raf = requestAnimationFrame(tick);
     };
 
-    rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   const doubled = [...items, ...items];
