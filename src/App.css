@@ -165,6 +165,7 @@
   margin-bottom: 2rem;
   background: rgba(46, 127, 255, 0.07);
   animation: fadeUp 0.6s ease both;
+  align-self: flex-start;
 }
 
 @keyframes pulse {
@@ -1735,12 +1736,34 @@
   inset: 0;
   background:
     radial-gradient(
-      ellipse 55% 75% at 68% 50%,
-      rgba(30, 80, 200, 0.15) 0%,
-      transparent 68%
+      ellipse 50% 60% at 25% 50%,
+      rgba(20, 60, 190, 0.14) 0%,
+      transparent 65%
     ),
-    linear-gradient(180deg, #080d18 0%, #050810 100%);
+    radial-gradient(
+      ellipse 40% 50% at 75% 50%,
+      rgba(46, 127, 255, 0.1) 0%,
+      transparent 60%
+    ),
+    linear-gradient(160deg, #07101e 0%, #050810 55%, #040710 100%);
   z-index: 0;
+  pointer-events: none;
+}
+.hero-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    rgba(46, 127, 255, 0.18) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+  mask-image: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    black 20%,
+    transparent 80%
+  );
+  z-index: 0;
+  opacity: 0.5;
   pointer-events: none;
 }
 
@@ -1760,7 +1783,9 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 10rem 3rem 6rem 4rem;
+  align-items: flex-start;
+  padding: 8rem 3rem 4rem 4rem;
+  gap: 0;
 }
 
 .hero-badge {
@@ -1795,10 +1820,10 @@
 
 .hero-split-title {
   font-family: var(--font-display);
-  font-size: clamp(2.8rem, 5.5vw, 5rem);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  line-height: 1.05;
+  font-size: clamp(3.2rem, 6vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1;
   margin-bottom: 1.25rem;
   animation: fadeUp 0.7s ease both;
 }
@@ -1832,8 +1857,20 @@
   justify-content: center;
   overflow: hidden;
   min-height: 520px;
-  background: #040710;
-  clip-path: polygon(8% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+.hero-sep {
+  position: absolute;
+  left: 0;
+  top: 10%;
+  bottom: 10%;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(46, 127, 255, 0.2),
+    transparent
+  );
+  z-index: 3;
 }
 
 .hero-vial-grid {
@@ -2362,4 +2399,11 @@
   .story-card {
     padding: 1.5rem 1rem;
   }
+}
+.hero-title-line {
+  width: 48px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--blue-bright), transparent);
+  border-radius: 2px;
+  margin-bottom: 1.25rem;
 }

@@ -574,6 +574,7 @@ function Hero() {
   return (
     <section className="hero hero-split">
       <div className="hero-split-bg" />
+      <div className="hero-dots" />
       <div className="hero-grid hero-grid-drift" />
 
       {/* ── Left ── */}
@@ -589,6 +590,7 @@ function Hero() {
           <br />
           Verified.
         </h1>
+        <div className="hero-title-line" />
         <p className="hero-split-sub">
           Every compound independently tested and supplied strictly for
           scientific research by qualified professionals.
@@ -616,6 +618,7 @@ function Hero() {
 
       {/* ── Right: vial showcase ── */}
       <div className="hero-split-right">
+        <div className="hero-sep" />
         <div className="hero-vial-grid" />
         <div className="hero-vial-glow" />
         <div className="hero-vial-scene">
