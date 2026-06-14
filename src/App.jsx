@@ -481,7 +481,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(
                           err.message ||
-                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                            `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
                         );
                       }
                     }
@@ -535,7 +535,9 @@ function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance }) {
           style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
           onClick={onWalletOpen}
         >
-          {walletBalance !== null ? `$${parseFloat(walletBalance).toFixed(2)}` : "Wallet"}
+          {walletBalance !== null
+            ? `$${parseFloat(walletBalance).toFixed(2)}`
+            : "Wallet"}
         </button>
         <button className="nav-cta" onClick={onCartOpen}>
           Cart{" "}
@@ -568,14 +570,13 @@ function Hero() {
         const img = tenMg?.images?.[0]?.src || product.images?.[0]?.src || null;
         if (img) setVialImg(img);
       })
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   return (
     <section className="hero hero-split">
       <div className="hero-split-bg" />
       <div className="hero-dots" />
-      <div className="hero-grid hero-grid-drift" />
 
       {/* ── Left ── */}
       <div className="hero-split-left">
@@ -698,10 +699,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-            a.option;
-          return acc;
-        }, {})
+            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+              a.option;
+            return acc;
+          }, {})
         : null;
 
     addToCart(product, {
@@ -1870,10 +1871,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-            a.option;
-          return acc;
-        }, {})
+            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+              a.option;
+            return acc;
+          }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
