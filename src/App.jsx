@@ -1,6 +1,6 @@
 import "./App.css";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 const WC_URL = import.meta.env.VITE_WC_URL;
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
@@ -656,10 +656,44 @@ function TrustBar() {
     "Research Use Only",
     "US Based",
   ];
+
+  const trackRef = useRef(null);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    // Measure the first half (one set of items)
+    const children = Array.from(track.children);
+    const halfCount = children.length / 2;
+    let halfWidth = 0;
+    for (let i = 0; i < halfCount; i++) {
+      halfWidth += children[i].getBoundingClientRect().width;
+    }
+
+    // Inject a keyframe rule using the exact pixel width
+    const styleId = "ticker-keyframe";
+    let styleEl = document.getElementById(styleId);
+    if (!styleEl) {
+      styleEl = document.createElement("style");
+      styleEl.id = styleId;
+      document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = `
+      @keyframes ticker-exact {
+        0%   { transform: translateX(0px); }
+        100% { transform: translateX(-${halfWidth}px); }
+      }
+    `;
+
+    track.style.animation = `ticker-exact 22s linear infinite`;
+  }, []);
+
   const doubled = [...items, ...items];
+
   return (
     <div className="ticker-wrap">
-      <div className="ticker-track">
+      <div className="ticker-track" ref={trackRef}>
         {doubled.map((item, i) => (
           <div className="ticker-item" key={i}>
             <span className="ticker-dot" />

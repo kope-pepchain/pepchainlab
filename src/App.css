@@ -2235,18 +2235,8 @@
 
 .ticker-track {
   display: flex;
-  animation: ticker 22s linear infinite;
   white-space: nowrap;
   will-change: transform;
-}
-
-@keyframes ticker {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
 }
 
 .ticker-item {
