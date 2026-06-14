@@ -11,8 +11,8 @@
   --white-dim: rgba(255, 255, 255, 0.35);
   --border: rgba(46, 127, 255, 0.2);
   --border-bright: rgba(46, 127, 255, 0.5);
-  --font-display: "Rajdhani", sans-serif;
-  --font-body: "Exo 2", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
 }
 
 *,
