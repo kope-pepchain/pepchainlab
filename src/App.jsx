@@ -159,13 +159,21 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
     <>
       <div className="modal-overlay" onClick={onClose} />
       <div className="modal" style={{ maxWidth: "460px" }}>
-        <button className="modal-close-btn" onClick={onClose}>✕</button>
+        <button className="modal-close-btn" onClick={onClose}>
+          ✕
+        </button>
 
         {step === "amount" && (
           <>
             <p className="section-label">Add Funds</p>
             <h3 className="modal-title">Top Up Your Wallet</h3>
-            <p style={{ color: "var(--white-muted)", fontSize: "0.88rem", marginBottom: "0.5rem" }}>
+            <p
+              style={{
+                color: "var(--white-muted)",
+                fontSize: "0.88rem",
+                marginBottom: "0.5rem",
+              }}
+            >
               Funds are added instantly and can be used on any order.
             </p>
             <input
@@ -176,7 +184,7 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
               className="notify-input"
               placeholder="Amount in USD (min $5)"
               value={amount}
-              onChange={e => setAmount(e.target.value)}
+              onChange={(e) => setAmount(e.target.value)}
               style={{ marginTop: "0.5rem" }}
             />
             <button
@@ -193,28 +201,38 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
         {step === "pay" && (
           <>
             <p className="section-label">Payment</p>
-            <p style={{ color: "var(--white-muted)", fontSize: "0.9rem", marginBottom: "1.25rem" }}>
+            <p
+              style={{
+                color: "var(--white-muted)",
+                fontSize: "0.9rem",
+                marginBottom: "1.25rem",
+              }}
+            >
               Adding{" "}
               <strong style={{ color: "var(--blue-bright)" }}>
                 ${parsedAmount.toFixed(2)}
               </strong>{" "}
               to your wallet
             </p>
-            <PayPalScriptProvider options={{
-              clientId: PAYPAL_CLIENT_ID,
-              currency: "USD",
-              intent: "capture",
-              components: "buttons",
-            }}>
+            <PayPalScriptProvider
+              options={{
+                clientId: PAYPAL_CLIENT_ID,
+                currency: "USD",
+                intent: "capture",
+                components: "buttons",
+              }}
+            >
               <PayPalButtons
                 style={{ layout: "vertical", shape: "rect", label: "pay" }}
                 forceReRender={[parsedAmount]}
                 createOrder={(data, actions) => {
                   return actions.order.create({
-                    purchase_units: [{
-                      amount: { value: parsedAmount.toFixed(2) },
-                      description: "PepChain Store Credit",
-                    }],
+                    purchase_units: [
+                      {
+                        amount: { value: parsedAmount.toFixed(2) },
+                        description: "PepChain Store Credit",
+                      },
+                    ],
                     application_context: { shipping_preference: "NO_SHIPPING" },
                   });
                 }}
@@ -231,18 +249,23 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
                           paypal_order_id: order.id,
                           amount: parsedAmount,
                         }),
-                      }
+                      },
                     );
                     const result = await res.json();
                     if (result.success) {
                       setStep("success");
-                      setTimeout(() => { onSuccess(result.new_balance); onClose(); }, 2000);
+                      setTimeout(() => {
+                        onSuccess(result.new_balance);
+                        onClose();
+                      }, 2000);
                     } else {
                       setErrorMsg(result.message || "Could not credit wallet.");
                       setStep("error");
                     }
                   } catch (err) {
-                    setErrorMsg("Network error. Contact support with your PayPal receipt.");
+                    setErrorMsg(
+                      "Network error. Contact support with your PayPal receipt.",
+                    );
                     setStep("error");
                   }
                 }}
@@ -276,16 +299,31 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
         {step === "error" && (
           <div style={{ textAlign: "center", padding: "1rem 0" }}>
             <p style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>⚠</p>
-            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, marginBottom: "0.5rem" }}>
+            <p
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                marginBottom: "0.5rem",
+              }}
+            >
               Something went wrong
             </p>
-            <p style={{ color: "var(--white-muted)", fontSize: "0.85rem", marginBottom: "1.5rem" }}>
+            <p
+              style={{
+                color: "var(--white-muted)",
+                fontSize: "0.85rem",
+                marginBottom: "1.5rem",
+              }}
+            >
               {errorMsg}
             </p>
             <button
               className="btn-secondary"
               style={{ width: "100%" }}
-              onClick={() => { setStep("amount"); setErrorMsg(""); }}
+              onClick={() => {
+                setStep("amount");
+                setErrorMsg("");
+              }}
             >
               Try Again
             </button>
@@ -443,7 +481,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(
                           err.message ||
-                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                            `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
                         );
                       }
                     }
@@ -509,21 +547,51 @@ function Navbar({ cartCount, onCartOpen, onWalletOpen }) {
 }
 
 function Hero() {
+  const [vialImg, setVialImg] = useState(null);
+
+  useEffect(() => {
+    Promise.all([
+      wcFetch(
+        "products?slug=retatrutide-triple-receptor-agonist-peptide-for-research-use-only",
+      ),
+      wcFetch("products?type=variation&per_page=100"),
+    ])
+      .then(([data, allVariations]) => {
+        const product = data[0];
+        if (!product) return;
+        const parentVariations = (allVariations || []).filter(
+          (v) => v.parent === product.id,
+        );
+        const tenMg = parentVariations.find((v) =>
+          (v.variation || "").toLowerCase().includes("10"),
+        );
+        const img = tenMg?.images?.[0]?.src || product.images?.[0]?.src || null;
+        if (img) setVialImg(img);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
-    <section className="hero">
-      <div className="hero-bg" />
-      <div className="hero-grid" />
-      <div className="hero-content">
-        <div className="hero-badge">Research Grade Peptides</div>
-        <img
-          src="/pep-chain-banner.png"
-          alt="Pep-Chain"
-          className="hero-banner-img"
-        />
-        <p className="hero-desc">
-          Research-grade peptides for qualified professionals. Every compound
-          independently tested, verified, and supplied strictly for scientific
-          research purposes.
+    <section className="hero hero-split">
+      <div className="hero-split-bg" />
+      <div className="hero-grid hero-grid-drift" />
+
+      {/* ── Left ── */}
+      <div className="hero-split-left">
+        <div className="hero-badge">
+          <span className="hero-badge-dot" />
+          Research Grade Peptides
+        </div>
+        <h1 className="hero-split-title">
+          Precision.
+          <br />
+          <span>Purity.</span>
+          <br />
+          Verified.
+        </h1>
+        <p className="hero-split-sub">
+          Every compound independently tested and supplied strictly for
+          scientific research by qualified professionals.
         </p>
         <div className="hero-actions">
           <button
@@ -543,6 +611,30 @@ function Hero() {
           >
             Learn More
           </button>
+        </div>
+      </div>
+
+      {/* ── Right: vial showcase ── */}
+      <div className="hero-split-right">
+        <div className="hero-vial-grid" />
+        <div className="hero-vial-glow" />
+        <div className="hero-vial-scene">
+          <span className="hero-vial-tag">Research Compound</span>
+          <div className="hero-vial-frame">
+            <div className="hero-vial-float">
+              {vialImg ? (
+                <img
+                  src={vialImg}
+                  alt="Retatrutide 10mg"
+                  className="hero-vial-img"
+                />
+              ) : (
+                <div className="hero-vial-placeholder" />
+              )}
+            </div>
+          </div>
+          <div className="hero-vial-shadow" />
+          <span className="hero-vial-tag">Retatrutide · 10mg</span>
         </div>
       </div>
     </section>
@@ -595,10 +687,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-            a.option;
-          return acc;
-        }, {})
+            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+              a.option;
+            return acc;
+          }, {})
         : null;
 
     addToCart(product, {
@@ -1746,10 +1838,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-            a.option;
-          return acc;
-        }, {})
+            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+              a.option;
+            return acc;
+          }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
@@ -2206,14 +2298,18 @@ export default function App() {
       <>
         <div className="noise-overlay" />
         {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
-        <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} onWalletOpen={async () => {
-          const loggedIn = await checkLoggedIn();
-          if (!loggedIn) {
-            window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
-          } else {
-            setWalletOpen(true);
-          }
-        }} />
+        <Navbar
+          cartCount={cartCount}
+          onCartOpen={() => setCartOpen(true)}
+          onWalletOpen={async () => {
+            const loggedIn = await checkLoggedIn();
+            if (!loggedIn) {
+              window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
+            } else {
+              setWalletOpen(true);
+            }
+          }}
+        />
         {walletOpen && (
           <WalletTopupModal
             userId={currentUserId}
@@ -2240,14 +2336,18 @@ export default function App() {
       <>
         <div className="noise-overlay" />
         {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
-        <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} onWalletOpen={async () => {
-          const loggedIn = await checkLoggedIn();
-          if (!loggedIn) {
-            window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
-          } else {
-            setWalletOpen(true);
-          }
-        }} />
+        <Navbar
+          cartCount={cartCount}
+          onCartOpen={() => setCartOpen(true)}
+          onWalletOpen={async () => {
+            const loggedIn = await checkLoggedIn();
+            if (!loggedIn) {
+              window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
+            } else {
+              setWalletOpen(true);
+            }
+          }}
+        />
         {walletOpen && (
           <WalletTopupModal
             userId={currentUserId}
@@ -2286,18 +2386,24 @@ export default function App() {
       </Helmet>
       <div className="noise-overlay" />
       {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
-      <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} onWalletOpen={async () => {
-        const loggedIn = await checkLoggedIn();
-        if (!loggedIn) {
-          window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
-        } else {
-          setWalletOpen(true);
-        }
-      }} />
+      <Navbar
+        cartCount={cartCount}
+        onCartOpen={() => setCartOpen(true)}
+        onWalletOpen={async () => {
+          const loggedIn = await checkLoggedIn();
+          if (!loggedIn) {
+            window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
+          } else {
+            setWalletOpen(true);
+          }
+        }}
+      />
       {walletOpen && (
         <WalletTopupModal
           userId={currentUserId}
-          onSuccess={(newBalance) => { setWalletOpen(false); }}
+          onSuccess={(newBalance) => {
+            setWalletOpen(false);
+          }}
           onClose={() => setWalletOpen(false)}
         />
       )}
