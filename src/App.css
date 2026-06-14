@@ -1723,7 +1723,7 @@
 /* ─── HERO SPLIT ─── */
 .hero-split {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 7fr 3fr;
   min-height: 100vh;
   padding: 0;
   align-items: stretch;
@@ -2249,8 +2249,12 @@
 }
 
 @keyframes ticker-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-25%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-25%);
+  }
 }
 
 .ticker-item {
@@ -2935,6 +2939,7 @@
   }
 }
 
+<<<<<<< HEAD
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; appearance: textfield; }
@@ -2946,3 +2951,19 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
   padding: 1rem;
   margin-bottom: 0.5rem;
 }
+=======
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.nav-banner-img {
+  height: 160px;
+  width: auto;
+  object-fit: contain;
+}
+>>>>>>> b829646 (70 30 hero split and added banner to header)

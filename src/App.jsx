@@ -513,6 +513,11 @@ function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance }) {
     <nav className="navbar">
       <a href="/" className="nav-logo">
         <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+        <img
+          src="/pep-chain-banner.png"
+          alt="PepChain"
+          className="nav-banner-img"
+        />
       </a>
       <ul className="nav-links">
         <li>
