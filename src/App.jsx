@@ -214,6 +214,7 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
             <p className="notify-success-icon">✓</p>
             <p className="notify-success-text">Funds Added!</p>
             <p className="notify-success-sub">${parsedAmount.toFixed(2)} has been added to your wallet.</p>
+            <button className="btn-primary" style={{ marginTop: "1rem", width: "100%" }} onClick={onClose}>Done</button>
           </div>
         )}
         {step === "error" && (
@@ -377,7 +378,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(
                           err.message ||
-                            `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
                         );
                       }
                     }
@@ -471,7 +472,7 @@ function Hero() {
         const img = tenMg?.images?.[0]?.src || product.images?.[0]?.src || null;
         if (img) setVialImg(img);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   return (
@@ -599,10 +600,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
 
     addToCart(product, {
@@ -1870,10 +1871,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
@@ -2225,9 +2226,9 @@ export default function App() {
     }
   });
   const [cartOpen, setCartOpen] = useState(false);
- const [walletOpen, setWalletOpen] = useState(
-  () => new URLSearchParams(window.location.search).get("openWallet") === "true"
-);
+  const [walletOpen, setWalletOpen] = useState(
+    () => new URLSearchParams(window.location.search).get("openWallet") === "true"
+  );
   const [currentUserId, setCurrentUserId] = useState(null);
   const [walletBalance, setWalletBalance] = useState(null);
 
@@ -2354,7 +2355,6 @@ export default function App() {
             userId={currentUserId}
             onSuccess={(newBalance) => {
               setWalletBalance(newBalance);
-              setWalletOpen(false);
             }}
             onClose={() => setWalletOpen(false)}
           />
