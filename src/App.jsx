@@ -657,11 +657,31 @@ function TrustBar() {
     "US Based",
   ];
 
-  const doubled = [...items, ...items, ...items];
+  const trackRef = useRef(null);
+  const posRef = useRef(0);
+  const rafRef = useRef(null);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const halfWidth = track.scrollWidth / 2;
+
+    const tick = () => {
+      posRef.current += 0.5;
+      if (posRef.current >= halfWidth) posRef.current = 0;
+      track.style.transform = `translateX(-${posRef.current}px)`;
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  const doubled = [...items, ...items];
 
   return (
     <div className="ticker-wrap">
-      <div className="ticker-track ticker-animate">
+      <div className="ticker-track" ref={trackRef}>
         {doubled.map((item, i) => (
           <div className="ticker-item" key={i}>
             <span className="ticker-dot" />
