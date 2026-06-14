@@ -682,7 +682,8 @@ function Footer() {
               qualified professionals.
             </p>
             <p>
-              1845 McArthur Place, Oxnard, CA 93033 · compliance@pepchainlab.com
+              1845 MacArthur Place, Oxnard, CA 93033 ·
+              compliance@pepchainlab.com
             </p>
           </div>
           <div className="footer-links">
