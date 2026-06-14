@@ -892,7 +892,7 @@ function COALibrary() {
           <div className="pdf-modal" onClick={(e) => e.stopPropagation()}>
             <button
               className="pdf-modal-close"
-              onClick={() => setActivePdf(null)}
+              onClick={() => setActivePdf(coa.pdf + "#zoom=150")}
             >
               ✕
             </button>

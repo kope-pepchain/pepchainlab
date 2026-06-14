@@ -1321,8 +1321,8 @@
   border: 1px solid var(--border-bright);
   border-radius: 8px;
   width: 90%;
-  max-width: 860px;
-  height: 85vh;
+  max-width: 1000px;
+  height: 92vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
