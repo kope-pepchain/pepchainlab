@@ -414,7 +414,6 @@ function TrustBar() {
 }
 
 function ProductCard({ product, addToCart, full = false }) {
-  const image = product.images?.[0]?.src || "/placeholder.png";
   const badge = product.tags?.[0]?.name || "Research";
   const shortName = product.name.split("|")[0].trim();
   const isVariable = product.type === "variable";
@@ -459,7 +458,15 @@ function ProductCard({ product, addToCart, full = false }) {
   return (
     <div className="product-card">
       <span className="product-badge">{badge}</span>
-      <img src={image} alt={shortName} className="product-img" />
+      <img
+        src={
+          selectedVariant?.image?.src ||
+          product.images?.[0]?.src ||
+          "/placeholder.png"
+        }
+        alt={shortName}
+        className="product-img"
+      />
       <div>
         <p className="product-name">{shortName}</p>
         {isVariable && variants.length > 0 && (
