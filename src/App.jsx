@@ -1,5 +1,6 @@
 import "./App.css";
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 const WC_URL = import.meta.env.VITE_WC_URL;
 
 const wcFetch = (endpoint) => {
@@ -738,6 +739,13 @@ function Footer() {
 function RUOPolicy() {
   return (
     <div className="policy-page">
+      <Helmet>
+        <title>Research Use Only Policy | PepChain LLC</title>
+        <meta
+          name="description"
+          content="PepChain LLC's Research Use Only policy. All products are intended exclusively for in vitro laboratory research by qualified professionals."
+        />
+      </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
           <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
@@ -873,6 +881,13 @@ function COALibrary() {
 
   return (
     <div className="policy-page">
+      <Helmet>
+        <title>Certificate of Analysis Library | PepChain LLC</title>
+        <meta
+          name="description"
+          content="View third-party certificates of analysis for all PepChain peptide products. HPLC and mass spectrometry verified by accredited laboratories."
+        />
+      </Helmet>
       {activePdf && (
         <div className="pdf-modal-overlay" onClick={() => setActivePdf(null)}>
           <div className="pdf-modal" onClick={(e) => e.stopPropagation()}>
@@ -955,6 +970,13 @@ function COALibrary() {
 function TermsOfUse() {
   return (
     <div className="policy-page">
+      <Helmet>
+        <title>Terms of Use | PepChain LLC</title>
+        <meta
+          name="description"
+          content="Read PepChain LLC's Terms of Use. By accessing pepchainlab.com you agree to these terms governing research chemical purchases."
+        />
+      </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
           <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
@@ -1048,6 +1070,13 @@ function TermsOfUse() {
 function ShippingPolicy() {
   return (
     <div className="policy-page">
+      <Helmet>
+        <title>Shipping Policy | PepChain LLC</title>
+        <meta
+          name="description"
+          content="PepChain LLC ships all orders within the continental United States via USPS. Learn about processing times, delivery estimates, and shipping rates."
+        />
+      </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
           <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
@@ -1138,6 +1167,13 @@ function ShippingPolicy() {
 function ReturnsPolicy() {
   return (
     <div className="policy-page">
+      <Helmet>
+        <title>Returns & Replacements | PepChain LLC</title>
+        <meta
+          name="description"
+          content="PepChain LLC's returns and replacement policy. All sales are final. Damaged or incorrect items eligible for replacement within 7 days of delivery."
+        />
+      </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
           <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
@@ -1216,6 +1252,13 @@ function ReturnsPolicy() {
 function PrivacyPolicy() {
   return (
     <div className="policy-page">
+      <Helmet>
+        <title>Privacy Policy | PepChain LLC</title>
+        <meta
+          name="description"
+          content="PepChain LLC's privacy policy. Learn how we collect, use, and protect your personal information in compliance with the CCPA."
+        />
+      </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
           <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
@@ -1712,6 +1755,13 @@ function ShippingBanner() {
 function CatalogPage({ addToCart }) {
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg-primary)" }}>
+      <Helmet>
+        <title>Research Peptides Catalog | PepChain LLC</title>
+        <meta
+          name="description"
+          content="Browse PepChain's full catalog of research-grade peptides. Every compound independently tested, purity verified, for qualified researchers only."
+        />
+      </Helmet>
       <ShippingBanner />
       <section className="section" style={{ paddingTop: "8rem" }}>
         <div className="section-inner">
@@ -1732,6 +1782,13 @@ function CatalogPage({ addToCart }) {
 function AboutPage() {
   return (
     <div className="policy-page">
+      <Helmet>
+        <title>About PepChain | Research Peptide Supplier USA</title>
+        <meta
+          name="description"
+          content="PepChain LLC is a U.S.-based supplier of research-grade peptides. Every batch independently tested with COAs available. Sacramento, CA."
+        />
+      </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
           <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
@@ -1808,6 +1865,13 @@ function AboutPage() {
 function ContactPage() {
   return (
     <div className="policy-page">
+      <Helmet>
+        <title>Contact PepChain | Support & Inquiries</title>
+        <meta
+          name="description"
+          content="Have a question or concern? Contact the PepChain support team at support@pepchainlab.com. We're here to help."
+        />
+      </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
           <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
@@ -2001,6 +2065,13 @@ export default function App() {
 
   return (
     <>
+      <Helmet>
+        <title>PepChain | Research Grade Peptides | USA</title>
+        <meta
+          name="description"
+          content="PepChain LLC supplies research-grade peptides independently tested for purity and potency. For qualified research professionals only. Based in Sacramento, CA."
+        />
+      </Helmet>
       <div className="noise-overlay" />
       {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
       <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} />
