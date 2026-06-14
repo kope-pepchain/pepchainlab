@@ -12,6 +12,7 @@ jobs:
       - name: Build
         env:
           VITE_WC_URL: ${{ secrets.VITE_WC_URL }}
+          VITE_PAYPAL_CLIENT_ID: ${{ secrets.VITE_PAYPAL_CLIENT_ID }}
         run: npm run build
       - name: Clean old assets
         uses: appleboy/ssh-action@v1.0.3
@@ -31,3 +32,4 @@ jobs:
           strip_components: 1
           timeout: 60s
           command_timeout: 10m
+          

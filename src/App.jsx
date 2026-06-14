@@ -1,7 +1,9 @@
 import "./App.css";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 const WC_URL = import.meta.env.VITE_WC_URL;
+const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
 
 const wcFetch = (endpoint) => {
   return fetch(
@@ -147,7 +149,152 @@ const FEATURES = [
 ];
 
 // ─── COMPONENTS ───
+function WalletTopupModal({ userId, onSuccess, onClose }) {
+  const [amount, setAmount] = useState("");
+  const [step, setStep] = useState("amount");
+  const [errorMsg, setErrorMsg] = useState("");
+  const parsedAmount = parseFloat(amount) || 0;
 
+  return (
+    <>
+      <div className="modal-overlay" onClick={onClose} />
+      <div className="modal" style={{ maxWidth: "460px" }}>
+        <button className="modal-close-btn" onClick={onClose}>✕</button>
+
+        {step === "amount" && (
+          <>
+            <p className="section-label">Add Funds</p>
+            <h3 className="modal-title">Top Up Your Wallet</h3>
+            <p style={{ color: "var(--white-muted)", fontSize: "0.88rem", marginBottom: "0.5rem" }}>
+              Funds are added instantly and can be used on any order.
+            </p>
+            <input
+              type="number"
+              min="5"
+              max="5000"
+              step="0.01"
+              className="notify-input"
+              placeholder="Amount in USD (min $5)"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              style={{ marginTop: "0.5rem" }}
+            />
+            <button
+              className="btn-primary"
+              style={{ width: "100%", marginTop: "1rem" }}
+              disabled={parsedAmount < 5}
+              onClick={() => setStep("pay")}
+            >
+              Continue to Payment
+            </button>
+          </>
+        )}
+
+        {step === "pay" && (
+          <>
+            <p className="section-label">Payment</p>
+            <p style={{ color: "var(--white-muted)", fontSize: "0.9rem", marginBottom: "1.25rem" }}>
+              Adding{" "}
+              <strong style={{ color: "var(--blue-bright)" }}>
+                ${parsedAmount.toFixed(2)}
+              </strong>{" "}
+              to your wallet
+            </p>
+            <PayPalScriptProvider options={{
+              clientId: PAYPAL_CLIENT_ID,
+              currency: "USD",
+              intent: "capture",
+              components: "buttons",
+            }}>
+              <PayPalButtons
+                style={{ layout: "vertical", shape: "rect", label: "pay" }}
+                forceReRender={[parsedAmount]}
+                createOrder={(data, actions) => {
+                  return actions.order.create({
+                    purchase_units: [{
+                      amount: { value: parsedAmount.toFixed(2) },
+                      description: "PepChain Store Credit",
+                    }],
+                    application_context: { shipping_preference: "NO_SHIPPING" },
+                  });
+                }}
+                onApprove={async (data, actions) => {
+                  try {
+                    const order = await actions.order.capture();
+                    const res = await fetch(
+                      `${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/wallet/topup`,
+                      {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({
+                          paypal_order_id: order.id,
+                          amount: parsedAmount,
+                        }),
+                      }
+                    );
+                    const result = await res.json();
+                    if (result.success) {
+                      setStep("success");
+                      setTimeout(() => { onSuccess(result.new_balance); onClose(); }, 2000);
+                    } else {
+                      setErrorMsg(result.message || "Could not credit wallet.");
+                      setStep("error");
+                    }
+                  } catch (err) {
+                    setErrorMsg("Network error. Contact support with your PayPal receipt.");
+                    setStep("error");
+                  }
+                }}
+                onError={() => {
+                  setErrorMsg("PayPal encountered an error. Please try again.");
+                  setStep("error");
+                }}
+                onCancel={() => setStep("amount")}
+              />
+            </PayPalScriptProvider>
+            <button
+              className="btn-secondary"
+              style={{ width: "100%", marginTop: "0.75rem" }}
+              onClick={() => setStep("amount")}
+            >
+              ← Change Amount
+            </button>
+          </>
+        )}
+
+        {step === "success" && (
+          <div className="notify-success" style={{ padding: "1.5rem 0" }}>
+            <p className="notify-success-icon">✓</p>
+            <p className="notify-success-text">Funds Added!</p>
+            <p className="notify-success-sub">
+              ${parsedAmount.toFixed(2)} has been added to your wallet.
+            </p>
+          </div>
+        )}
+
+        {step === "error" && (
+          <div style={{ textAlign: "center", padding: "1rem 0" }}>
+            <p style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>⚠</p>
+            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, marginBottom: "0.5rem" }}>
+              Something went wrong
+            </p>
+            <p style={{ color: "var(--white-muted)", fontSize: "0.85rem", marginBottom: "1.5rem" }}>
+              {errorMsg}
+            </p>
+            <button
+              className="btn-secondary"
+              style={{ width: "100%" }}
+              onClick={() => { setStep("amount"); setErrorMsg(""); }}
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
 function AgeGate({ onConfirm }) {
   return (
     <>
@@ -296,7 +443,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(
                           err.message ||
-                            `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
                         );
                       }
                     }
@@ -321,7 +468,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
     </>
   );
 }
-function Navbar({ cartCount, onCartOpen }) {
+function Navbar({ cartCount, onCartOpen, onWalletOpen }) {
   return (
     <nav className="navbar">
       <a href="/" className="nav-logo">
@@ -345,6 +492,13 @@ function Navbar({ cartCount, onCartOpen }) {
         <a href="/my-account" className="nav-icon-btn" title="My Account">
           <IconUser />
         </a>
+        <button
+          className="btn-secondary"
+          style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
+          onClick={onWalletOpen}
+        >
+          Wallet
+        </button>
         <button className="nav-cta" onClick={onCartOpen}>
           Cart{" "}
           {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
@@ -441,10 +595,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
 
     addToCart(product, {
@@ -1592,10 +1746,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
@@ -1947,9 +2101,23 @@ export default function App() {
     }
   });
   const [cartOpen, setCartOpen] = useState(false);
+  const [walletOpen, setWalletOpen] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
+  useEffect(() => {
+    checkLoggedIn().then((loggedIn) => {
+      if (loggedIn) {
+        fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/me`, {
+          credentials: "include",
+        })
+          .then((r) => r.json())
+          .then((data) => setCurrentUserId(data.user_id));
+      }
+    });
+  }, []);
   const [ageVerified, setAgeVerified] = useState(
     () => sessionStorage.getItem("ageVerified") === "true",
   );
@@ -2038,7 +2206,16 @@ export default function App() {
       <>
         <div className="noise-overlay" />
         {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
-        <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} />
+        <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} onWalletOpen={() => setWalletOpen(true)} />
+        {walletOpen && (
+          <WalletTopupModal
+            userId={currentUserId}
+            onSuccess={(newBalance) => {
+              setWalletOpen(false);
+            }}
+            onClose={() => setWalletOpen(false)}
+          />
+        )}
         {cartOpen && (
           <CartDrawer
             cart={cart}
@@ -2056,7 +2233,16 @@ export default function App() {
       <>
         <div className="noise-overlay" />
         {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
-        <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} />
+        <Navbar cartCount={cartCount} onCartOpen={() => setCartOpen(true)} onWalletOpen={() => setWalletOpen(true)} />
+        {walletOpen && (
+          <WalletTopupModal
+            userId={currentUserId}
+            onSuccess={(newBalance) => {
+              setWalletOpen(false);
+            }}
+            onClose={() => setWalletOpen(false)}
+          />
+        )}
         {cartOpen && (
           <CartDrawer
             cart={cart}
