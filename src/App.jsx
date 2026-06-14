@@ -178,11 +178,11 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
             </p>
             <input
               type="number"
-              min="5"
+              min="1"
               max="5000"
               step="0.01"
               className="notify-input"
-              placeholder="Amount in USD (min $5)"
+              placeholder="Amount in USD (min $1)"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               style={{ marginTop: "0.5rem" }}
@@ -190,7 +190,7 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
             <button
               className="btn-primary"
               style={{ width: "100%", marginTop: "1rem" }}
-              disabled={parsedAmount < 5}
+              disabled={parsedAmount < 1}
               onClick={() => setStep("pay")}
             >
               Continue to Payment
