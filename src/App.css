@@ -2011,6 +2011,15 @@
   }
   .hero-split-left {
     padding: 8rem 1.5rem 2rem;
+    align-items: center;
+    text-align: center;
+  }
+  .hero-split-left .hero-actions {
+    justify-content: center;
+    width: 100%;
+  }
+  .hero-badge {
+    align-self: center;
   }
   .hero-split-right {
     min-height: 380px;
