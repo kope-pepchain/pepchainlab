@@ -657,38 +657,10 @@ function TrustBar() {
     "US Based",
   ];
 
-  const trackRef = useRef(null);
-  
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-
-    let pos = 0;
-    let halfWidth = 0;
-    let raf;
-
-    const tick = () => {
-      if (!halfWidth) {
-        halfWidth = track.scrollWidth / 2;
-      }
-      if (halfWidth > 0) {
-        pos += 0.5;
-        if (pos >= halfWidth) pos = 0;
-        track.style.transform = `translateX(-${pos}px)`;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  const doubled = [...items, ...items];
-
   return (
     <div className="ticker-wrap">
-      <div className="ticker-track" ref={trackRef}>
-        {doubled.map((item, i) => (
+      <div className="ticker-track ticker-animate">
+        {[...items, ...items, ...items, ...items].map((item, i) => (
           <div className="ticker-item" key={i}>
             <span className="ticker-dot" />
             {item}
