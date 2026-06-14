@@ -2394,7 +2394,6 @@ export default function App() {
             userId={currentUserId}
             onSuccess={(newBalance) => {
               setWalletBalance(newBalance);
-              setWalletOpen(false);
             }}
             onClose={() => setWalletOpen(false)}
           />
