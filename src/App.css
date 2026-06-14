@@ -930,10 +930,13 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+.modal:hover {
   box-shadow:
     0 0 60px rgba(46, 127, 255, 0.2),
     0 0 120px rgba(46, 127, 255, 0.08),
     0 24px 60px rgba(0, 0, 0, 0.7);
+  transition: box-shadow 0.3s ease;
 }
 
 .modal-close-btn {
