@@ -2230,10 +2230,11 @@
   grid-template-columns: 1fr 1fr;
   background: var(--bg-primary);
   border-top: 1px solid rgba(46, 127, 255, 0.08);
+  align-items: center;
 }
 
 .story-left {
-  padding: 4rem 3rem;
+  padding: 4rem 3rem 4rem 4rem;
   border-right: 1px solid rgba(46, 127, 255, 0.08);
   display: flex;
   flex-direction: column;
