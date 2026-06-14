@@ -2232,7 +2232,9 @@
   border-top: 1px solid rgba(46, 127, 255, 0.1);
   border-bottom: 1px solid rgba(46, 127, 255, 0.1);
   padding: 0.7rem 0;
-  white-space: nowrap;
+  will-change: transform;
+  display: flex; /* ADD */
+  align-items: center; /* ADD */
 }
 
 .ticker-track {
@@ -2258,7 +2260,7 @@
 .ticker-item {
   font-family: var(--font-display);
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 400; /* WAS 600, now lighter */
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(46, 127, 255, 0.6);
