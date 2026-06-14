@@ -2225,6 +2225,7 @@
   }
 }
 /* ─── TICKER ─── */
+/* ─── TICKER ─── */
 .ticker-wrap {
   overflow: hidden;
   background: rgba(8, 13, 24, 0.9);
@@ -2236,7 +2237,20 @@
 .ticker-track {
   display: flex;
   white-space: nowrap;
-  will-change: transform;
+  width: max-content;
+}
+
+.ticker-animate {
+  animation: ticker-scroll 40s linear infinite;
+}
+
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .ticker-item {
@@ -2434,7 +2448,7 @@
   align-items: center;
   gap: 3rem;
   padding: 3rem;
-  border-top: 1px solid var(--blue-bright);
+  border-top: 1px solid var(--border);
   background: linear-gradient(
     135deg,
     rgba(20, 50, 140, 0.18) 0%,
@@ -2454,7 +2468,7 @@
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(46, 127, 255, 0.1) 0%,
+    rgba(46, 127, 255, 0.04) 0%,
     transparent 70%
   );
   pointer-events: none;

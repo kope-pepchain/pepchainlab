@@ -657,43 +657,11 @@ function TrustBar() {
     "US Based",
   ];
 
-  const trackRef = useRef(null);
-
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-
-    requestAnimationFrame(() => {
-      const children = Array.from(track.children);
-      const halfCount = children.length / 2;
-      let halfWidth = 0;
-      for (let i = 0; i < halfCount; i++) {
-        halfWidth += children[i].getBoundingClientRect().width;
-      }
-
-      const styleId = "ticker-keyframe";
-      let styleEl = document.getElementById(styleId);
-      if (!styleEl) {
-        styleEl = document.createElement("style");
-        styleEl.id = styleId;
-        document.head.appendChild(styleEl);
-      }
-      styleEl.textContent = `
-      @keyframes ticker-exact {
-        0%   { transform: translateX(0px); }
-        100% { transform: translateX(-${halfWidth}px); }
-      }
-    `;
-
-      track.style.animation = `ticker-exact 40s linear infinite`;
-    });
-  }, []);
-
   const doubled = [...items, ...items];
 
   return (
     <div className="ticker-wrap">
-      <div className="ticker-track" ref={trackRef}>
+      <div className="ticker-track ticker-animate">
         {doubled.map((item, i) => (
           <div className="ticker-item" key={i}>
             <span className="ticker-dot" />
@@ -704,7 +672,6 @@ function TrustBar() {
     </div>
   );
 }
-
 function ProductCard({ product, addToCart, full = false }) {
   const badge = product.tags?.[0]?.name || "Research";
   const shortName = product.name.split("|")[0].trim();
