@@ -2684,7 +2684,6 @@
   align-items: center;
   gap: 3rem;
   padding: 2.5rem 3rem;
-  border-top: 1px solid var(--blue-bright);
   background: linear-gradient(
     135deg,
     rgba(20, 50, 140, 0.2) 0%,
