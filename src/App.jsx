@@ -2225,7 +2225,9 @@ export default function App() {
     }
   });
   const [cartOpen, setCartOpen] = useState(false);
-  const [walletOpen, setWalletOpen] = useState(false);
+ const [walletOpen, setWalletOpen] = useState(
+  () => new URLSearchParams(window.location.search).get("openWallet") === "true"
+);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [walletBalance, setWalletBalance] = useState(null);
 
