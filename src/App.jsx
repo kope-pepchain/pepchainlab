@@ -2295,6 +2295,24 @@ function ContactPage() {
   );
 }
 
+function CartToast({ toast, onView, onClose }) {
+  if (!toast) return null;
+  return (
+    <div className="cart-toast" key={toast.id}>
+      <div className="cart-toast-check">✓</div>
+      <img src={toast.image} alt="" className="cart-toast-img" />
+      <div className="cart-toast-info">
+        <p className="cart-toast-label">Added to Cart</p>
+        <p className="cart-toast-name">{toast.name}</p>
+        {toast.dose && <p className="cart-toast-dose">{toast.dose}</p>}
+        <p className="cart-toast-price">{toast.price}</p>
+      </div>
+      <button className="cart-toast-view" onClick={onView}>View Cart</button>
+      <button className="cart-toast-close" onClick={onClose} aria-label="Dismiss">✕</button>
+    </div>
+  );
+}
+
 // ─── APP ───
 export default function App() {
   const [cart, setCart] = useState(() => {
@@ -2311,6 +2329,7 @@ export default function App() {
     return cached !== null ? cached : null;
   });
   const [cartSyncing, setCartSyncing] = useState(false);
+  const [toast, setToast] = useState(null);
   // reveal the instant the stylesheet is actually loaded (no fixed delay)
 
   // Map a CoCart response into our drawer shape. ONE place to fix if fields differ.
@@ -2327,6 +2346,13 @@ export default function App() {
 
   // cache drawer locally so it paints instantly next load
   useEffect(() => { localStorage.setItem("cart", JSON.stringify(cart)); }, [cart]);
+
+  // auto-dismiss the "added to cart" toast after a few seconds
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3500);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   // wallet balance + user id for navbar/top-up — single /me call (was two)
   useEffect(() => {
@@ -2420,6 +2446,13 @@ export default function App() {
       if (existing) return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + 1 } : i));
       return [...prev, { key, name: product.name, dose: variant.dose, price: variant.price, qty: 1, variation_id: variant.variation_id || null, variation: variant.variation || null }];
     });
+    setToast({
+      id: Date.now(),
+      name: product.name.split("|")[0].trim(),
+      dose: variant.dose,
+      price: variant.price,
+      image: getLocalImage(product.slug) || product.images?.[0]?.src || "/placeholder.png",
+    });
     try {
       let cartKey = localStorage.getItem("wcCartKey");
       if (!cartKey) {
@@ -2482,6 +2515,11 @@ export default function App() {
             onQtyChange={handleQtyChange}
           />
         )}
+        <CartToast
+          toast={toast}
+          onView={() => { setToast(null); setCartOpen(true); }}
+          onClose={() => setToast(null)}
+        />
         <CatalogPage addToCart={addToCart} />
         <Footer />
       </>
@@ -2523,6 +2561,11 @@ export default function App() {
             onQtyChange={handleQtyChange}
           />
         )}
+        <CartToast
+          toast={toast}
+          onView={() => { setToast(null); setCartOpen(true); }}
+          onClose={() => setToast(null)}
+        />
         <ShippingBanner />
         <ProductPage
           slug={path.replace("/product/", "")}
@@ -2576,6 +2619,11 @@ export default function App() {
           onQtyChange={handleQtyChange}
         />
       )}
+      <CartToast
+        toast={toast}
+        onView={() => { setToast(null); setCartOpen(true); }}
+        onClose={() => setToast(null)}
+      />
       <main>
         <Hero />
         <TrustBar />
