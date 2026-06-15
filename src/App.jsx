@@ -2235,7 +2235,7 @@ export default function App() {
     Object.values(data?.items || {}).map((it) => ({
       key: it.item_key, item_key: it.item_key, name: it.name,
       dose: it.meta?.variation ? Object.values(it.meta.variation).join(", ") : "",
-      price: `$${parseFloat(it.price).toFixed(2)}`,
+      price: `$${(parseFloat(it.price) / 100).toFixed(2)}`,
       qty: it.quantity?.value ?? it.quantity,
       variation_id: it.id, variation: it.meta?.variation || null,
     }));
@@ -2256,16 +2256,22 @@ export default function App() {
 
   // server cart = source of truth: hydrate drawer from it on load
   useEffect(() => {
-    (async () => {
+    const resync = async () => {
       const cartKey = localStorage.getItem("wcCartKey");
       if (!cartKey) return;
       try {
-        const res = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart?cart_key=${cartKey}`, { credentials: "include" });
+        const res = await fetch(
+          `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart?cart_key=${cartKey}`,
+          { credentials: "include" }
+        );
         const data = await res.json();
-        console.log("CoCart cart:", data);  // check shape once, then delete this line
         setCart(mapCoCart(data));
-      } catch (e) { console.warn("hydrate failed", e); }
-    })();
+      } catch (e) {
+        console.warn("resync failed", e);
+      }
+    };
+    window.addEventListener("focus", resync);
+    return () => window.removeEventListener("focus", resync);
   }, []);
 
   const [ageVerified, setAgeVerified] = useState(() => sessionStorage.getItem("ageVerified") === "true");
