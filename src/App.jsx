@@ -520,9 +520,23 @@ function Hero() {
                   fetchPriority="high"
                   style={{
                     opacity: 0,
-                    transition: "opacity 0.4s ease",
+                    transform: "translateY(12px)",
+                    transition: "opacity 0.7s ease, transform 0.7s ease",
                   }}
-                  onLoad={(e) => { e.currentTarget.style.opacity = 1; }}
+                  ref={(node) => {
+                    if (node && node.complete) {
+                      node.style.opacity = 1;
+                      node.style.transform = "translateY(0)";
+                    }
+                  }}
+                  onLoad={(e) => {
+                    e.currentTarget.style.opacity = 1;
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.style.opacity = 1;
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
                 />
               ) : (
                 <div className="hero-vial-placeholder" />
