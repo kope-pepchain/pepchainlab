@@ -2315,10 +2315,7 @@ export default function App() {
   });
   const [cartSyncing, setCartSyncing] = useState(false);
   const [toast, setToast] = useState(null);
-  const addQueueRef = useRef(Promise.resolve());
-  const pendingAddsRef = useRef(0);
   const cartKeyFetchRef = useRef(null);
-  const cartRef = useRef([]);
   // reveal the instant the stylesheet is actually loaded (no fixed delay)
 
   // Validates the stored key looks real (CoCart keys are 32+ char hex strings,
@@ -2363,7 +2360,6 @@ export default function App() {
   // cache drawer locally so it paints instantly next load
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
-    cartRef.current = cart;
   }, [cart]);
 
   // auto-dismiss the "added to cart" toast after a few seconds
@@ -2390,120 +2386,42 @@ export default function App() {
       .catch(() => {});
   }, []);
 
-  // server cart = source of truth. Debounced so focus + visibilitychange firing
-  // together (which they do on every tab-return) collapse into ONE call instead of two.
-  // Also guards against overlapping in-flight requests.
+  // The cart is now fully local during browsing — no live CoCart sync, so
+  // nothing can race or get overwritten. CoCart is only touched once, at
+  // checkout (see CartDrawer's onClick), which clears it and pushes the full
+  // local cart over right before redirecting.
+  //
+  // One thing still matters on mount: if the user is coming BACK from
+  // WooCommerce checkout, their local cart was already handed off — clear it
+  // so old items don't reappear.
   useEffect(() => {
-    let debounceTimer = null;
-    let inFlight = false;
-
-    const doResync = async (loud = false) => {
-      const cartKey = localStorage.getItem("wcCartKey");
-      if (!cartKey || inFlight) return;
-      // Re-check inside the async body — pendingAdds may have incremented
-      // between the debounce scheduling and actual execution.
-      if (pendingAddsRef.current > 0) return;
-      inFlight = true;
-      if (loud) setCartSyncing(true);
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart?cart_key=${cartKey}`,
-          { credentials: "include", cache: "no-store" }
-        );
-        const data = await res.json();
-        setCart(mapCoCart(data));
-      } catch (e) {
-        console.warn("resync failed", e);
-      } finally {
-        inFlight = false;
-        if (loud) setCartSyncing(false);
-      }
-    };
-
-    // collapse rapid-fire triggers (focus + visibility firing together) into one call
-    const resync = (loud = false) => {
-      if (debounceTimer) clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => doResync(loud), 500);
-    };
-
     const cameFromWP = sessionStorage.getItem("returningFromWP") === "1";
     sessionStorage.removeItem("returningFromWP");
-    doResync(cameFromWP); // initial mount: fire immediately, not debounced
-
-    const onFocus = () => resync(false);
-    const onVisible = () => { if (document.visibilityState === "visible") resync(false); };
-    const onPageshow = (e) => { if (e.persisted) resync(true); };
-    window.addEventListener("focus", onFocus);
-    document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("pageshow", onPageshow);
-    return () => {
-      if (debounceTimer) clearTimeout(debounceTimer);
-      window.removeEventListener("focus", onFocus);
-      document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("pageshow", onPageshow);
-    };
+    if (cameFromWP) {
+      setCart([]);
+      localStorage.removeItem("wcCartKey");
+    }
   }, []);
   const [ageVerified, setAgeVerified] = useState(() => sessionStorage.getItem("ageVerified") === "true");
   const handleAgeConfirm = () => { sessionStorage.setItem("ageVerified", "true"); setAgeVerified(true); };
 
-  // qty/remove writes to CoCart so edits stick. Uses the same queue pattern as
-  // addToCart: compute newQty from the LATEST cart state (not the stale closure
-  // value), and serialize network writes so rapid clicks don't race each other.
+  // Pure local edit — no network call, so spam-clicking +/- is instant and
+  // can never race or get overwritten by a server response.
   const handleQtyChange = (key, delta) => {
-    // Read from cartRef.current — this is always the latest committed state,
-    // even under rapid clicks, because the ref is updated in the cart effect.
-    const item = cartRef.current.find((i) => i.key === key);
-    if (!item) return;
-
-    const capturedQty = item.qty + delta;
-    const capturedItemKey = item.item_key;
-    const cartKey = localStorage.getItem("wcCartKey");
-
-    // Optimistic UI update
     setCart((prev) => {
-      if (capturedQty <= 0) return prev.filter((i) => i.key !== key);
-      return prev.map((i) => (i.key === key ? { ...i, qty: capturedQty } : i));
-    });
-
-    // No item_key means it hasn't committed to CoCart yet — addToCart's final
-    // queue response will reconcile. Skip the network call.
-    if (!capturedItemKey) return;
-    if (!cartKey || cartKey.length < 10) return;
-
-    pendingAddsRef.current += 1;
-    addQueueRef.current = addQueueRef.current.then(async () => {
-      const url = `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/item/${capturedItemKey}?cart_key=${cartKey}`;
-      try {
-        if (capturedQty <= 0) {
-          await fetch(url, { method: "DELETE", credentials: "include" });
-        } else {
-          await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ quantity: String(capturedQty) }),
-          });
-        }
-      } catch (e) {
-        console.warn("qty sync failed", e);
-      } finally {
-        pendingAddsRef.current = Math.max(0, pendingAddsRef.current - 1);
-      }
+      const item = prev.find((i) => i.key === key);
+      if (!item) return prev;
+      const nextQty = item.qty + delta;
+      if (nextQty <= 0) return prev.filter((i) => i.key !== key);
+      return prev.map((i) => (i.key === key ? { ...i, qty: nextQty } : i));
     });
   };
 
-  // Waits for all pending cart writes to finish before doing something
-  // (used by page navigation to avoid abandoning in-flight requests)
-  const waitForCart = () => addQueueRef.current;
-
+  // Pure local add — no network call, so spamming "Add to Cart" is instant
+  // and the count never lags or drops back down. CoCart is only touched
+  // once, at checkout.
   const addToCart = (product, variant) => {
     const key = `${product.id}-${variant.dose}`;
-    // Capture now — the async closure below needs these, not stale refs
-    const capturedVariant = { ...variant };
-    const capturedProductId = product.id;
-    const capturedSlug = product.slug;
-
-    // Optimistic local update — instant UI feedback
     setCart((prev) => {
       const existing = prev.find((i) => i.key === key);
       if (existing) return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + 1 } : i));
@@ -2514,43 +2432,7 @@ export default function App() {
       name: product.name.split("|")[0].trim(),
       dose: variant.dose,
       price: variant.price,
-      image: getLocalImage(capturedSlug) || product.images?.[0]?.src || "/placeholder.png",
-    });
-
-    pendingAddsRef.current += 1;
-    addQueueRef.current = addQueueRef.current.then(async () => {
-      let lastOkData = null;
-      try {
-        const cartKey = await getCartKey();
-        const addRes = await fetch(
-          `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-              id: String(capturedVariant.variation_id || capturedProductId),
-              quantity: "1",
-              ...(capturedVariant.variation_id && {
-                variation_id: capturedVariant.variation_id,
-                variation: capturedVariant.variation,
-              }),
-            }),
-          }
-        );
-        if (addRes.status === 404) localStorage.removeItem("wcCartKey");
-        const data = await addRes.json();
-        if (addRes.ok && data?.items) lastOkData = data;
-      } catch (e) {
-        console.warn("add sync failed", e);
-      } finally {
-        // Always decrement exactly once, no matter what path we took above
-        pendingAddsRef.current = Math.max(0, pendingAddsRef.current - 1);
-        // Only apply the server's cart once all queued adds have completed
-        if (pendingAddsRef.current === 0 && lastOkData) {
-          setCart(mapCoCart(lastOkData));
-        }
-      }
+      image: getLocalImage(product.slug) || product.images?.[0]?.src || "/placeholder.png",
     });
   };
   const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
@@ -2575,12 +2457,7 @@ export default function App() {
           onCartOpen={() => setCartOpen(true)}
           cartSyncing={cartSyncing}
           walletBalance={walletBalance}
-          onNavigate={async (url) => {
-            if (pendingAddsRef.current > 0) {
-              await addQueueRef.current;
-            }
-            window.location.href = url;
-          }}
+          onNavigate={(url) => { window.location.href = url; }}
           onWalletOpen={async () => {
             const loggedIn = await checkLoggedIn();
             if (loggedIn === false) {
