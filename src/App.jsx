@@ -2292,14 +2292,26 @@ export default function App() {
   const [cartSyncing, setCartSyncing] = useState(false);
   // reveal the instant the stylesheet is actually loaded (no fixed delay)
   useEffect(() => {
-    const reveal = () => document.getElementById("root")?.classList.add("loaded");
+    const root = document.getElementById("root");
+    const reveal = () => root?.classList.add("loaded");
+    
+    // Reveal immediately if already loaded
     if (document.readyState === "complete") {
       reveal();
     } else {
       window.addEventListener("load", reveal, { once: true });
-      const t = setTimeout(reveal, 800); // safety net, never hangs
+      const t = setTimeout(reveal, 800);
       return () => { window.removeEventListener("load", reveal); clearTimeout(t); };
     }
+
+    // Keep it visible when tabbing back — never let it go grey
+    const keepVisible = () => root?.classList.add("loaded");
+    document.addEventListener("visibilitychange", keepVisible);
+    window.addEventListener("focus", keepVisible);
+    return () => {
+      document.removeEventListener("visibilitychange", keepVisible);
+      window.removeEventListener("focus", keepVisible);
+    };
   }, []);
 
   // Map a CoCart response into our drawer shape. ONE place to fix if fields differ.
