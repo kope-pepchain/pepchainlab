@@ -453,29 +453,9 @@ function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance, cartSyncin
 }
 
 function Hero() {
-  const [vialImg, setVialImg] = useState(null);
-
-  useEffect(() => {
-    Promise.all([
-      wcFetch(
-        "products?slug=retatrutide-triple-receptor-agonist-peptide-for-research-use-only",
-      ),
-      wcFetch("products?type=variation&per_page=100"),
-    ])
-      .then(([data, allVariations]) => {
-        const product = data[0];
-        if (!product) return;
-        const parentVariations = (allVariations || []).filter(
-          (v) => v.parent === product.id,
-        );
-        const tenMg = parentVariations.find((v) =>
-          (v.variation || "").toLowerCase().includes("10"),
-        );
-        const img = tenMg?.images?.[0]?.src || product.images?.[0]?.src || null;
-        if (img) setVialImg(img);
-      })
-      .catch(() => { });
-  }, []);
+  const [vialImg] = useState(
+    "https://pepchainlab.com/wp-content/uploads/2026/06/reta10fixed.png"
+  );
 
   return (
     <section className="hero hero-split">
@@ -2229,9 +2209,7 @@ export default function App() {
   );
   const [currentUserId, setCurrentUserId] = useState(null);
   const [walletBalance, setWalletBalance] = useState(null);
-  const [cartSyncing, setCartSyncing] = useState(
-    () => !!localStorage.getItem("wcCartKey")
-  );
+  const [cartSyncing, setCartSyncing] = useState(false);
 
   // Map a CoCart response into our drawer shape. ONE place to fix if fields differ.
   // If prices come out ~100x too big in testing, CoCart returns cents:
@@ -2259,36 +2237,39 @@ export default function App() {
     });
   }, []);
 
-  // server cart = source of truth: hydrate drawer from it whenever the page is seen
+  // server cart = source of truth. Tab-switching resyncs QUIETLY (count just
+  // updates, no banner). Returning from the WP cart (browser-back / bfcache)
+  // resyncs LOUDLY so you never see a stale count flash.
   useEffect(() => {
-    const resync = async () => {
+    const resync = async (loud = false) => {
       const cartKey = localStorage.getItem("wcCartKey");
       if (!cartKey) return;
-      setCartSyncing(true); // show "Syncing…" BEFORE the await, every time
+      if (loud) setCartSyncing(true);
       try {
         const res = await fetch(
           `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart?cart_key=${cartKey}`,
           { credentials: "include", cache: "no-store" }
         );
         const data = await res.json();
-        setCart(mapCoCart(data)); // server is truth — overwrite local
+        setCart(mapCoCart(data));
       } catch (e) {
         console.warn("resync failed", e);
       } finally {
-        setCartSyncing(false);
+        if (loud) setCartSyncing(false);
       }
     };
 
-    const onVisible = () => {
-      if (document.visibilityState === "visible") resync();
-    };
-    window.addEventListener("focus", resync);
+    resync(false); // quiet background sync on first load
+    const onFocus = () => resync(false); // tab back in: quiet
+    const onVisible = () => { if (document.visibilityState === "visible") resync(false); };
+    const onPageshow = (e) => { if (e.persisted) resync(true); }; // back from WP cart: loud
+    window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("pageshow", resync);
+    window.addEventListener("pageshow", onPageshow);
     return () => {
-      window.removeEventListener("focus", resync);
+      window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("pageshow", resync);
+      window.removeEventListener("pageshow", onPageshow);
     };
   }, []);
 
