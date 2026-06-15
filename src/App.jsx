@@ -732,8 +732,22 @@ function ProductCard({ product, addToCart, full = false }) {
 }
 
 function ProductGrid({ addToCart }) {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Start with cached catalog if we have it — page renders instantly on revisit.
+  const [products, setProducts] = useState(() => {
+    try {
+      const cached = localStorage.getItem("catalogCache");
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [loading, setLoading] = useState(() => {
+    try {
+      return !localStorage.getItem("catalogCache");
+    } catch {
+      return true;
+    }
+  });
 
   useEffect(() => {
     pepFetch("catalog")
@@ -745,6 +759,11 @@ function ProductGrid({ addToCart }) {
         }));
         setProducts(withLocalImg);
         setLoading(false);
+        try {
+          localStorage.setItem("catalogCache", JSON.stringify(withLocalImg));
+        } catch (e) {
+          console.warn("catalog cache write failed", e);
+        }
       })
       .catch((err) => {
         console.error(err);
@@ -752,7 +771,7 @@ function ProductGrid({ addToCart }) {
       });
   }, []);
 
-  if (loading)
+  if (loading && products.length === 0)
     return (
       <p style={{ color: "var(--white-dim)", padding: "4rem 0" }}>Loading…</p>
     );
@@ -1784,9 +1803,37 @@ function NotifyModal({ product, variationId, onClose }) {
 }
 
 function ProductPage({ slug, addToCart }) {
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [selectedVariant, setSelectedVariant] = useState(null);
+  // Start with cached product if we have one — instant render on revisit.
+  const [product, setProduct] = useState(() => {
+    try {
+      const cached = localStorage.getItem(`productCache:${slug}`);
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [loading, setLoading] = useState(() => {
+    try {
+      return !localStorage.getItem(`productCache:${slug}`);
+    } catch {
+      return true;
+    }
+  });
+  const [selectedVariant, setSelectedVariant] = useState(() => {
+    try {
+      const cached = localStorage.getItem(`productCache:${slug}`);
+      if (cached) {
+        const p = JSON.parse(cached);
+        if (p && p.type === "variable") {
+          const firstInStock = (p.variation_data || []).find(
+            (v) => v.stock_status === "instock",
+          );
+          return firstInStock || p.variation_data?.[0] || null;
+        }
+      }
+    } catch {}
+    return null;
+  });
   const [authChecked, setAuthChecked] = useState(false);
   const [showNotify, setShowNotify] = useState(false);
 
@@ -1812,17 +1859,27 @@ function ProductPage({ slug, addToCart }) {
         }
         setProduct(p);
         if (p.type === "variable") {
-          const firstInStock = (p.variation_data || []).find(
-            (v) => v.stock_status === "instock",
-          );
-          setSelectedVariant(firstInStock || p.variation_data?.[0] || null);
+          setSelectedVariant((current) => {
+            if (current && (p.variation_data || []).some((v) => v.id === current.id)) {
+              return current;
+            }
+            const firstInStock = (p.variation_data || []).find(
+              (v) => v.stock_status === "instock",
+            );
+            return firstInStock || p.variation_data?.[0] || null;
+          });
         }
         setLoading(false);
+        try {
+          localStorage.setItem(`productCache:${slug}`, JSON.stringify(p));
+        } catch (e) {
+          console.warn("product cache write failed", e);
+        }
       })
       .catch(() => setLoading(false));
   }, [slug]);
 
-  if (loading)
+  if (loading && !product)
     return (
       <div className="policy-page">
         <p
