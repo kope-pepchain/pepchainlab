@@ -2243,15 +2243,17 @@ export default function App() {
   // cache drawer locally so it paints instantly next load
   useEffect(() => { localStorage.setItem("cart", JSON.stringify(cart)); }, [cart]);
 
-  // RESTORED: wallet balance + user id for navbar/top-up
+  // wallet balance + user id for navbar/top-up — single /me call (was two)
   useEffect(() => {
-    checkLoggedIn().then((loggedIn) => {
-      if (loggedIn) {
-        fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/me`, { credentials: "include" })
-          .then((r) => r.json())
-          .then((data) => { setCurrentUserId(data.user_id); setWalletBalance(data.wallet_balance); });
-      }
-    });
+    fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/me`, { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.logged_in) {
+          setCurrentUserId(data.user_id);
+          setWalletBalance(data.wallet_balance);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // server cart = source of truth. On first load + on returning from the WP cart,
