@@ -2383,8 +2383,8 @@ export default function App() {
     const doResync = async (loud = false) => {
       const cartKey = localStorage.getItem("wcCartKey");
       if (!cartKey || inFlight) return;
-      // Don't resync while cart writes are pending — the server's view is stale
-      // until they commit, and applying it would clobber the user's optimistic state.
+      // Re-check inside the async body — pendingAdds may have incremented
+      // between the debounce scheduling and actual execution.
       if (pendingAddsRef.current > 0) return;
       inFlight = true;
       if (loud) setCartSyncing(true);
@@ -2406,7 +2406,7 @@ export default function App() {
     // collapse rapid-fire triggers (focus + visibility firing together) into one call
     const resync = (loud = false) => {
       if (debounceTimer) clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => doResync(loud), 300);
+      debounceTimer = setTimeout(() => doResync(loud), 500);
     };
 
     const cameFromWP = sessionStorage.getItem("returningFromWP") === "1";
@@ -2433,21 +2433,23 @@ export default function App() {
   // addToCart: compute newQty from the LATEST cart state (not the stale closure
   // value), and serialize network writes so rapid clicks don't race each other.
   const handleQtyChange = (key, delta) => {
-    let nextQty = null;
-    let itemKey = null;
-    // Functional updater reads the current cart synchronously — avoids the
-    // stale-closure bug where rapid clicks all compute newQty from the same old qty.
-    setCart((prev) => {
-      const item = prev.find((i) => i.key === key);
-      if (!item) return prev;
-      nextQty = item.qty + delta;
-      itemKey = item.item_key;
-      return prev.map((i) => (i.key === key ? { ...i, qty: nextQty } : i)).filter((i) => i.qty > 0);
-    });
+    // Read current cart state synchronously before any async work
+    const currentCart = cart;
+    const item = currentCart.find((i) => i.key === key);
+    if (!item) return;
+    const capturedQty = item.qty + delta;
+    const capturedItemKey = item.item_key;
     const cartKey = localStorage.getItem("wcCartKey");
-    if (nextQty === null || !cartKey || !itemKey) return;
-    const capturedQty = nextQty;
-    const capturedItemKey = itemKey;
+
+    // Optimistic local update
+    setCart((prev) =>
+      prev
+        .map((i) => (i.key === key ? { ...i, qty: capturedQty } : i))
+        .filter((i) => i.qty > 0)
+    );
+
+    if (!cartKey || !capturedItemKey) return;
+
     pendingAddsRef.current += 1;
     addQueueRef.current = addQueueRef.current.then(async () => {
       const url = `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/item/${capturedItemKey}?cart_key=${cartKey}`;
@@ -2501,11 +2503,13 @@ export default function App() {
           body: JSON.stringify({ id: String(variant.variation_id || product.id), quantity: "1", ...(variant.variation_id && { variation_id: variant.variation_id, variation: variant.variation }) }),
         });
         const data = await addRes.json();
-        pendingAddsRef.current -= 1;
-        // Only apply server's view of the cart once the queue is fully drained.
-        // Intermediate responses are stale — they don't include the clicks queued after them.
-        if (pendingAddsRef.current === 0 && addRes.ok && data?.items) {
-          setCart(mapCoCart(data));
+        if (addRes.ok && data?.items) {
+          pendingAddsRef.current -= 1;
+          if (pendingAddsRef.current === 0) {
+            setCart(mapCoCart(data));
+          }
+        } else {
+          pendingAddsRef.current = Math.max(0, pendingAddsRef.current - 1);
         }
       } catch (e) {
         pendingAddsRef.current = Math.max(0, pendingAddsRef.current - 1);
