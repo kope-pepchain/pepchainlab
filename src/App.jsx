@@ -5,28 +5,39 @@ import { Helmet } from "react-helmet-async";
 const WC_URL = import.meta.env.VITE_WC_URL;
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
 const IMAGE_MAP = {
-  "retatrutide": "https://pepchainlab.com/wp-content/uploads/2026/06/reta10fixed.png",
-  "retatrutide-20": "https://pepchainlab.com/wp-content/uploads/2026/06/reta20fixed.png",
-  "retatrutide-30": "https://pepchainlab.com/wp-content/uploads/2026/06/reta30fixed.png",
-  "ghk-cu": "https://pepchainlab.com/wp-content/uploads/2026/06/ghkcu50mgfixed.png",
+  retatrutide:
+    "https://pepchainlab.com/wp-content/uploads/2026/06/reta10fixed.png",
+  "retatrutide-20":
+    "https://pepchainlab.com/wp-content/uploads/2026/06/reta20fixed.png",
+  "retatrutide-30":
+    "https://pepchainlab.com/wp-content/uploads/2026/06/reta30fixed.png",
+  "ghk-cu":
+    "https://pepchainlab.com/wp-content/uploads/2026/06/ghkcu50mgfixed.png",
   "mots-c": "https://pepchainlab.com/wp-content/uploads/2026/06/motscfixed.png",
-  "glow": "https://pepchainlab.com/wp-content/uploads/2026/06/glowblend50mgfixed.png",
-  "bacteriostatic-water": "https://pepchainlab.com/wp-content/uploads/2026/06/bacwater10mlfixed.png",
-  "bacteriostatic-water-3ml": "https://pepchainlab.com/wp-content/uploads/2026/06/bacwater3mlfixed.png",
-  "wolverine": "https://pepchainlab.com/wp-content/uploads/2026/06/wolverineblend10mgfixed.png",
+  glow: "https://pepchainlab.com/wp-content/uploads/2026/06/glowblend50mgfixed.png",
+  "bacteriostatic-water":
+    "https://pepchainlab.com/wp-content/uploads/2026/06/bacwater10mlfixed.png",
+  "bacteriostatic-water-3ml":
+    "https://pepchainlab.com/wp-content/uploads/2026/06/bacwater3mlfixed.png",
+  wolverine:
+    "https://pepchainlab.com/wp-content/uploads/2026/06/wolverineblend10mgfixed.png",
 };
 
 const getLocalImage = (slug) => {
   if (!slug) return null;
   const s = slug.toLowerCase();
-  if (s.includes("retatrutide") && s.includes("30")) return IMAGE_MAP["retatrutide-30"];
-  if (s.includes("retatrutide") && s.includes("20")) return IMAGE_MAP["retatrutide-20"];
+  if (s.includes("retatrutide") && s.includes("30"))
+    return IMAGE_MAP["retatrutide-30"];
+  if (s.includes("retatrutide") && s.includes("20"))
+    return IMAGE_MAP["retatrutide-20"];
   if (s.includes("retatrutide")) return IMAGE_MAP["retatrutide"];
   if (s.includes("ghk")) return IMAGE_MAP["ghk-cu"];
   if (s.includes("mots")) return IMAGE_MAP["mots-c"];
   if (s.includes("glow")) return IMAGE_MAP["glow"];
-  if (s.includes("bac") && s.includes("3")) return IMAGE_MAP["bacteriostatic-water-3ml"];
-  if (s.includes("bac") || s.includes("water")) return IMAGE_MAP["bacteriostatic-water"];
+  if (s.includes("bac") && s.includes("3"))
+    return IMAGE_MAP["bacteriostatic-water-3ml"];
+  if (s.includes("bac") || s.includes("water"))
+    return IMAGE_MAP["bacteriostatic-water"];
   if (s.includes("wolverine")) return IMAGE_MAP["wolverine"];
   return null;
 };
@@ -192,27 +203,65 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
     <>
       <div className="modal-overlay" onClick={onClose} />
       <div className="modal" style={{ maxWidth: "460px" }}>
-        <button className="modal-close-btn" onClick={onClose}>✕</button>
+        <button className="modal-close-btn" onClick={onClose}>
+          ✕
+        </button>
         {step === "amount" && (
           <>
             <p className="section-label">Add Funds</p>
             <h3 className="modal-title">Top Up Your Wallet</h3>
-            <p style={{ color: "var(--white-muted)", fontSize: "0.88rem", marginBottom: "0.5rem" }}>
+            <p
+              style={{
+                color: "var(--white-muted)",
+                fontSize: "0.88rem",
+                marginBottom: "0.5rem",
+              }}
+            >
               Funds are added instantly and can be used on any order.
             </p>
-            <input type="number" min="20" max="5000" step="0.01" className="notify-input"
-              placeholder="Amount in USD (min $50)" value={amount}
-              onChange={(e) => { setAmount(e.target.value); setAmountError(""); }} style={{ marginTop: "0.5rem" }} />
-            <button className="btn-primary" style={{ width: "100%", marginTop: "1rem" }}
+            <input
+              type="number"
+              min="20"
+              max="5000"
+              step="0.01"
+              className="notify-input"
+              placeholder="Amount in USD (min $50)"
+              value={amount}
+              onChange={(e) => {
+                setAmount(e.target.value);
+                setAmountError("");
+              }}
+              style={{ marginTop: "0.5rem" }}
+            />
+            <button
+              className="btn-primary"
+              style={{ width: "100%", marginTop: "1rem" }}
               onClick={() => {
-                if (parsedAmount < 50) { setAmountError("Minimum top-up amount is $50."); return; }
+                if (parsedAmount < 50) {
+                  setAmountError("Minimum top-up amount is $50.");
+                  return;
+                }
                 setAmountError("");
                 setStep("pay");
-              }}>
+              }}
+            >
               Continue to Payment
             </button>
             {amountError && (
-              <p style={{ color: "rgba(46, 127, 255, 0.75)", fontSize: "0.72rem", fontFamily: "var(--font-display)", fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", marginTop: "0.75rem", textAlign: "center", borderTop: "1px solid rgba(46, 127, 255, 0.15)", paddingTop: "0.75rem" }}>
+              <p
+                style={{
+                  color: "rgba(46, 127, 255, 0.75)",
+                  fontSize: "0.72rem",
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 600,
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  marginTop: "0.75rem",
+                  textAlign: "center",
+                  borderTop: "1px solid rgba(46, 127, 255, 0.15)",
+                  paddingTop: "0.75rem",
+                }}
+              >
                 {amountError}
               </p>
             )}
@@ -221,32 +270,83 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
         {step === "pay" && (
           <>
             <p className="section-label">Payment</p>
-            <p style={{ color: "var(--white-muted)", fontSize: "0.9rem", marginBottom: "1.25rem" }}>
-              Adding <strong style={{ color: "var(--blue-bright)" }}>${parsedAmount.toFixed(2)}</strong> to your wallet
+            <p
+              style={{
+                color: "var(--white-muted)",
+                fontSize: "0.9rem",
+                marginBottom: "1.25rem",
+              }}
+            >
+              Adding{" "}
+              <strong style={{ color: "var(--blue-bright)" }}>
+                ${parsedAmount.toFixed(2)}
+              </strong>{" "}
+              to your wallet
             </p>
-            <PayPalScriptProvider options={{ clientId: PAYPAL_CLIENT_ID, currency: "USD", intent: "capture", components: "buttons" }}>
-              <PayPalButtons style={{ layout: "vertical", shape: "rect", label: "pay" }}
+            <PayPalScriptProvider
+              options={{
+                clientId: PAYPAL_CLIENT_ID,
+                currency: "USD",
+                intent: "capture",
+                components: "buttons",
+              }}
+            >
+              <PayPalButtons
+                style={{ layout: "vertical", shape: "rect", label: "pay" }}
                 forceReRender={[parsedAmount]}
-                createOrder={(data, actions) => actions.order.create({
-                  purchase_units: [{ amount: { value: parsedAmount.toFixed(2) }, description: "Store Credit - PepChain LLC" }],
-                  application_context: { shipping_preference: "NO_SHIPPING" },
-                })}
+                createOrder={(data, actions) =>
+                  actions.order.create({
+                    purchase_units: [
+                      {
+                        amount: { value: parsedAmount.toFixed(2) },
+                        description: "Store Credit - PepChain LLC",
+                      },
+                    ],
+                    application_context: { shipping_preference: "NO_SHIPPING" },
+                  })
+                }
                 onApprove={async (data, actions) => {
                   try {
                     const order = await actions.order.capture();
-                    const res = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/wallet/topup`, {
-                      method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-                      body: JSON.stringify({ paypal_order_id: order.id, amount: parsedAmount }),
-                    });
+                    const res = await fetch(
+                      `${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/wallet/topup`,
+                      {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({
+                          paypal_order_id: order.id,
+                          amount: parsedAmount,
+                        }),
+                      },
+                    );
                     const result = await res.json();
-                    if (result.success) { setStep("success"); onSuccess(result.new_balance); }
-                    else { setErrorMsg(result.message || "Could not credit wallet."); setStep("error"); }
-                  } catch { setErrorMsg("Network error. Contact support with your PayPal receipt."); setStep("error"); }
+                    if (result.success) {
+                      setStep("success");
+                      onSuccess(result.new_balance);
+                    } else {
+                      setErrorMsg(result.message || "Could not credit wallet.");
+                      setStep("error");
+                    }
+                  } catch {
+                    setErrorMsg(
+                      "Network error. Contact support with your PayPal receipt.",
+                    );
+                    setStep("error");
+                  }
                 }}
-                onError={() => { setErrorMsg("PayPal encountered an error."); setStep("error"); }}
-                onCancel={() => setStep("amount")} />
+                onError={() => {
+                  setErrorMsg("PayPal encountered an error.");
+                  setStep("error");
+                }}
+                onCancel={() => setStep("amount")}
+              />
             </PayPalScriptProvider>
-            <button className="btn-secondary" style={{ width: "100%", marginTop: "0.75rem" }} onClick={() => setStep("amount")}>
+            <button
+              className="btn-secondary"
+              style={{ width: "100%", marginTop: "0.75rem" }}
+              onClick={() => setStep("amount")}
+            >
               ← Change Amount
             </button>
           </>
@@ -255,17 +355,49 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
           <div className="notify-success" style={{ padding: "1.5rem 0" }}>
             <p className="notify-success-icon">✓</p>
             <p className="notify-success-text">Funds Added!</p>
-            <p className="notify-success-sub">${parsedAmount.toFixed(2)} has been added to your wallet.</p>
-            <button className="btn-primary" style={{ marginTop: "1rem", width: "100%" }} onClick={onClose}>Done</button>
+            <p className="notify-success-sub">
+              ${parsedAmount.toFixed(2)} has been added to your wallet.
+            </p>
+            <button
+              className="btn-primary"
+              style={{ marginTop: "1rem", width: "100%" }}
+              onClick={onClose}
+            >
+              Done
+            </button>
           </div>
         )}
         {step === "error" && (
           <div style={{ textAlign: "center", padding: "1rem 0" }}>
             <p style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>⚠</p>
-            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, marginBottom: "0.5rem" }}>Something went wrong</p>
-            <p style={{ color: "var(--white-muted)", fontSize: "0.85rem", marginBottom: "1.5rem" }}>{errorMsg}</p>
-            <button className="btn-secondary" style={{ width: "100%" }}
-              onClick={() => { setStep("amount"); setErrorMsg(""); }}>Try Again</button>
+            <p
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                marginBottom: "0.5rem",
+              }}
+            >
+              Something went wrong
+            </p>
+            <p
+              style={{
+                color: "var(--white-muted)",
+                fontSize: "0.85rem",
+                marginBottom: "1.5rem",
+              }}
+            >
+              {errorMsg}
+            </p>
+            <button
+              className="btn-secondary"
+              style={{ width: "100%" }}
+              onClick={() => {
+                setStep("amount");
+                setErrorMsg("");
+              }}
+            >
+              Try Again
+            </button>
           </div>
         )}
       </div>
@@ -405,7 +537,7 @@ function CartDrawer({ cart, onClose, onQtyChange, getCartKey }) {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(
                           err.message ||
-                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                            `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
                         );
                       }
                     }
@@ -431,29 +563,67 @@ function CartDrawer({ cart, onClose, onQtyChange, getCartKey }) {
     </>
   );
 }
-function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance, cartSyncing, onNavigate }) {
+function Navbar({
+  cartCount,
+  onCartOpen,
+  onWalletOpen,
+  walletBalance,
+  cartSyncing,
+  onNavigate,
+}) {
   return (
     <nav className="navbar">
       <a href="/" className="nav-logo">
-        <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
         <img
-          src="/pep-chain-banner.png"
+          src="/pep-chain-logo-banner.png"
           alt="PepChain"
-          className="nav-banner-img"
+          className="nav-logo-img"
         />
       </a>
       <ul className="nav-links">
         <li>
-          <a href="/products" onClick={(e) => { e.preventDefault(); onNavigate("/products"); }}>Products</a>
+          <a
+            href="/products"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate("/products");
+            }}
+          >
+            Products
+          </a>
         </li>
         <li>
-          <a href="/about" onClick={(e) => { e.preventDefault(); onNavigate("/about"); }}>About</a>
+          <a
+            href="/about"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate("/about");
+            }}
+          >
+            About
+          </a>
         </li>
         <li>
-          <a href="/coa-library" onClick={(e) => { e.preventDefault(); onNavigate("/coa-library"); }}>COA Library</a>
+          <a
+            href="/coa-library"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate("/coa-library");
+            }}
+          >
+            COA Library
+          </a>
         </li>
         <li>
-          <a href="/contact" onClick={(e) => { e.preventDefault(); onNavigate("/contact"); }}>Contact</a>
+          <a
+            href="/contact"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate("/contact");
+            }}
+          >
+            Contact
+          </a>
         </li>
       </ul>
       <div className="nav-right">
@@ -490,9 +660,8 @@ function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance, cartSyncin
 
 function Hero() {
   const [vialImg] = useState(
-    "https://pepchainlab.com/wp-content/uploads/2026/06/reta10fixed.png"
+    "https://pepchainlab.com/wp-content/uploads/2026/06/reta10fixed.png",
   );
-
 
   return (
     <section
@@ -609,12 +778,19 @@ function ProductCard({ product, addToCart, full = false }) {
 
   const getVariantImage = () => {
     if (!selectedVariant) return product.localImg;
-    const attrs = selectedVariant.attributes?.map((a) => a.option).join(" ").toLowerCase() || "";
+    const attrs =
+      selectedVariant.attributes
+        ?.map((a) => a.option)
+        .join(" ")
+        .toLowerCase() || "";
     if (attrs.includes("30")) return IMAGE_MAP["retatrutide-30"];
     if (attrs.includes("20")) return IMAGE_MAP["retatrutide-20"];
-    if (attrs.includes("10") && product.slug?.includes("retatrutide")) return IMAGE_MAP["retatrutide"];
-    if (attrs.includes("10") && product.slug?.includes("bac")) return IMAGE_MAP["bacteriostatic-water"];
-    if (attrs.includes("3") && product.slug?.includes("bac")) return IMAGE_MAP["bacteriostatic-water-3ml"];
+    if (attrs.includes("10") && product.slug?.includes("retatrutide"))
+      return IMAGE_MAP["retatrutide"];
+    if (attrs.includes("10") && product.slug?.includes("bac"))
+      return IMAGE_MAP["bacteriostatic-water"];
+    if (attrs.includes("3") && product.slug?.includes("bac"))
+      return IMAGE_MAP["bacteriostatic-water-3ml"];
     return product.localImg;
   };
   const inStock =
@@ -637,10 +813,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-            a.option;
-          return acc;
-        }, {})
+            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+              a.option;
+            return acc;
+          }, {})
         : null;
 
     addToCart(product, {
@@ -1068,7 +1244,11 @@ function RUOPolicy() {
       </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
-          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+          <img
+            src="/pep-chain-logo-banner.png"
+            alt="PepChain"
+            className="nav-logo-img"
+          />
         </a>
         <ul className="nav-links">
           <li>
@@ -1227,7 +1407,11 @@ function COALibrary() {
       )}
       <nav className="navbar">
         <a href="/" className="nav-logo">
-          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+          <img
+            src="/pep-chain-logo-banner.png"
+            alt="PepChain"
+            className="nav-logo-img"
+          />
         </a>
         <ul className="nav-links">
           <li>
@@ -1299,7 +1483,11 @@ function TermsOfUse() {
       </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
-          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+          <img
+            src="/pep-chain-logo-banner.png"
+            alt="PepChain"
+            className="nav-logo-img"
+          />
         </a>
         <ul className="nav-links">
           <li>
@@ -1399,7 +1587,11 @@ function ShippingPolicy() {
       </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
-          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+          <img
+            src="/pep-chain-logo-banner.png"
+            alt="PepChain"
+            className="nav-logo-img"
+          />
         </a>
         <ul className="nav-links">
           <li>
@@ -1496,7 +1688,11 @@ function ReturnsPolicy() {
       </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
-          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+          <img
+            src="/pep-chain-logo-banner.png"
+            alt="PepChain"
+            className="nav-logo-img"
+          />
         </a>
         <ul className="nav-links">
           <li>
@@ -1581,7 +1777,11 @@ function PrivacyPolicy() {
       </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
-          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+          <img
+            src="/pep-chain-logo-banner.png"
+            alt="PepChain"
+            className="nav-logo-img"
+          />
         </a>
         <ul className="nav-links">
           <li>
@@ -1676,7 +1876,11 @@ function NotFound() {
     <div className="policy-page">
       <nav className="navbar">
         <a href="/" className="nav-logo">
-          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+          <img
+            src="/pep-chain-logo-banner.png"
+            alt="PepChain"
+            className="nav-logo-img"
+          />
         </a>
         <div className="nav-right">
           <a href="/my-account" className="nav-icon-btn" title="My Account">
@@ -1861,7 +2065,10 @@ function ProductPage({ slug, addToCart }) {
         setProduct(p);
         if (p.type === "variable") {
           setSelectedVariant((current) => {
-            if (current && (p.variation_data || []).some((v) => v.id === current.id)) {
+            if (
+              current &&
+              (p.variation_data || []).some((v) => v.id === current.id)
+            ) {
               return current;
             }
             const firstInStock = (p.variation_data || []).find(
@@ -1903,7 +2110,11 @@ function ProductPage({ slug, addToCart }) {
 
   const getProductPageImage = () => {
     if (!selectedVariant) return getLocalImage(slug);
-    const attrs = selectedVariant.attributes?.map((a) => a.option).join(" ").toLowerCase() || "";
+    const attrs =
+      selectedVariant.attributes
+        ?.map((a) => a.option)
+        .join(" ")
+        .toLowerCase() || "";
     if (slug.includes("retatrutide")) {
       if (attrs.includes("30")) return IMAGE_MAP["retatrutide-30"];
       if (attrs.includes("20")) return IMAGE_MAP["retatrutide-20"];
@@ -1939,10 +2150,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-            a.option;
-          return acc;
-        }, {})
+            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+              a.option;
+            return acc;
+          }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
@@ -2157,7 +2368,11 @@ function AboutPage() {
       </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
-          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+          <img
+            src="/pep-chain-logo-banner.png"
+            alt="PepChain"
+            className="nav-logo-img"
+          />
         </a>
         <ul className="nav-links">
           <li>
@@ -2240,7 +2455,11 @@ function ContactPage() {
       </Helmet>
       <nav className="navbar">
         <a href="/" className="nav-logo">
-          <img src="/logo.png" alt="Pep-Chain" className="nav-logo-img" />
+          <img
+            src="/pep-chain-logo-banner.png"
+            alt="PepChain"
+            className="nav-logo-img"
+          />
         </a>
         <ul className="nav-links">
           <li>
@@ -2302,8 +2521,16 @@ function CartToast({ toast, onView, onClose }) {
         {toast.dose && <p className="cart-toast-dose">{toast.dose}</p>}
         <p className="cart-toast-price">{toast.price}</p>
       </div>
-      <button className="cart-toast-view" onClick={onView}>View Cart</button>
-      <button className="cart-toast-close" onClick={onClose} aria-label="Dismiss">✕</button>
+      <button className="cart-toast-view" onClick={onView}>
+        View Cart
+      </button>
+      <button
+        className="cart-toast-close"
+        onClick={onClose}
+        aria-label="Dismiss"
+      >
+        ✕
+      </button>
     </div>
   );
 }
@@ -2311,12 +2538,17 @@ function CartToast({ toast, onView, onClose }) {
 // ─── APP ───
 export default function App() {
   const [cart, setCart] = useState(() => {
-    try { const saved = localStorage.getItem("cart"); return saved ? JSON.parse(saved) : []; }
-    catch { return []; }
+    try {
+      const saved = localStorage.getItem("cart");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
   const [cartOpen, setCartOpen] = useState(false);
   const [walletOpen, setWalletOpen] = useState(
-    () => new URLSearchParams(window.location.search).get("openWallet") === "true"
+    () =>
+      new URLSearchParams(window.location.search).get("openWallet") === "true",
   );
   const [currentUserId, setCurrentUserId] = useState(null);
   const [walletBalance, setWalletBalance] = useState(() => {
@@ -2338,7 +2570,7 @@ export default function App() {
     if (cartKeyFetchRef.current) return cartKeyFetchRef.current;
     cartKeyFetchRef.current = fetch(
       `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`,
-      { method: "GET", credentials: "include" }
+      { method: "GET", credentials: "include" },
     )
       .then((r) => r.json())
       .then((data) => {
@@ -2360,11 +2592,16 @@ export default function App() {
   // swap parseFloat(it.price) for (parseInt(it.price,10)/100).
   const mapCoCart = (data) =>
     Object.values(data?.items || {}).map((it) => ({
-      key: it.item_key, item_key: it.item_key, name: it.name,
-      dose: it.meta?.variation ? Object.values(it.meta.variation).join(", ") : "",
+      key: it.item_key,
+      item_key: it.item_key,
+      name: it.name,
+      dose: it.meta?.variation
+        ? Object.values(it.meta.variation).join(", ")
+        : "",
       price: `$${(parseFloat(it.price) / 100).toFixed(2)}`,
       qty: it.quantity?.value ?? it.quantity,
-      variation_id: it.id, variation: it.meta?.variation || null,
+      variation_id: it.id,
+      variation: it.meta?.variation || null,
     }));
 
   // cache drawer locally so it paints instantly next load
@@ -2381,7 +2618,9 @@ export default function App() {
 
   // wallet balance + user id for navbar/top-up — single /me call (was two)
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/me`, { credentials: "include" })
+    fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/me`, {
+      credentials: "include",
+    })
       .then((r) => r.json())
       .then((data) => {
         if (data.logged_in) {
@@ -2412,8 +2651,13 @@ export default function App() {
       localStorage.removeItem("wcCartKey");
     }
   }, []);
-  const [ageVerified, setAgeVerified] = useState(() => sessionStorage.getItem("ageVerified") === "true");
-  const handleAgeConfirm = () => { sessionStorage.setItem("ageVerified", "true"); setAgeVerified(true); };
+  const [ageVerified, setAgeVerified] = useState(
+    () => sessionStorage.getItem("ageVerified") === "true",
+  );
+  const handleAgeConfirm = () => {
+    sessionStorage.setItem("ageVerified", "true");
+    setAgeVerified(true);
+  };
 
   // Pure local edit — no network call, so spam-clicking +/- is instant and
   // can never race or get overwritten by a server response.
@@ -2434,15 +2678,30 @@ export default function App() {
     const key = `${product.id}-${variant.dose}`;
     setCart((prev) => {
       const existing = prev.find((i) => i.key === key);
-      if (existing) return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + 1 } : i));
-      return [...prev, { key, name: product.name, dose: variant.dose, price: variant.price, qty: 1, variation_id: variant.variation_id || null, variation: variant.variation || null }];
+      if (existing)
+        return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + 1 } : i));
+      return [
+        ...prev,
+        {
+          key,
+          name: product.name,
+          dose: variant.dose,
+          price: variant.price,
+          qty: 1,
+          variation_id: variant.variation_id || null,
+          variation: variant.variation || null,
+        },
+      ];
     });
     setToast({
       id: Date.now(),
       name: product.name.split("|")[0].trim(),
       dose: variant.dose,
       price: variant.price,
-      image: getLocalImage(product.slug) || product.images?.[0]?.src || "/placeholder.png",
+      image:
+        getLocalImage(product.slug) ||
+        product.images?.[0]?.src ||
+        "/placeholder.png",
     });
   };
   const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
@@ -2467,7 +2726,9 @@ export default function App() {
           onCartOpen={() => setCartOpen(true)}
           cartSyncing={cartSyncing}
           walletBalance={walletBalance}
-          onNavigate={(url) => { window.location.href = url; }}
+          onNavigate={(url) => {
+            window.location.href = url;
+          }}
           onWalletOpen={async () => {
             const loggedIn = await checkLoggedIn();
             if (loggedIn === false) {
@@ -2497,7 +2758,10 @@ export default function App() {
         )}
         <CartToast
           toast={toast}
-          onView={() => { setToast(null); setCartOpen(true); }}
+          onView={() => {
+            setToast(null);
+            setCartOpen(true);
+          }}
           onClose={() => setToast(null)}
         />
         <CatalogPage addToCart={addToCart} />
@@ -2515,7 +2779,9 @@ export default function App() {
           onCartOpen={() => setCartOpen(true)}
           cartSyncing={cartSyncing}
           walletBalance={walletBalance}
-          onNavigate={(url) => { window.location.href = url; }}
+          onNavigate={(url) => {
+            window.location.href = url;
+          }}
           onWalletOpen={async () => {
             const loggedIn = await checkLoggedIn();
             if (loggedIn === false) {
@@ -2545,7 +2811,10 @@ export default function App() {
         )}
         <CartToast
           toast={toast}
-          onView={() => { setToast(null); setCartOpen(true); }}
+          onView={() => {
+            setToast(null);
+            setCartOpen(true);
+          }}
           onClose={() => setToast(null)}
         />
         <ShippingBanner />
@@ -2571,12 +2840,14 @@ export default function App() {
       <div className="noise-overlay" />
       {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
       <Navbar
-          cartCount={cartCount}
-          onCartOpen={() => setCartOpen(true)}
-          cartSyncing={cartSyncing}
-          walletBalance={walletBalance}
-          onNavigate={(url) => { window.location.href = url; }}
-          onWalletOpen={async () => {
+        cartCount={cartCount}
+        onCartOpen={() => setCartOpen(true)}
+        cartSyncing={cartSyncing}
+        walletBalance={walletBalance}
+        onNavigate={(url) => {
+          window.location.href = url;
+        }}
+        onWalletOpen={async () => {
           const loggedIn = await checkLoggedIn();
           if (loggedIn === false) {
             window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
@@ -2589,23 +2860,26 @@ export default function App() {
         <WalletTopupModal
           userId={currentUserId}
           onSuccess={(newBalance) => {
-              setWalletBalance(newBalance);
-              localStorage.setItem("walletBalance", newBalance);
-            }}
+            setWalletBalance(newBalance);
+            localStorage.setItem("walletBalance", newBalance);
+          }}
           onClose={() => setWalletOpen(false)}
         />
       )}
       {cartOpen && (
         <CartDrawer
-            cart={cart}
-            onClose={() => setCartOpen(false)}
-            onQtyChange={handleQtyChange}
-            getCartKey={getCartKey}
-          />
+          cart={cart}
+          onClose={() => setCartOpen(false)}
+          onQtyChange={handleQtyChange}
+          getCartKey={getCartKey}
+        />
       )}
       <CartToast
         toast={toast}
-        onView={() => { setToast(null); setCartOpen(true); }}
+        onView={() => {
+          setToast(null);
+          setCartOpen(true);
+        }}
         onClose={() => setToast(null)}
       />
       <main>

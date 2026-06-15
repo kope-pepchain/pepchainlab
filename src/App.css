@@ -1,5 +1,6 @@
 /* ─── GLOBAL RESET ─── */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
 }
@@ -789,8 +790,12 @@ html, body {
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 .cart-count {
   background: var(--blue-bright);
@@ -2965,9 +2970,15 @@ html, body {
   }
 }
 
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
 /* ─── PAYPAL CARD FIELDS DARK WRAPPER ─── */
 .paypal-card-wrapper {
   background: rgba(255, 255, 255, 0.03);
@@ -2984,11 +2995,6 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
-}
-.nav-banner-img {
-  height: 160px;
-  width: auto;
-  object-fit: contain;
 }
 
 /* Wallet button label in React navbar — matches WP header pill */
@@ -3068,8 +3074,12 @@ input[type="number"] {
 }
 
 @keyframes cartToastTimer {
-  from { width: 100%; }
-  to { width: 0%; }
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
 }
 
 .cart-toast-check {
@@ -3154,7 +3164,9 @@ input[type="number"] {
   border-radius: 3px;
   cursor: pointer;
   flex-shrink: 0;
-  transition: box-shadow 0.2s, transform 0.15s;
+  transition:
+    box-shadow 0.2s,
+    transform 0.15s;
 }
 
 .cart-toast-view:hover {
@@ -3186,4 +3198,3 @@ input[type="number"] {
     max-width: none;
   }
 }
-
