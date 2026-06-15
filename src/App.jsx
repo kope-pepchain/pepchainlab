@@ -4,7 +4,30 @@ import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 const WC_URL = import.meta.env.VITE_WC_URL;
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
+const IMAGE_MAP = {
+  "retatrutide": "https://pepchainlab.com/wp-content/uploads/2026/06/reta10fixed.png",
+  "retatrutide-20": "https://pepchainlab.com/wp-content/uploads/2026/06/reta20fixed.png",
+  "retatrutide-30": "https://pepchainlab.com/wp-content/uploads/2026/06/reta30fixed.png",
+  "ghk-cu": "https://pepchainlab.com/wp-content/uploads/2026/06/ghkcu50mgfixed.png",
+  "mots-c": "https://pepchainlab.com/wp-content/uploads/2026/06/motscfixed.png",
+  "glow": "https://pepchainlab.com/wp-content/uploads/2026/06/glowblend50mgfixed.png",
+  "bacteriostatic-water": "https://pepchainlab.com/wp-content/uploads/2026/06/bacwater10mlfixed.png",
+  "wolverine": "https://pepchainlab.com/wp-content/uploads/2026/06/wolverineblend10mgfixed.png",
+};
 
+const getLocalImage = (slug) => {
+  if (!slug) return null;
+  const s = slug.toLowerCase();
+  if (s.includes("retatrutide") && s.includes("30")) return IMAGE_MAP["retatrutide-30"];
+  if (s.includes("retatrutide") && s.includes("20")) return IMAGE_MAP["retatrutide-20"];
+  if (s.includes("retatrutide")) return IMAGE_MAP["retatrutide"];
+  if (s.includes("ghk")) return IMAGE_MAP["ghk-cu"];
+  if (s.includes("mots")) return IMAGE_MAP["mots-c"];
+  if (s.includes("glow")) return IMAGE_MAP["glow"];
+  if (s.includes("bac") || s.includes("water")) return IMAGE_MAP["bacteriostatic-water"];
+  if (s.includes("wolverine")) return IMAGE_MAP["wolverine"];
+  return null;
+};
 const wcFetch = (endpoint) => {
   return fetch(
     `${import.meta.env.VITE_WC_URL}/wp-content/themes/storefront-child/proxy.php?endpoint=${encodeURIComponent(endpoint)}`,
@@ -618,12 +641,16 @@ function ProductCard({ product, addToCart, full = false }) {
       <span className="product-badge">{badge}</span>
       <img
         src={
+          product.localImg ||
           selectedVariant?.image?.src ||
           product.images?.[0]?.src ||
           "/placeholder.png"
         }
         alt={shortName}
         className="product-img"
+        fetchPriority="high"
+        decoding="async"
+        onLoad={(e) => e.target.classList.add("loaded")}
       />
       <div>
         <p className="product-name">{shortName}</p>
@@ -702,6 +729,7 @@ function ProductGrid({ addToCart }) {
           variationsByParent[v.parent].push(v);
         });
         const hydrated = data.map((product) => {
+          const localImg = getLocalImage(product.slug);
           if (product.type === "variable") {
             const parentVariations = variationsByParent[product.id] || [];
             const variation_data = parentVariations.map((v) => {
@@ -721,9 +749,9 @@ function ProductGrid({ addToCart }) {
                 (parseFloat(a.attributes[0].option) || 0) -
                 (parseFloat(b.attributes[0].option) || 0),
             );
-            return { ...product, variation_data };
+            return { ...product, variation_data, localImg };
           }
-          return { ...product, variation_data: [] };
+          return { ...product, variation_data: [], localImg };
         });
         setProducts(hydrated.reverse());
         setLoading(false);
@@ -1845,6 +1873,7 @@ function ProductPage({ slug, addToCart }) {
   if (!product) return <NotFound />;
 
   const image =
+    getLocalImage(slug) ||
     selectedVariant?.image?.src ||
     product.images?.[0]?.src ||
     "/placeholder.png";
@@ -1903,7 +1932,14 @@ function ProductPage({ slug, addToCart }) {
       <div className="product-page-inner">
         <div className="product-page-media">
           <span className="product-badge">{badge}</span>
-          <img src={image} alt={shortName} className="product-page-img" />
+          <img
+            src={image}
+            alt={shortName}
+            className="product-page-img"
+            fetchPriority="high"
+            decoding="async"
+            onLoad={(e) => e.target.classList.add("loaded")}
+          />
         </div>
         <div className="product-page-details">
           <p className="section-label">Research Peptide</p>
