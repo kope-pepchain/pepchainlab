@@ -1922,6 +1922,7 @@
   position: relative;
   z-index: 2;
   padding: 3rem 2rem;
+  animation: fadeUp 0.8s 0.15s ease both;
 }
 
 .hero-vial-tag {
@@ -2964,3 +2965,5 @@ input[type="number"] {
   width: auto;
   object-fit: contain;
 }
+
+

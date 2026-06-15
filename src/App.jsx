@@ -459,7 +459,12 @@ function Hero() {
   );
 
   return (
-    <section className="hero hero-split">
+    <section
+      className="hero hero-split"
+      style={{
+        animation: "heroFadeIn 0.8s ease both",
+      }}
+    >
       <div className="hero-split-bg" />
       <div className="hero-dots" />
 
