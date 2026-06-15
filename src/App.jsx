@@ -458,6 +458,15 @@ function Hero() {
     "https://pepchainlab.com/wp-content/uploads/2026/06/reta10fixed.png"
   );
 
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = vialImg;
+    document.head.appendChild(link);
+    return () => { document.head.removeChild(link); };
+  }, [vialImg]);
+
   return (
     <section
       className="hero hero-split"
