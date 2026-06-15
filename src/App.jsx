@@ -384,6 +384,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                     }
 
                     // Step 4: Redirect only after every item confirmed
+                    sessionStorage.setItem("returningFromWP", "1");
                     window.location.href = `${import.meta.env.VITE_WC_URL}/checkout/?cocart-load-cart=${cartKey}&keep-cart=false`;
                   } catch (err) {
                     console.error("Cart sync failed", err);
@@ -515,6 +516,13 @@ function Hero() {
                   src={vialImg}
                   alt="Retatrutide 10mg"
                   className="hero-vial-img"
+                  decoding="async"
+                  fetchPriority="high"
+                  style={{
+                    opacity: 0,
+                    transition: "opacity 0.4s ease",
+                  }}
+                  onLoad={(e) => { e.currentTarget.style.opacity = 1; }}
                 />
               ) : (
                 <div className="hero-vial-placeholder" />
@@ -2237,9 +2245,9 @@ export default function App() {
     });
   }, []);
 
-  // server cart = source of truth. Tab-switching resyncs QUIETLY (count just
-  // updates, no banner). Returning from the WP cart (browser-back / bfcache)
-  // resyncs LOUDLY so you never see a stale count flash.
+  // server cart = source of truth. On first load + on returning from the WP cart,
+  // show "Syncing…" until the server confirms (count may be stale). Plain tab-switching
+  // stays quiet — nothing changed the cart, so no banner.
   useEffect(() => {
     const resync = async (loud = false) => {
       const cartKey = localStorage.getItem("wcCartKey");
@@ -2259,10 +2267,12 @@ export default function App() {
       }
     };
 
-    resync(false); // quiet background sync on first load
+    const cameFromWP = sessionStorage.getItem("returningFromWP") === "1";
+    sessionStorage.removeItem("returningFromWP");
+    resync(cameFromWP); // loud only if we just came back from the WP cart/checkout
     const onFocus = () => resync(false); // tab back in: quiet
     const onVisible = () => { if (document.visibilityState === "visible") resync(false); };
-    const onPageshow = (e) => { if (e.persisted) resync(true); }; // back from WP cart: loud
+    const onPageshow = (e) => { if (e.persisted) resync(true); }; // bfcache back: loud
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisible);
     window.addEventListener("pageshow", onPageshow);
