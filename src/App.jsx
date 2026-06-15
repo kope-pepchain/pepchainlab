@@ -442,8 +442,10 @@ function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance, cartSyncin
             : "Wallet"}
         </button>
         <button className="nav-cta" onClick={onCartOpen}>
-          {cartSyncing ? "Syncing…" : "Cart"}{" "}
-          {!cartSyncing && cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+          {cartSyncing ? "Syncing…" : "Cart"}
+          {!cartSyncing && cartCount > 0 && (
+            <span className="cart-count">{cartCount}</span>
+          )}
         </button>
       </div>
     </nav>
@@ -2255,27 +2257,37 @@ export default function App() {
     });
   }, []);
 
-  // server cart = source of truth: hydrate drawer from it on load
+  // server cart = source of truth: hydrate drawer from it whenever the page is seen
   useEffect(() => {
     const resync = async () => {
       const cartKey = localStorage.getItem("wcCartKey");
       if (!cartKey) return;
-      setCartSyncing(true);
+      setCartSyncing(true); // show "Syncing…" BEFORE the await, every time
       try {
         const res = await fetch(
           `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart?cart_key=${cartKey}`,
-          { credentials: "include" }
+          { credentials: "include", cache: "no-store" }
         );
         const data = await res.json();
-        setCart(mapCoCart(data));
+        setCart(mapCoCart(data)); // server is truth — overwrite local
       } catch (e) {
         console.warn("resync failed", e);
       } finally {
         setCartSyncing(false);
       }
     };
+
+    const onVisible = () => {
+      if (document.visibilityState === "visible") resync();
+    };
     window.addEventListener("focus", resync);
-    return () => window.removeEventListener("focus", resync);
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("pageshow", resync);
+    return () => {
+      window.removeEventListener("focus", resync);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("pageshow", resync);
+    };
   }, []);
 
   const [ageVerified, setAgeVerified] = useState(() => sessionStorage.getItem("ageVerified") === "true");
