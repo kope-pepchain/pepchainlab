@@ -2510,41 +2510,6 @@ export default function App() {
       }
     });
   };
-    if (!item) return;
-    const capturedQty = item.qty + delta;
-    const capturedItemKey = item.item_key;
-    const cartKey = localStorage.getItem("wcCartKey");
-
-    // Optimistic local update
-    setCart((prev) =>
-      prev
-        .map((i) => (i.key === key ? { ...i, qty: capturedQty } : i))
-        .filter((i) => i.qty > 0)
-    );
-
-    if (!cartKey || !capturedItemKey) return;
-
-    pendingAddsRef.current += 1;
-    addQueueRef.current = addQueueRef.current.then(async () => {
-      const url = `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/item/${capturedItemKey}?cart_key=${cartKey}`;
-      try {
-        if (capturedQty <= 0) {
-          await fetch(url, { method: "DELETE", credentials: "include" });
-        } else {
-          await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ quantity: String(capturedQty) }),
-          });
-        }
-      } catch (e) {
-        console.warn("qty sync failed", e);
-      } finally {
-        pendingAddsRef.current = Math.max(0, pendingAddsRef.current - 1);
-      }
-    });
-  };
 
   const addToCart = (product, variant) => {
     const key = `${product.id}-${variant.dose}`;
