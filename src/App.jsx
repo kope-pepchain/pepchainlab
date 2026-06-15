@@ -199,11 +199,11 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
             <p style={{ color: "var(--white-muted)", fontSize: "0.88rem", marginBottom: "0.5rem" }}>
               Funds are added instantly and can be used on any order.
             </p>
-            <input type="number" min="1" max="5000" step="0.01" className="notify-input"
-              placeholder="Amount in USD (min $1)" value={amount}
+            <input type="number" min="20" max="5000" step="0.01" className="notify-input"
+              placeholder="Amount in USD (min $20)" value={amount}
               onChange={(e) => setAmount(e.target.value)} style={{ marginTop: "0.5rem" }} />
             <button className="btn-primary" style={{ width: "100%", marginTop: "1rem" }}
-              disabled={parsedAmount < 1} onClick={() => setStep("pay")}>
+              disabled={parsedAmount < 20} onClick={() => setStep("pay")}>
               Continue to Payment
             </button>
           </>
