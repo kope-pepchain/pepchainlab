@@ -2967,4 +2967,23 @@ input[type="number"] {
   object-fit: contain;
 }
 
+/* Wallet button label in React navbar — matches WP header pill */
+.pep-wallet-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.pep-wallet-btn-label {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--blue-bright);
+}
+.pep-wallet-btn-amount {
+  color: var(--white);
+  font-weight: 700;
+}
+
 

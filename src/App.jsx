@@ -434,13 +434,21 @@ function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance, cartSyncin
           <IconUser />
         </a>
         <button
-          className="btn-secondary"
+          className="btn-secondary pep-wallet-btn"
           style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
           onClick={onWalletOpen}
+          title="Add funds to wallet"
         >
-          {walletBalance !== null
-            ? `$${parseFloat(walletBalance).toFixed(2)}`
-            : "Wallet"}
+          {walletBalance !== null ? (
+            <>
+              <span className="pep-wallet-btn-label">Wallet</span>
+              <span className="pep-wallet-btn-amount">
+                ${parseFloat(walletBalance).toFixed(2)}
+              </span>
+            </>
+          ) : (
+            "Wallet"
+          )}
         </button>
         <button className="nav-cta" onClick={onCartOpen}>
           {cartSyncing ? "Syncing…" : "Cart"}
