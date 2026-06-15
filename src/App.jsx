@@ -2229,7 +2229,9 @@ export default function App() {
   );
   const [currentUserId, setCurrentUserId] = useState(null);
   const [walletBalance, setWalletBalance] = useState(null);
-  const [cartSyncing, setCartSyncing] = useState(false);
+  const [cartSyncing, setCartSyncing] = useState(
+    () => !!localStorage.getItem("wcCartKey")
+  );
 
   // Map a CoCart response into our drawer shape. ONE place to fix if fields differ.
   // If prices come out ~100x too big in testing, CoCart returns cents:
