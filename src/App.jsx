@@ -2234,7 +2234,7 @@ export default function App() {
   useEffect(() => {
     const t = setTimeout(() => {
       document.getElementById("root")?.classList.add("loaded");
-    }, 50);
+    }, 400);
     return () => clearTimeout(t);
   }, []);
 
