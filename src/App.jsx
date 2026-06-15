@@ -12,6 +12,7 @@ const IMAGE_MAP = {
   "mots-c": "https://pepchainlab.com/wp-content/uploads/2026/06/motscfixed.png",
   "glow": "https://pepchainlab.com/wp-content/uploads/2026/06/glowblend50mgfixed.png",
   "bacteriostatic-water": "https://pepchainlab.com/wp-content/uploads/2026/06/bacwater10mlfixed.png",
+  "bacteriostatic-water-3ml": "https://pepchainlab.com/wp-content/uploads/2026/06/bacwater3mlfixed.png",
   "wolverine": "https://pepchainlab.com/wp-content/uploads/2026/06/wolverineblend10mgfixed.png",
 };
 
@@ -24,6 +25,7 @@ const getLocalImage = (slug) => {
   if (s.includes("ghk")) return IMAGE_MAP["ghk-cu"];
   if (s.includes("mots")) return IMAGE_MAP["mots-c"];
   if (s.includes("glow")) return IMAGE_MAP["glow"];
+  if (s.includes("bac") && s.includes("3")) return IMAGE_MAP["bacteriostatic-water-3ml"];
   if (s.includes("bac") || s.includes("water")) return IMAGE_MAP["bacteriostatic-water"];
   if (s.includes("wolverine")) return IMAGE_MAP["wolverine"];
   return null;
@@ -602,6 +604,17 @@ function ProductCard({ product, addToCart, full = false }) {
   const [selectedVariant, setSelectedVariant] = useState(
     variants.find((v) => v.stock_status === "instock") || variants[0] || null,
   );
+
+  const getVariantImage = () => {
+    if (!selectedVariant) return product.localImg;
+    const attrs = selectedVariant.attributes?.map((a) => a.option).join(" ").toLowerCase() || "";
+    if (attrs.includes("30")) return IMAGE_MAP["retatrutide-30"];
+    if (attrs.includes("20")) return IMAGE_MAP["retatrutide-20"];
+    if (attrs.includes("10") && product.slug?.includes("retatrutide")) return IMAGE_MAP["retatrutide"];
+    if (attrs.includes("10") && product.slug?.includes("bac")) return IMAGE_MAP["bacteriostatic-water"];
+    if (attrs.includes("3") && product.slug?.includes("bac")) return IMAGE_MAP["bacteriostatic-water-3ml"];
+    return product.localImg;
+  };
   const inStock =
     isVariable && selectedVariant
       ? selectedVariant.stock_status === "instock"
@@ -641,7 +654,7 @@ function ProductCard({ product, addToCart, full = false }) {
       <span className="product-badge">{badge}</span>
       <img
         src={
-          product.localImg ||
+          getVariantImage() ||
           selectedVariant?.image?.src ||
           product.images?.[0]?.src ||
           "/placeholder.png"
@@ -1872,11 +1885,22 @@ function ProductPage({ slug, addToCart }) {
     );
   if (!product) return <NotFound />;
 
-  const image =
-    getLocalImage(slug) ||
-    selectedVariant?.image?.src ||
-    product.images?.[0]?.src ||
-    "/placeholder.png";
+  const getProductPageImage = () => {
+    if (!selectedVariant) return getLocalImage(slug);
+    const attrs = selectedVariant.attributes?.map((a) => a.option).join(" ").toLowerCase() || "";
+    if (slug.includes("retatrutide")) {
+      if (attrs.includes("30")) return IMAGE_MAP["retatrutide-30"];
+      if (attrs.includes("20")) return IMAGE_MAP["retatrutide-20"];
+      return IMAGE_MAP["retatrutide"];
+    }
+    if (slug.includes("bac") || slug.includes("water")) {
+      if (attrs.includes("3")) return IMAGE_MAP["bacteriostatic-water-3ml"];
+      return IMAGE_MAP["bacteriostatic-water"];
+    }
+    return getLocalImage(slug);
+  };
+
+  const image = getProductPageImage();
   const badge = product.tags?.[0]?.name || "Research";
   const shortName = product.name.split("|")[0].trim();
   const isVariable = product.type === "variable";
