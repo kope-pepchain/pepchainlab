@@ -2332,7 +2332,35 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const addQueueRef = useRef(Promise.resolve());
   const pendingAddsRef = useRef(0);
+  const cartKeyFetchRef = useRef(null);
   // reveal the instant the stylesheet is actually loaded (no fixed delay)
+
+  // Validates the stored key looks real (CoCart keys are 32+ char hex strings,
+  // not "1"). If missing or invalid, fetches a fresh one. Concurrent callers
+  // share the same in-flight promise so we never fire two GET /cart at once.
+  const getCartKey = () => {
+    const stored = localStorage.getItem("wcCartKey");
+    if (stored && stored.length >= 10) return Promise.resolve(stored);
+    // Already fetching — share that promise
+    if (cartKeyFetchRef.current) return cartKeyFetchRef.current;
+    cartKeyFetchRef.current = fetch(
+      `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`,
+      { method: "GET", credentials: "include" }
+    )
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.cart_key) throw new Error("no cart_key in response");
+        localStorage.setItem("wcCartKey", data.cart_key);
+        cartKeyFetchRef.current = null;
+        return data.cart_key;
+      })
+      .catch((err) => {
+        cartKeyFetchRef.current = null;
+        localStorage.removeItem("wcCartKey");
+        throw err;
+      });
+    return cartKeyFetchRef.current;
+  };
 
   // Map a CoCart response into our drawer shape. ONE place to fix if fields differ.
   // If prices come out ~100x too big in testing, CoCart returns cents:
@@ -2433,9 +2461,55 @@ export default function App() {
   // addToCart: compute newQty from the LATEST cart state (not the stale closure
   // value), and serialize network writes so rapid clicks don't race each other.
   const handleQtyChange = (key, delta) => {
-    // Read current cart state synchronously before any async work
-    const currentCart = cart;
-    const item = currentCart.find((i) => i.key === key);
+    // Capture values INSIDE the setCart functional updater — that's the only
+    // place guaranteed to have the latest state under rapid clicks.
+    // (Reading `cart` directly here is a stale closure when you spam-click.)
+    let capturedQty = null;
+    let capturedItemKey = null;
+
+    setCart((prev) => {
+      const item = prev.find((i) => i.key === key);
+      if (!item) return prev;
+      capturedQty = item.qty + delta;
+      capturedItemKey = item.item_key;
+      if (capturedQty <= 0) return prev.filter((i) => i.key !== key);
+      return prev.map((i) => (i.key === key ? { ...i, qty: capturedQty } : i));
+    });
+
+    // If item wasn't found in state, nothing to do
+    if (capturedQty === null) return;
+
+    // If no item_key, this item hasn't synced to CoCart yet — the final
+    // addToCart queue response will reconcile the quantity; skip network call
+    if (!capturedItemKey) return;
+
+    const cartKey = localStorage.getItem("wcCartKey");
+    if (!cartKey || cartKey.length < 10) return;
+
+    const qtySnapshot = capturedQty;
+    const itemKeySnapshot = capturedItemKey;
+
+    pendingAddsRef.current += 1;
+    addQueueRef.current = addQueueRef.current.then(async () => {
+      const url = `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/item/${itemKeySnapshot}?cart_key=${cartKey}`;
+      try {
+        if (qtySnapshot <= 0) {
+          await fetch(url, { method: "DELETE", credentials: "include" });
+        } else {
+          await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ quantity: String(qtySnapshot) }),
+          });
+        }
+      } catch (e) {
+        console.warn("qty sync failed", e);
+      } finally {
+        pendingAddsRef.current = Math.max(0, pendingAddsRef.current - 1);
+      }
+    });
+  };
     if (!item) return;
     const capturedQty = item.qty + delta;
     const capturedItemKey = item.item_key;
@@ -2474,7 +2548,12 @@ export default function App() {
 
   const addToCart = (product, variant) => {
     const key = `${product.id}-${variant.dose}`;
-    // Optimistic local update — fires instantly so the UI feels snappy
+    // Capture now — the async closure below needs these, not stale refs
+    const capturedVariant = { ...variant };
+    const capturedProductId = product.id;
+    const capturedSlug = product.slug;
+
+    // Optimistic local update — instant UI feedback
     setCart((prev) => {
       const existing = prev.find((i) => i.key === key);
       if (existing) return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + 1 } : i));
@@ -2485,31 +2564,44 @@ export default function App() {
       name: product.name.split("|")[0].trim(),
       dose: variant.dose,
       price: variant.price,
-      image: getLocalImage(product.slug) || product.images?.[0]?.src || "/placeholder.png",
+      image: getLocalImage(capturedSlug) || product.images?.[0]?.src || "/placeholder.png",
     });
-    // Queue the server sync. Each add waits for the previous one to finish, which
-    // (1) prevents CoCart session lock conflicts that cause 404s under spam,
-    // (2) keeps out-of-order responses from overwriting newer optimistic state.
+
     pendingAddsRef.current += 1;
     addQueueRef.current = addQueueRef.current.then(async () => {
       try {
-        let cartKey = localStorage.getItem("wcCartKey");
-        if (!cartKey) {
-          const res = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`, { method: "GET", credentials: "include" });
-          const data = await res.json(); cartKey = data.cart_key; localStorage.setItem("wcCartKey", cartKey);
-        }
-        const addRes = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`, {
-          method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-          body: JSON.stringify({ id: String(variant.variation_id || product.id), quantity: "1", ...(variant.variation_id && { variation_id: variant.variation_id, variation: variant.variation }) }),
-        });
+        // getCartKey() rejects "1" and any short/missing key, fetches fresh if needed
+        const cartKey = await getCartKey();
+        const addRes = await fetch(
+          `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              id: String(capturedVariant.variation_id || capturedProductId),
+              quantity: "1",
+              ...(capturedVariant.variation_id && {
+                variation_id: capturedVariant.variation_id,
+                variation: capturedVariant.variation,
+              }),
+            }),
+          }
+        );
         const data = await addRes.json();
         if (addRes.ok && data?.items) {
           pendingAddsRef.current -= 1;
+          // Only apply the server's view once ALL queued adds have landed —
+          // intermediate responses don't know about clicks that came after them
           if (pendingAddsRef.current === 0) {
             setCart(mapCoCart(data));
           }
         } else {
           pendingAddsRef.current = Math.max(0, pendingAddsRef.current - 1);
+          // 404 almost always means a bad cart_key — nuke it so next call gets a fresh one
+          if (addRes.status === 404) {
+            localStorage.removeItem("wcCartKey");
+          }
         }
       } catch (e) {
         pendingAddsRef.current = Math.max(0, pendingAddsRef.current - 1);
