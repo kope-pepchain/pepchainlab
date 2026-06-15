@@ -185,6 +185,7 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
   const [amount, setAmount] = useState("");
   const [step, setStep] = useState("amount");
   const [errorMsg, setErrorMsg] = useState("");
+  const [amountError, setAmountError] = useState("");
   const parsedAmount = parseFloat(amount) || 0;
 
   return (
@@ -201,11 +202,20 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
             </p>
             <input type="number" min="20" max="5000" step="0.01" className="notify-input"
               placeholder="Amount in USD (min $50)" value={amount}
-              onChange={(e) => setAmount(e.target.value)} style={{ marginTop: "0.5rem" }} />
+              onChange={(e) => { setAmount(e.target.value); setAmountError(""); }} style={{ marginTop: "0.5rem" }} />
             <button className="btn-primary" style={{ width: "100%", marginTop: "1rem" }}
-              disabled={parsedAmount < 50} onClick={() => setStep("pay")}>
+              onClick={() => {
+                if (parsedAmount < 50) { setAmountError("Minimum top-up amount is $50."); return; }
+                setAmountError("");
+                setStep("pay");
+              }}>
               Continue to Payment
             </button>
+            {amountError && (
+              <p style={{ color: "#f87171", fontSize: "0.82rem", marginTop: "0.5rem", textAlign: "center" }}>
+                {amountError}
+              </p>
+            )}
           </>
         )}
         {step === "pay" && (
@@ -2505,12 +2515,7 @@ export default function App() {
           onCartOpen={() => setCartOpen(true)}
           cartSyncing={cartSyncing}
           walletBalance={walletBalance}
-          onNavigate={async (url) => {
-            if (pendingAddsRef.current > 0) {
-              await addQueueRef.current;
-            }
-            window.location.href = url;
-          }}
+          onNavigate={(url) => { window.location.href = url; }}
           onWalletOpen={async () => {
             const loggedIn = await checkLoggedIn();
             if (loggedIn === false) {
@@ -2570,12 +2575,7 @@ export default function App() {
           onCartOpen={() => setCartOpen(true)}
           cartSyncing={cartSyncing}
           walletBalance={walletBalance}
-          onNavigate={async (url) => {
-            if (pendingAddsRef.current > 0) {
-              await addQueueRef.current;
-            }
-            window.location.href = url;
-          }}
+          onNavigate={(url) => { window.location.href = url; }}
           onWalletOpen={async () => {
           const loggedIn = await checkLoggedIn();
           if (loggedIn === false) {
