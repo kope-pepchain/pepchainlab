@@ -2218,12 +2218,8 @@ function ContactPage() {
 // ─── APP ───
 export default function App() {
   const [cart, setCart] = useState(() => {
-    try {
-      const saved = localStorage.getItem("cart");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
+    try { const saved = localStorage.getItem("cart"); return saved ? JSON.parse(saved) : []; }
+    catch { return []; }
   });
   const [cartOpen, setCartOpen] = useState(false);
   const [walletOpen, setWalletOpen] = useState(
@@ -2232,93 +2228,84 @@ export default function App() {
   const [currentUserId, setCurrentUserId] = useState(null);
   const [walletBalance, setWalletBalance] = useState(null);
 
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+  // Map a CoCart response into our drawer shape. ONE place to fix if fields differ.
+  // If prices come out ~100x too big in testing, CoCart returns cents:
+  // swap parseFloat(it.price) for (parseInt(it.price,10)/100).
+  const mapCoCart = (data) =>
+    Object.values(data?.items || {}).map((it) => ({
+      key: it.item_key, item_key: it.item_key, name: it.name,
+      dose: it.meta?.variation ? Object.values(it.meta.variation).join(", ") : "",
+      price: `$${parseFloat(it.price).toFixed(2)}`,
+      qty: it.quantity?.value ?? it.quantity,
+      variation_id: it.id, variation: it.meta?.variation || null,
+    }));
+
+  // cache drawer locally so it paints instantly next load
+  useEffect(() => { localStorage.setItem("cart", JSON.stringify(cart)); }, [cart]);
+
+  // RESTORED: wallet balance + user id for navbar/top-up
   useEffect(() => {
     checkLoggedIn().then((loggedIn) => {
       if (loggedIn) {
-        fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/me`, {
-          credentials: "include",
-        })
+        fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/me`, { credentials: "include" })
           .then((r) => r.json())
-          .then((data) => {
-            setCurrentUserId(data.user_id);
-            setWalletBalance(data.wallet_balance);
-          });
+          .then((data) => { setCurrentUserId(data.user_id); setWalletBalance(data.wallet_balance); });
       }
     });
   }, []);
-  const [ageVerified, setAgeVerified] = useState(
-    () => sessionStorage.getItem("ageVerified") === "true",
-  );
 
-  const handleAgeConfirm = () => {
-    sessionStorage.setItem("ageVerified", "true");
-    setAgeVerified(true);
-  };
-  const handleQtyChange = (key, delta) => {
-    setCart((prev) =>
-      prev
-        .map((i) => (i.key === key ? { ...i, qty: i.qty + delta } : i))
-        .filter((i) => i.qty > 0),
-    );
+  // server cart = source of truth: hydrate drawer from it on load
+  useEffect(() => {
+    (async () => {
+      const cartKey = localStorage.getItem("wcCartKey");
+      if (!cartKey) return;
+      try {
+        const res = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart?cart_key=${cartKey}`, { credentials: "include" });
+        const data = await res.json();
+        console.log("CoCart cart:", data);  // check shape once, then delete this line
+        setCart(mapCoCart(data));
+      } catch (e) { console.warn("hydrate failed", e); }
+    })();
+  }, []);
+
+  const [ageVerified, setAgeVerified] = useState(() => sessionStorage.getItem("ageVerified") === "true");
+  const handleAgeConfirm = () => { sessionStorage.setItem("ageVerified", "true"); setAgeVerified(true); };
+
+  // qty/remove now writes to CoCart so edits actually stick
+  const handleQtyChange = async (key, delta) => {
+    const cartKey = localStorage.getItem("wcCartKey");
+    const item = cart.find((i) => i.key === key);
+    if (!item) return;
+    const newQty = item.qty + delta;
+    setCart((prev) => prev.map((i) => (i.key === key ? { ...i, qty: newQty } : i)).filter((i) => i.qty > 0));
+    if (!cartKey || !item.item_key) return;
+    const url = `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/item/${item.item_key}?cart_key=${cartKey}`;
+    try {
+      if (newQty <= 0) await fetch(url, { method: "DELETE", credentials: "include" });
+      else await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ quantity: String(newQty) }) });
+    } catch (e) { console.warn("qty sync failed", e); }
   };
 
-  const addToCart = (product, variant) => {
+  const addToCart = async (product, variant) => {
     const key = `${product.id}-${variant.dose}`;
     setCart((prev) => {
       const existing = prev.find((i) => i.key === key);
-      if (existing)
-        return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + 1 } : i));
-      return [
-        ...prev,
-        {
-          key,
-          name: product.name,
-          dose: variant.dose,
-          price: variant.price,
-          qty: 1,
-          variation_id: variant.variation_id || null,
-          variation: variant.variation || null,
-        },
-      ];
+      if (existing) return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + 1 } : i));
+      return [...prev, { key, name: product.name, dose: variant.dose, price: variant.price, qty: 1, variation_id: variant.variation_id || null, variation: variant.variation || null }];
     });
-
-    // Background sync to WooCommerce — fire and forget, don't block the UI
-    (async () => {
-      try {
-        let cartKey = localStorage.getItem("wcCartKey");
-        if (!cartKey) {
-          const res = await fetch(
-            `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`,
-            { method: "GET", credentials: "include" },
-          );
-          const data = await res.json();
-          cartKey = data.cart_key;
-          localStorage.setItem("wcCartKey", cartKey);
-        }
-
-        await fetch(
-          `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-              id: String(variant.variation_id || product.id),
-              quantity: "1",
-              ...(variant.variation_id && {
-                variation_id: variant.variation_id,
-                variation: variant.variation,
-              }),
-            }),
-          },
-        );
-      } catch (e) {
-        console.warn("Background cart sync failed:", e);
+    try {
+      let cartKey = localStorage.getItem("wcCartKey");
+      if (!cartKey) {
+        const res = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`, { method: "GET", credentials: "include" });
+        const data = await res.json(); cartKey = data.cart_key; localStorage.setItem("wcCartKey", cartKey);
       }
-    })();
+      const addRes = await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ id: String(variant.variation_id || product.id), quantity: "1", ...(variant.variation_id && { variation_id: variant.variation_id, variation: variant.variation }) }),
+      });
+      const data = await addRes.json();
+      if (data?.items) setCart(mapCoCart(data));  // re-sync so each line gets its real item_key
+    } catch (e) { console.warn("add sync failed", e); }
   };
   const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
 
