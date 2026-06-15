@@ -2397,34 +2397,10 @@ export default function App() {
   useEffect(() => {
     const cameFromWP = sessionStorage.getItem("returningFromWP") === "1";
     sessionStorage.removeItem("returningFromWP");
-    if (!cameFromWP) return;
-
-    // User came back from WooCommerce cart/checkout — read whatever
-    // WooCommerce has now (they may have removed items or changed qty there)
-    // and sync it back into React's local cart.
-    const cartKey = localStorage.getItem("wcCartKey");
-    if (!cartKey || cartKey.length < 10) {
+    if (cameFromWP) {
       setCart([]);
       localStorage.removeItem("wcCartKey");
-      return;
     }
-
-    fetch(
-      `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart?cart_key=${cartKey}`,
-      { credentials: "include", cache: "no-store" }
-    )
-      .then((r) => r.json())
-      .then((data) => {
-        const mapped = mapCoCart(data);
-        setCart(mapped);
-        // If WooCommerce emptied the cart (order completed), clear the key too
-        if (mapped.length === 0) localStorage.removeItem("wcCartKey");
-      })
-      .catch(() => {
-        // If fetch fails, clear to be safe rather than show stale data
-        setCart([]);
-        localStorage.removeItem("wcCartKey");
-      });
   }, []);
   const [ageVerified, setAgeVerified] = useState(() => sessionStorage.getItem("ageVerified") === "true");
   const handleAgeConfirm = () => { sessionStorage.setItem("ageVerified", "true"); setAgeVerified(true); };
