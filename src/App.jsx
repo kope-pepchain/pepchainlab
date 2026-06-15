@@ -2230,12 +2230,16 @@ export default function App() {
     return cached !== null ? cached : null;
   });
   const [cartSyncing, setCartSyncing] = useState(false);
-  // reveal once CSS has applied (kills the unstyled-text flash)
+  // reveal the instant the stylesheet is actually loaded (no fixed delay)
   useEffect(() => {
-    const t = setTimeout(() => {
-      document.getElementById("root")?.classList.add("loaded");
-    }, 400);
-    return () => clearTimeout(t);
+    const reveal = () => document.getElementById("root")?.classList.add("loaded");
+    if (document.readyState === "complete") {
+      reveal();
+    } else {
+      window.addEventListener("load", reveal, { once: true });
+      const t = setTimeout(reveal, 800); // safety net, never hangs
+      return () => { window.removeEventListener("load", reveal); clearTimeout(t); };
+    }
   }, []);
 
   // Map a CoCart response into our drawer shape. ONE place to fix if fields differ.
