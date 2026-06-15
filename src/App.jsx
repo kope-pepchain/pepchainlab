@@ -403,7 +403,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
     </>
   );
 }
-function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance }) {
+function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance, cartSyncing }) {
   return (
     <nav className="navbar">
       <a href="/" className="nav-logo">
@@ -442,8 +442,8 @@ function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance }) {
             : "Wallet"}
         </button>
         <button className="nav-cta" onClick={onCartOpen}>
-          Cart{" "}
-          {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+          {cartSyncing ? "Syncing…" : "Cart"}{" "}
+          {!cartSyncing && cartCount > 0 && <span className="cart-count">{cartCount}</span>}
         </button>
       </div>
     </nav>
@@ -2227,6 +2227,7 @@ export default function App() {
   );
   const [currentUserId, setCurrentUserId] = useState(null);
   const [walletBalance, setWalletBalance] = useState(null);
+  const [cartSyncing, setCartSyncing] = useState(false);
 
   // Map a CoCart response into our drawer shape. ONE place to fix if fields differ.
   // If prices come out ~100x too big in testing, CoCart returns cents:
@@ -2259,6 +2260,7 @@ export default function App() {
     const resync = async () => {
       const cartKey = localStorage.getItem("wcCartKey");
       if (!cartKey) return;
+      setCartSyncing(true);
       try {
         const res = await fetch(
           `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart?cart_key=${cartKey}`,
@@ -2268,6 +2270,8 @@ export default function App() {
         setCart(mapCoCart(data));
       } catch (e) {
         console.warn("resync failed", e);
+      } finally {
+        setCartSyncing(false);
       }
     };
     window.addEventListener("focus", resync);
@@ -2333,6 +2337,7 @@ export default function App() {
         <Navbar
           cartCount={cartCount}
           onCartOpen={() => setCartOpen(true)}
+          cartSyncing={cartSyncing}
           walletBalance={walletBalance}
           onWalletOpen={async () => {
             const loggedIn = await checkLoggedIn();
@@ -2372,6 +2377,7 @@ export default function App() {
         <Navbar
           cartCount={cartCount}
           onCartOpen={() => setCartOpen(true)}
+          cartSyncing={cartSyncing}
           walletBalance={walletBalance}
           onWalletOpen={async () => {
             const loggedIn = await checkLoggedIn();
@@ -2423,6 +2429,7 @@ export default function App() {
       <Navbar
         cartCount={cartCount}
         onCartOpen={() => setCartOpen(true)}
+        cartSyncing={cartSyncing}
         walletBalance={walletBalance}
         onWalletOpen={async () => {
           const loggedIn = await checkLoggedIn();
