@@ -292,7 +292,7 @@ function AgeGate({ onConfirm }) {
     </>
   );
 }
-function CartDrawer({ cart, onClose, onQtyChange }) {
+function CartDrawer({ cart, onClose, onQtyChange, getCartKey }) {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const total = cart.reduce((sum, i) => {
     const price = parseFloat(i.price.replace("$", ""));
@@ -352,25 +352,10 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
                   if (isCheckingOut) return;
                   setIsCheckingOut(true);
                   try {
-                    // Step 1: Reuse our persistent cart key, or get one from CoCart
-                    let cartKey = localStorage.getItem("wcCartKey");
-                    if (!cartKey) {
-                      const createRes = await fetch(
-                        `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart`,
-                        {
-                          method: "GET",
-                          headers: { "Content-Type": "application/json" },
-                          credentials: "include",
-                        },
-                      );
-                      if (!createRes.ok)
-                        throw new Error("Could not start checkout session.");
-                      const cartData = await createRes.json();
-                      cartKey = cartData.cart_key;
-                      if (!cartKey)
-                        throw new Error("Could not start checkout session.");
-                    }
-                    localStorage.setItem("wcCartKey", cartKey);
+                    // Step 1: Get a validated cart key (rejects short/corrupt values like "1")
+                    const cartKey = await getCartKey().catch(() => {
+                      throw new Error("Could not start checkout session.");
+                    });
 
                     // Step 2: Clear any existing items in that cart
                     const clearRes = await fetch(
@@ -436,7 +421,7 @@ function CartDrawer({ cart, onClose, onQtyChange }) {
     </>
   );
 }
-function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance, cartSyncing }) {
+function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance, cartSyncing, onNavigate }) {
   return (
     <nav className="navbar">
       <a href="/" className="nav-logo">
@@ -449,16 +434,16 @@ function Navbar({ cartCount, onCartOpen, onWalletOpen, walletBalance, cartSyncin
       </a>
       <ul className="nav-links">
         <li>
-          <a href="/products">Products</a>
+          <a href="/products" onClick={(e) => { e.preventDefault(); onNavigate("/products"); }}>Products</a>
         </li>
         <li>
-          <a href="/about">About</a>
+          <a href="/about" onClick={(e) => { e.preventDefault(); onNavigate("/about"); }}>About</a>
         </li>
         <li>
-          <a href="/coa-library">COA Library</a>
+          <a href="/coa-library" onClick={(e) => { e.preventDefault(); onNavigate("/coa-library"); }}>COA Library</a>
         </li>
         <li>
-          <a href="/contact">Contact</a>
+          <a href="/contact" onClick={(e) => { e.preventDefault(); onNavigate("/contact"); }}>Contact</a>
         </li>
       </ul>
       <div className="nav-right">
@@ -2333,6 +2318,7 @@ export default function App() {
   const addQueueRef = useRef(Promise.resolve());
   const pendingAddsRef = useRef(0);
   const cartKeyFetchRef = useRef(null);
+  const cartRef = useRef([]);
   // reveal the instant the stylesheet is actually loaded (no fixed delay)
 
   // Validates the stored key looks real (CoCart keys are 32+ char hex strings,
@@ -2375,7 +2361,10 @@ export default function App() {
     }));
 
   // cache drawer locally so it paints instantly next load
-  useEffect(() => { localStorage.setItem("cart", JSON.stringify(cart)); }, [cart]);
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+    cartRef.current = cart;
+  }, [cart]);
 
   // auto-dismiss the "added to cart" toast after a few seconds
   useEffect(() => {
@@ -2461,46 +2450,38 @@ export default function App() {
   // addToCart: compute newQty from the LATEST cart state (not the stale closure
   // value), and serialize network writes so rapid clicks don't race each other.
   const handleQtyChange = (key, delta) => {
-    // Capture values INSIDE the setCart functional updater — that's the only
-    // place guaranteed to have the latest state under rapid clicks.
-    // (Reading `cart` directly here is a stale closure when you spam-click.)
-    let capturedQty = null;
-    let capturedItemKey = null;
+    // Read from cartRef.current — this is always the latest committed state,
+    // even under rapid clicks, because the ref is updated in the cart effect.
+    const item = cartRef.current.find((i) => i.key === key);
+    if (!item) return;
 
+    const capturedQty = item.qty + delta;
+    const capturedItemKey = item.item_key;
+    const cartKey = localStorage.getItem("wcCartKey");
+
+    // Optimistic UI update
     setCart((prev) => {
-      const item = prev.find((i) => i.key === key);
-      if (!item) return prev;
-      capturedQty = item.qty + delta;
-      capturedItemKey = item.item_key;
       if (capturedQty <= 0) return prev.filter((i) => i.key !== key);
       return prev.map((i) => (i.key === key ? { ...i, qty: capturedQty } : i));
     });
 
-    // If item wasn't found in state, nothing to do
-    if (capturedQty === null) return;
-
-    // If no item_key, this item hasn't synced to CoCart yet — the final
-    // addToCart queue response will reconcile the quantity; skip network call
+    // No item_key means it hasn't committed to CoCart yet — addToCart's final
+    // queue response will reconcile. Skip the network call.
     if (!capturedItemKey) return;
-
-    const cartKey = localStorage.getItem("wcCartKey");
     if (!cartKey || cartKey.length < 10) return;
-
-    const qtySnapshot = capturedQty;
-    const itemKeySnapshot = capturedItemKey;
 
     pendingAddsRef.current += 1;
     addQueueRef.current = addQueueRef.current.then(async () => {
-      const url = `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/item/${itemKeySnapshot}?cart_key=${cartKey}`;
+      const url = `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/item/${capturedItemKey}?cart_key=${cartKey}`;
       try {
-        if (qtySnapshot <= 0) {
+        if (capturedQty <= 0) {
           await fetch(url, { method: "DELETE", credentials: "include" });
         } else {
           await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ quantity: String(qtySnapshot) }),
+            body: JSON.stringify({ quantity: String(capturedQty) }),
           });
         }
       } catch (e) {
@@ -2510,6 +2491,10 @@ export default function App() {
       }
     });
   };
+
+  // Waits for all pending cart writes to finish before doing something
+  // (used by page navigation to avoid abandoning in-flight requests)
+  const waitForCart = () => addQueueRef.current;
 
   const addToCart = (product, variant) => {
     const key = `${product.id}-${variant.dose}`;
@@ -2534,8 +2519,8 @@ export default function App() {
 
     pendingAddsRef.current += 1;
     addQueueRef.current = addQueueRef.current.then(async () => {
+      let lastOkData = null;
       try {
-        // getCartKey() rejects "1" and any short/missing key, fetches fresh if needed
         const cartKey = await getCartKey();
         const addRes = await fetch(
           `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`,
@@ -2553,24 +2538,18 @@ export default function App() {
             }),
           }
         );
+        if (addRes.status === 404) localStorage.removeItem("wcCartKey");
         const data = await addRes.json();
-        if (addRes.ok && data?.items) {
-          pendingAddsRef.current -= 1;
-          // Only apply the server's view once ALL queued adds have landed —
-          // intermediate responses don't know about clicks that came after them
-          if (pendingAddsRef.current === 0) {
-            setCart(mapCoCart(data));
-          }
-        } else {
-          pendingAddsRef.current = Math.max(0, pendingAddsRef.current - 1);
-          // 404 almost always means a bad cart_key — nuke it so next call gets a fresh one
-          if (addRes.status === 404) {
-            localStorage.removeItem("wcCartKey");
-          }
-        }
+        if (addRes.ok && data?.items) lastOkData = data;
       } catch (e) {
-        pendingAddsRef.current = Math.max(0, pendingAddsRef.current - 1);
         console.warn("add sync failed", e);
+      } finally {
+        // Always decrement exactly once, no matter what path we took above
+        pendingAddsRef.current = Math.max(0, pendingAddsRef.current - 1);
+        // Only apply the server's cart once all queued adds have completed
+        if (pendingAddsRef.current === 0 && lastOkData) {
+          setCart(mapCoCart(lastOkData));
+        }
       }
     });
   };
@@ -2596,6 +2575,12 @@ export default function App() {
           onCartOpen={() => setCartOpen(true)}
           cartSyncing={cartSyncing}
           walletBalance={walletBalance}
+          onNavigate={async (url) => {
+            if (pendingAddsRef.current > 0) {
+              await addQueueRef.current;
+            }
+            window.location.href = url;
+          }}
           onWalletOpen={async () => {
             const loggedIn = await checkLoggedIn();
             if (loggedIn === false) {
@@ -2620,6 +2605,7 @@ export default function App() {
             cart={cart}
             onClose={() => setCartOpen(false)}
             onQtyChange={handleQtyChange}
+            getCartKey={getCartKey}
           />
         )}
         <CartToast
@@ -2642,6 +2628,12 @@ export default function App() {
           onCartOpen={() => setCartOpen(true)}
           cartSyncing={cartSyncing}
           walletBalance={walletBalance}
+          onNavigate={async (url) => {
+            if (pendingAddsRef.current > 0) {
+              await addQueueRef.current;
+            }
+            window.location.href = url;
+          }}
           onWalletOpen={async () => {
             const loggedIn = await checkLoggedIn();
             if (loggedIn === false) {
@@ -2666,6 +2658,7 @@ export default function App() {
             cart={cart}
             onClose={() => setCartOpen(false)}
             onQtyChange={handleQtyChange}
+            getCartKey={getCartKey}
           />
         )}
         <CartToast
@@ -2696,11 +2689,17 @@ export default function App() {
       <div className="noise-overlay" />
       {!ageVerified && <AgeGate onConfirm={handleAgeConfirm} />}
       <Navbar
-        cartCount={cartCount}
-        onCartOpen={() => setCartOpen(true)}
-        cartSyncing={cartSyncing}
-        walletBalance={walletBalance}
-        onWalletOpen={async () => {
+          cartCount={cartCount}
+          onCartOpen={() => setCartOpen(true)}
+          cartSyncing={cartSyncing}
+          walletBalance={walletBalance}
+          onNavigate={async (url) => {
+            if (pendingAddsRef.current > 0) {
+              await addQueueRef.current;
+            }
+            window.location.href = url;
+          }}
+          onWalletOpen={async () => {
           const loggedIn = await checkLoggedIn();
           if (loggedIn === false) {
             window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
@@ -2721,10 +2720,11 @@ export default function App() {
       )}
       {cartOpen && (
         <CartDrawer
-          cart={cart}
-          onClose={() => setCartOpen(false)}
-          onQtyChange={handleQtyChange}
-        />
+            cart={cart}
+            onClose={() => setCartOpen(false)}
+            onQtyChange={handleQtyChange}
+            getCartKey={getCartKey}
+          />
       )}
       <CartToast
         toast={toast}
