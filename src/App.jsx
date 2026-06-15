@@ -1790,7 +1790,11 @@ function ProductPage({ slug, addToCart }) {
   const [authChecked, setAuthChecked] = useState(false);
   const [showNotify, setShowNotify] = useState(false);
 
+  // Auth + product data fire in parallel, not serial.
+  // Product renders as soon as data arrives; auth redirect happens
+  // independently if the user turns out to not be logged in.
   useEffect(() => {
+    // Fire auth check (doesn't block render)
     checkLoggedIn().then((loggedIn) => {
       if (!loggedIn) {
         window.location.href = `${import.meta.env.VITE_WC_URL}/my-account/?redirect_to=${encodeURIComponent(window.location.pathname)}`;
@@ -1798,10 +1802,8 @@ function ProductPage({ slug, addToCart }) {
       }
       setAuthChecked(true);
     });
-  }, []);
 
-  useEffect(() => {
-    if (!authChecked) return;
+    // Fire product data fetch immediately (doesn't wait for auth)
     pepFetch(`product/${slug}`)
       .then((p) => {
         if (!p || p.code === "not_found") {
@@ -1818,9 +1820,9 @@ function ProductPage({ slug, addToCart }) {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [slug, authChecked]);
+  }, [slug]);
 
-  if (!authChecked || loading)
+  if (loading)
     return (
       <div className="policy-page">
         <p
