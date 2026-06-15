@@ -35,6 +35,11 @@ const wcFetch = (endpoint) => {
     `${import.meta.env.VITE_WC_URL}/wp-content/themes/storefront-child/proxy.php?endpoint=${encodeURIComponent(endpoint)}`,
   ).then((r) => r.json());
 };
+const pepFetch = (path) => {
+  return fetch(
+    `${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/${path}`,
+  ).then((r) => r.json());
+};
 const checkLoggedIn = async () => {
   try {
     const res = await fetch(
@@ -731,42 +736,14 @@ function ProductGrid({ addToCart }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      wcFetch("products?per_page=50&status=publish"),
-      wcFetch("products?type=variation&per_page=100"),
-    ])
-      .then(([data, allVariations]) => {
-        const variationsByParent = {};
-        (allVariations || []).forEach((v) => {
-          if (!variationsByParent[v.parent]) variationsByParent[v.parent] = [];
-          variationsByParent[v.parent].push(v);
-        });
-        const hydrated = data.map((product) => {
-          const localImg = getLocalImage(product.slug);
-          if (product.type === "variable") {
-            const parentVariations = variationsByParent[product.id] || [];
-            const variation_data = parentVariations.map((v) => {
-              const parts = (v.variation || "").split(":");
-              const attrName = parts[0]?.trim() || "Variant";
-              const attrValue = parts.slice(1).join(":").trim() || "";
-              return {
-                id: v.id,
-                attributes: [{ name: attrName, option: attrValue }],
-                price: (parseInt(v.prices.price, 10) / 100).toFixed(2),
-                stock_status: v.is_in_stock ? "instock" : "outofstock",
-                image: v.images?.[0] || null,
-              };
-            });
-            variation_data.sort(
-              (a, b) =>
-                (parseFloat(a.attributes[0].option) || 0) -
-                (parseFloat(b.attributes[0].option) || 0),
-            );
-            return { ...product, variation_data, localImg };
-          }
-          return { ...product, variation_data: [], localImg };
-        });
-        setProducts(hydrated.reverse());
+    pepFetch("catalog")
+      .then((response) => {
+        const data = response.products || [];
+        const withLocalImg = data.map((product) => ({
+          ...product,
+          localImg: getLocalImage(product.slug),
+        }));
+        setProducts(withLocalImg);
         setLoading(false);
       })
       .catch((err) => {
@@ -1825,44 +1802,18 @@ function ProductPage({ slug, addToCart }) {
 
   useEffect(() => {
     if (!authChecked) return;
-    Promise.all([
-      wcFetch(`products?slug=${slug}`),
-      wcFetch("products?type=variation&per_page=100"),
-    ])
-      .then(([data, allVariations]) => {
-        const p = data[0];
-        if (!p) {
+    pepFetch(`product/${slug}`)
+      .then((p) => {
+        if (!p || p.code === "not_found") {
           setLoading(false);
           return;
         }
+        setProduct(p);
         if (p.type === "variable") {
-          const parentVariations = (allVariations || []).filter(
-            (v) => v.parent === p.id,
-          );
-          const variation_data = parentVariations.map((v) => {
-            const parts = (v.variation || "").split(":");
-            const attrName = parts[0]?.trim() || "Variant";
-            const attrValue = parts.slice(1).join(":").trim() || "";
-            return {
-              id: v.id,
-              attributes: [{ name: attrName, option: attrValue }],
-              price: (parseInt(v.prices.price, 10) / 100).toFixed(2),
-              stock_status: v.is_in_stock ? "instock" : "outofstock",
-              image: v.images?.[0] || null,
-            };
-          });
-          variation_data.sort(
-            (a, b) =>
-              (parseFloat(a.attributes[0].option) || 0) -
-              (parseFloat(b.attributes[0].option) || 0),
-          );
-          setProduct({ ...p, variation_data });
-          const firstInStock = variation_data.find(
+          const firstInStock = (p.variation_data || []).find(
             (v) => v.stock_status === "instock",
           );
-          setSelectedVariant(firstInStock || variation_data[0] || null);
-        } else {
-          setProduct({ ...p, variation_data: [] });
+          setSelectedVariant(firstInStock || p.variation_data?.[0] || null);
         }
         setLoading(false);
       })
