@@ -3,11 +3,26 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="/pep-chain-logo.png" />
-  <link rel="apple-touch-icon" href="/pep-chain-logo.png" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/android-chrome-512x512.png" />
   <meta name="theme-color" content="#050810" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pep-Chain | Research-Grade Peptides | For Research Use Only</title>
+  <style>
+    body {
+      background: #050810;
+      margin: 0;
+    }
+
+    #root {
+      opacity: 0;
+      transition: opacity 0.15s ease-in;
+    }
+
+    #root.loaded {
+      opacity: 1;
+    }
+  </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
