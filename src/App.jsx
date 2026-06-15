@@ -2230,9 +2230,11 @@ export default function App() {
     return cached !== null ? cached : null;
   });
   const [cartSyncing, setCartSyncing] = useState(false);
-  // reveal the app once mounted (kills the unstyled-text flash)
+  // reveal the app once mounted + painted (kills the unstyled-text flash)
   useEffect(() => {
-    document.getElementById("root")?.classList.add("loaded");
+    requestAnimationFrame(() => {
+      document.getElementById("root")?.classList.add("loaded");
+    });
   }, []);
 
   // Map a CoCart response into our drawer shape. ONE place to fix if fields differ.
