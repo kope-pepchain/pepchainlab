@@ -2275,13 +2275,17 @@ export default function App() {
       .catch(() => {});
   }, []);
 
-  // server cart = source of truth. On first load + on returning from the WP cart,
-  // show "Syncing…" until the server confirms (count may be stale). Plain tab-switching
-  // stays quiet — nothing changed the cart, so no banner.
+  // server cart = source of truth. Debounced so focus + visibilitychange firing
+  // together (which they do on every tab-return) collapse into ONE call instead of two.
+  // Also guards against overlapping in-flight requests.
   useEffect(() => {
-    const resync = async (loud = false) => {
+    let debounceTimer = null;
+    let inFlight = false;
+
+    const doResync = async (loud = false) => {
       const cartKey = localStorage.getItem("wcCartKey");
-      if (!cartKey) return;
+      if (!cartKey || inFlight) return;
+      inFlight = true;
       if (loud) setCartSyncing(true);
       try {
         const res = await fetch(
@@ -2293,26 +2297,34 @@ export default function App() {
       } catch (e) {
         console.warn("resync failed", e);
       } finally {
+        inFlight = false;
         if (loud) setCartSyncing(false);
       }
     };
 
+    // collapse rapid-fire triggers (focus + visibility firing together) into one call
+    const resync = (loud = false) => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => doResync(loud), 300);
+    };
+
     const cameFromWP = sessionStorage.getItem("returningFromWP") === "1";
     sessionStorage.removeItem("returningFromWP");
-    resync(cameFromWP); // loud only if we just came back from the WP cart/checkout
-    const onFocus = () => resync(false); // tab back in: quiet
+    doResync(cameFromWP); // initial mount: fire immediately, not debounced
+
+    const onFocus = () => resync(false);
     const onVisible = () => { if (document.visibilityState === "visible") resync(false); };
-    const onPageshow = (e) => { if (e.persisted) resync(true); }; // bfcache back: loud
+    const onPageshow = (e) => { if (e.persisted) resync(true); };
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisible);
     window.addEventListener("pageshow", onPageshow);
     return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("pageshow", onPageshow);
     };
   }, []);
-
   const [ageVerified, setAgeVerified] = useState(() => sessionStorage.getItem("ageVerified") === "true");
   const handleAgeConfirm = () => { sessionStorage.setItem("ageVerified", "true"); setAgeVerified(true); };
 
