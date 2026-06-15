@@ -1975,6 +1975,7 @@
   object-fit: contain;
   filter: drop-shadow(0 0 28px rgba(46, 127, 255, 0.4));
   display: block;
+  animation: fadeUp 0.8s 0.15s ease both;
 }
 
 .hero-vial-placeholder {

@@ -523,25 +523,6 @@ function Hero() {
                   className="hero-vial-img"
                   decoding="async"
                   fetchPriority="high"
-                  style={{
-                    opacity: 0,
-                    transform: "translateY(12px)",
-                    transition: "opacity 0.7s ease, transform 0.7s ease",
-                  }}
-                  ref={(node) => {
-                    if (node && node.complete) {
-                      node.style.opacity = 1;
-                      node.style.transform = "translateY(0)";
-                    }
-                  }}
-                  onLoad={(e) => {
-                    e.currentTarget.style.opacity = 1;
-                    e.currentTarget.style.transform = "translateY(0)";
-                  }}
-                  onError={(e) => {
-                    e.currentTarget.style.opacity = 1;
-                    e.currentTarget.style.transform = "translateY(0)";
-                  }}
                 />
               ) : (
                 <div className="hero-vial-placeholder" />
