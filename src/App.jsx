@@ -212,8 +212,8 @@ function WalletTopupModal({ userId, onSuccess, onClose }) {
               Continue to Payment
             </button>
             {amountError && (
-              <p style={{ color: "rgba(220, 120, 80, 0.9)", fontSize: "0.75rem", fontFamily: "var(--font-display)", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", marginTop: "0.5rem", textAlign: "center" }}>
-                ⚠ {amountError}
+              <p style={{ color: "rgba(46, 127, 255, 0.75)", fontSize: "0.72rem", fontFamily: "var(--font-display)", fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", marginTop: "0.75rem", textAlign: "center", borderTop: "1px solid rgba(46, 127, 255, 0.15)", paddingTop: "0.75rem" }}>
+                {amountError}
               </p>
             )}
           </>
