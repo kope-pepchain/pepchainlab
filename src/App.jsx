@@ -2225,7 +2225,10 @@ export default function App() {
     () => new URLSearchParams(window.location.search).get("openWallet") === "true"
   );
   const [currentUserId, setCurrentUserId] = useState(null);
-  const [walletBalance, setWalletBalance] = useState(null);
+  const [walletBalance, setWalletBalance] = useState(() => {
+    const cached = localStorage.getItem("walletBalance");
+    return cached !== null ? cached : null;
+  });
   const [cartSyncing, setCartSyncing] = useState(false);
 
   // Map a CoCart response into our drawer shape. ONE place to fix if fields differ.
@@ -2251,6 +2254,10 @@ export default function App() {
         if (data.logged_in) {
           setCurrentUserId(data.user_id);
           setWalletBalance(data.wallet_balance);
+          localStorage.setItem("walletBalance", data.wallet_balance);
+        } else {
+          setWalletBalance(null);
+          localStorage.removeItem("walletBalance");
         }
       })
       .catch(() => {});
@@ -2369,6 +2376,7 @@ export default function App() {
             userId={currentUserId}
             onSuccess={(newBalance) => {
               setWalletBalance(newBalance);
+              localStorage.setItem("walletBalance", newBalance);
             }}
             onClose={() => setWalletOpen(false)}
           />
@@ -2409,6 +2417,7 @@ export default function App() {
             userId={currentUserId}
             onSuccess={(newBalance) => {
               setWalletBalance(newBalance);
+              localStorage.setItem("walletBalance", newBalance);
             }}
             onClose={() => setWalletOpen(false)}
           />
@@ -2460,8 +2469,9 @@ export default function App() {
         <WalletTopupModal
           userId={currentUserId}
           onSuccess={(newBalance) => {
-            setWalletBalance(newBalance);
-          }}
+              setWalletBalance(newBalance);
+              localStorage.setItem("walletBalance", newBalance);
+            }}
           onClose={() => setWalletOpen(false)}
         />
       )}
