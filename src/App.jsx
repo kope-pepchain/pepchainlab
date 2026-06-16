@@ -1316,41 +1316,36 @@ function COALibrary() {
 
   const coas = [
     {
-      name: "Retatrutide 10mg",
-      detail: "Janoshik Laboratory · HPLC Verified",
-      pdf: "https://pepchainlab.com/wp-content/uploads/janoshik_r10.pdf",
-    },
-    {
-      name: "Retatrutide 20mg",
-      detail: "Janoshik Laboratory · HPLC Verified",
-      pdf: "https://pepchainlab.com/wp-content/uploads/janoshik_r20.pdf",
-    },
-    {
-      name: "Retatrutide 30mg",
-      detail: "Janoshik Laboratory · HPLC Verified",
-      pdf: "https://pepchainlab.com/wp-content/uploads/janoshik_r30.pdf",
-    },
-    {
       name: "GHK-Cu 50mg",
       detail: "Janoshik Laboratory · HPLC Verified",
       pdf: "https://pepchainlab.com/wp-content/uploads/janoshik_ghkcu50.pdf",
-    },
-    {
-      name: "MOTS-c 10mg",
-      detail: "Janoshik Laboratory · HPLC Verified",
-      pdf: "https://pepchainlab.com/wp-content/uploads/janoshik_motsc10.pdf",
     },
     {
       name: "Glow Blend 50mg",
       detail: "Janoshik Laboratory · HPLC Verified",
       pdf: "https://pepchainlab.com/wp-content/uploads/janoshik_glow50.pdf",
     },
-    {
-      name: "Bacteriostatic Water",
-      detail: "Janoshik Laboratory · HPLC Verified",
-      pdf: "https://pepchainlab.com/wp-content/uploads/janoshik_bacwater3.pdf",
-    },
     { name: "Wolverine Blend 10mg", detail: "Coming Soon", pdf: null },
+    {
+      name: "MOTS-c 10mg",
+      detail: "Janoshik Laboratory · HPLC Verified",
+      pdf: "https://pepchainlab.com/wp-content/uploads/janoshik_motsc10.pdf",
+    },
+    {
+      name: "GLP-3(RT) 10mg",
+      detail: "Janoshik Laboratory · HPLC Verified",
+      pdf: "https://pepchainlab.com/wp-content/uploads/janoshik_r10.pdf",
+    },
+    {
+      name: "GLP-3(RT) 20mg",
+      detail: "Janoshik Laboratory · HPLC Verified",
+      pdf: "https://pepchainlab.com/wp-content/uploads/janoshik_r20.pdf",
+    },
+    {
+      name: "GLP-3(RT) 30mg",
+      detail: "Janoshik Laboratory · HPLC Verified",
+      pdf: "https://pepchainlab.com/wp-content/uploads/janoshik_r30.pdf",
+    },
   ];
 
   return (
@@ -1365,12 +1360,15 @@ function COALibrary() {
       {activePdf && (
         <div className="pdf-modal-overlay" onClick={() => setActivePdf(null)}>
           <div className="pdf-modal" onClick={(e) => e.stopPropagation()}>
-            <button
-              className="pdf-modal-close"
-              onClick={() => setActivePdf(coa.pdf)}
-            >
-              ✕
-            </button>
+            <div className="pdf-modal-header">
+              <button
+                className="pdf-modal-close"
+                onClick={() => setActivePdf(null)}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
             <iframe
               src={`https://docs.google.com/viewer?url=${encodeURIComponent(activePdf)}&embedded=true`}
               className="pdf-iframe"

@@ -1359,10 +1359,20 @@ body {
   position: relative;
 }
 
+.pdf-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.5rem 0.6rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
 .pdf-modal-close {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -1371,7 +1381,6 @@ body {
   height: 32px;
   cursor: pointer;
   font-size: 0.85rem;
-  z-index: 1;
 }
 
 .pdf-modal-close:hover {
@@ -1381,9 +1390,9 @@ body {
 
 .pdf-iframe {
   width: 100%;
-  height: 100%;
+  flex: 1;
   border: none;
-  border-radius: 8px;
+  border-radius: 0;
 }
 .coa-link {
   font-family: var(--font-display);
