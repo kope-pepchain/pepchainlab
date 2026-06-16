@@ -434,7 +434,7 @@ function AgeGate({ onConfirm }) {
     </>
   );
 }
-function CartDrawer({ cart, onClose, onQtyChange, getCartKey }) {
+function CartDrawer({ cart, onClose, onQtyChange }) {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const total = cart.reduce((sum, i) => {
     const price = parseFloat(i.price.replace("$", ""));
@@ -447,9 +447,7 @@ function CartDrawer({ cart, onClose, onQtyChange, getCartKey }) {
       <div className="cart-drawer">
         <div className="cart-drawer-header">
           <h3>Your Cart</h3>
-          <button className="cart-close-btn" onClick={onClose}>
-            ✕
-          </button>
+          <button className="cart-close-btn" onClick={onClose}>✕</button>
         </div>
         {cart.length === 0 ? (
           <p className="cart-empty">Your cart is empty</p>
@@ -464,19 +462,9 @@ function CartDrawer({ cart, onClose, onQtyChange, getCartKey }) {
                     <p className="cart-item-price">{item.price}</p>
                   </div>
                   <div className="cart-item-qty-controls">
-                    <button
-                      className="qty-btn"
-                      onClick={() => onQtyChange(item.key, -1)}
-                    >
-                      −
-                    </button>
+                    <button className="qty-btn" onClick={() => onQtyChange(item.key, -1)}>−</button>
                     <span>{item.qty}</span>
-                    <button
-                      className="qty-btn"
-                      onClick={() => onQtyChange(item.key, 1)}
-                    >
-                      +
-                    </button>
+                    <button className="qty-btn" onClick={() => onQtyChange(item.key, 1)}>+</button>
                   </div>
                 </div>
               ))}
@@ -494,37 +482,26 @@ function CartDrawer({ cart, onClose, onQtyChange, getCartKey }) {
                   if (isCheckingOut) return;
                   setIsCheckingOut(true);
                   try {
-                    // Step 1: Get a validated cart key (rejects short/corrupt values like "1")
-                    const cartKey = await getCartKey().catch(() => {
-                      throw new Error("Could not start checkout session.");
+                    // User is logged in → their cart is bound to their account.
+                    // credentials:"include" carries the WP login cookie. No cart_key.
+
+                    // 1. Clear their server cart
+                    await fetch(`${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/clear`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      credentials: "include",
                     });
 
-                    // Step 2: Clear any existing items in that cart
-                    const clearRes = await fetch(
-                      `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/clear?cart_key=${cartKey}`,
-                      {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        credentials: "include",
-                      },
-                    );
-                    if (!clearRes.ok)
-                      throw new Error(
-                        "Could not prepare your cart. Please try again.",
-                      );
-
-                    // Step 3: Add items, verifying each one succeeded
+                    // 2. Push every local item
                     for (const item of cart) {
                       const res = await fetch(
-                        `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item?cart_key=${cartKey}`,
+                        `${import.meta.env.VITE_WC_URL}/wp-json/cocart/v2/cart/add-item`,
                         {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           credentials: "include",
                           body: JSON.stringify({
-                            id: String(
-                              item.variation_id || item.key.split("-")[0],
-                            ),
+                            id: String(item.variation_id || item.key.split("-")[0]),
                             quantity: String(item.qty),
                             ...(item.variation_id && {
                               variation_id: item.variation_id,
@@ -537,19 +514,17 @@ function CartDrawer({ cart, onClose, onQtyChange, getCartKey }) {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(
                           err.message ||
-                            `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
+                          `"${item.name.split("|")[0].trim()} ${item.dose}" couldn't be added — it may be out of stock.`,
                         );
                       }
                     }
 
-                    // Step 4: Redirect only after every item confirmed
+                    // 3. Hand off to checkout — session already owns the cart
                     sessionStorage.setItem("returningFromWP", "1");
-                    window.location.href = `${import.meta.env.VITE_WC_URL}/checkout/?cocart-load-cart=${cartKey}&keep-cart=false`;
+                    window.location.href = `${import.meta.env.VITE_WC_URL}/checkout/`;
                   } catch (err) {
                     console.error("Cart sync failed", err);
-                    alert(
-                      err.message || "Something went wrong. Please try again.",
-                    );
+                    alert(err.message || "Something went wrong. Please try again.");
                     setIsCheckingOut(false);
                   }
                 }}
@@ -813,10 +788,10 @@ function ProductCard({ product, addToCart, full = false }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
 
     addToCart(product, {
@@ -2032,7 +2007,7 @@ function ProductPage({ slug, addToCart }) {
           return firstInStock || p.variation_data?.[0] || null;
         }
       }
-    } catch {}
+    } catch { }
     return null;
   });
   const [authChecked, setAuthChecked] = useState(false);
@@ -2150,10 +2125,10 @@ function ProductPage({ slug, addToCart }) {
     const variation =
       isVariable && selectedVariant
         ? selectedVariant.attributes?.reduce((acc, a) => {
-            acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
-              a.option;
-            return acc;
-          }, {})
+          acc[`attribute_pa_${a.name.toLowerCase().replace(/\s+/g, "_")}`] =
+            a.option;
+          return acc;
+        }, {})
         : null;
     addToCart(product, {
       dose: variantLabel,
@@ -2616,7 +2591,7 @@ export default function App() {
     return () => clearTimeout(t);
   }, [toast]);
 
-// Affiliate referral tracking — fire SliceWP's visit recorder once per session.
+  // Affiliate referral tracking — fire SliceWP's visit recorder once per session.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const aff = params.get("aff") || params.get("ref");
@@ -2634,7 +2609,7 @@ export default function App() {
       body: body.toString(),
     })
       .then(() => sessionStorage.setItem(guardKey, "1"))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // wallet balance + user id for navbar/top-up — single /me call (was two)
@@ -2653,7 +2628,7 @@ export default function App() {
           localStorage.removeItem("walletBalance");
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // The cart is now fully local during browsing — no live CoCart sync, so
