@@ -1599,11 +1599,12 @@ body {
 .product-page-section-body h2,
 .product-page-section-body h3 {
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--white);
-  margin-top: 0.5rem;
+  margin-top: 0;
+  margin-bottom: 1.25rem;
 }
 
 .product-page-section-body strong {
