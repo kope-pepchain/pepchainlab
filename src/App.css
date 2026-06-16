@@ -3213,3 +3213,21 @@ input[type="number"] {
     height: 50px; /* tune this down until it fits comfortably */
   }
 }
+
+/* ─── UNIFORM PRODUCT PAGE TYPOGRAPHY ─── */
+/* Body text from WooCommerce descriptions → Inter */
+.product-page-section-body,
+.product-page-section-body p,
+.product-page-section-body td,
+.product-page-section-body th,
+.product-page-section-body span,
+.product-page-desc,
+.product-page-desc p {
+  font-family: var(--font-body);
+}
+
+/* Headings from WooCommerce descriptions → Outfit */
+.product-page-section-body h2,
+.product-page-section-body h3 {
+  font-family: var(--font-display);
+}
