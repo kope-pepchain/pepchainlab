@@ -635,9 +635,8 @@ function Navbar({
 
 function Hero() {
   const [vialImg] = useState(
-    "https://pepchainlab.com/wp-content/uploads/2026/06/reta10fixed.png",
-  );
-
+  "https://pepchainlab.com/wp-content/uploads/2026/06/ghkcu50mgfixed.png",
+);
   return (
     <section
       className="hero hero-split"
@@ -699,7 +698,7 @@ function Hero() {
               {vialImg ? (
                 <img
                   src={vialImg}
-                  alt="Retatrutide 10mg"
+                  alt="GHK-Cu 50mg"
                   className="hero-vial-img"
                   decoding="async"
                   fetchPriority="high"
@@ -710,7 +709,7 @@ function Hero() {
             </div>
           </div>
           <div className="hero-vial-shadow" />
-          <span className="hero-vial-tag">Retatrutide · 10mg</span>
+          <span className="hero-vial-tag">GHK-Cu · 50mg</span>
         </div>
       </div>
     </section>
