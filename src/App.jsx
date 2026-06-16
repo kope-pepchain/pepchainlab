@@ -26,17 +26,17 @@ const IMAGE_MAP = {
 const getLocalImage = (slug) => {
   if (!slug) return null;
   const s = slug.toLowerCase();
-  if (s.includes("retatrutide") && s.includes("30"))
+  if (s.includes("glp") && s.includes("30"))
     return IMAGE_MAP["retatrutide-30"];
-  if (s.includes("retatrutide") && s.includes("20"))
+  if (s.includes("glp") && s.includes("20"))
     return IMAGE_MAP["retatrutide-20"];
-  if (s.includes("retatrutide")) return IMAGE_MAP["retatrutide"];
+  if (s.includes("glp")) return IMAGE_MAP["retatrutide"];
   if (s.includes("ghk")) return IMAGE_MAP["ghk-cu"];
   if (s.includes("mots")) return IMAGE_MAP["mots-c"];
   if (s.includes("glow")) return IMAGE_MAP["glow"];
-  if (s.includes("bac") && s.includes("3"))
+  if (s.includes("h2o") && s.includes("3"))
     return IMAGE_MAP["bacteriostatic-water-3ml"];
-  if (s.includes("bac") || s.includes("water"))
+  if (s.includes("h2o"))
     return IMAGE_MAP["bacteriostatic-water"];
   if (s.includes("wolverine")) return IMAGE_MAP["wolverine"];
   return null;
@@ -759,11 +759,11 @@ function ProductCard({ product, addToCart, full = false }) {
         .toLowerCase() || "";
     if (attrs.includes("30")) return IMAGE_MAP["retatrutide-30"];
     if (attrs.includes("20")) return IMAGE_MAP["retatrutide-20"];
-    if (attrs.includes("10") && product.slug?.includes("retatrutide"))
+    if (attrs.includes("10") && product.slug?.includes("glp"))
       return IMAGE_MAP["retatrutide"];
-    if (attrs.includes("10") && product.slug?.includes("bac"))
+    if (attrs.includes("10") && product.slug?.includes("h2o"))
       return IMAGE_MAP["bacteriostatic-water"];
-    if (attrs.includes("3") && product.slug?.includes("bac"))
+    if (attrs.includes("3") && product.slug?.includes("h2o"))
       return IMAGE_MAP["bacteriostatic-water-3ml"];
     return product.localImg;
   };
@@ -2087,12 +2087,12 @@ function ProductPage({ slug, addToCart }) {
         ?.map((a) => a.option)
         .join(" ")
         .toLowerCase() || "";
-    if (slug.includes("retatrutide")) {
+    if (slug.includes("glp")) {
       if (attrs.includes("30")) return IMAGE_MAP["retatrutide-30"];
       if (attrs.includes("20")) return IMAGE_MAP["retatrutide-20"];
       return IMAGE_MAP["retatrutide"];
     }
-    if (slug.includes("bac") || slug.includes("water")) {
+    if (slug.includes("h2o")) {
       if (attrs.includes("3")) return IMAGE_MAP["bacteriostatic-water-3ml"];
       return IMAGE_MAP["bacteriostatic-water"];
     }
@@ -2137,11 +2137,10 @@ function ProductPage({ slug, addToCart }) {
 
   // Find COA link if one exists
   const coaMap = {
-    retatrutide: "janoshik_r10.pdf",
+    glp: "janoshik_r10.pdf",
     "ghk-cu": "janoshik_ghkcu50.pdf",
     "mots-c": "janoshik_motsc10.pdf",
     glow: "janoshik_glow50.pdf",
-    "bacteriostatic-water": "janoshik_bacwater3.pdf",
   };
   const coaFile = Object.entries(coaMap).find(([key]) =>
     slug.toLowerCase().includes(key),
