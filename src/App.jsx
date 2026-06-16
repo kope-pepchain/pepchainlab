@@ -2254,15 +2254,13 @@ function ProductPage({ slug, addToCart }) {
           <h2 className="product-page-section-title">Handling & Storage</h2>
           <div className="product-page-section-body">
             <p>
-              {shortName} is supplied as a lyophilised powder in a sealed glass
-              vial for controlled handling, storage, and analytical use in
-              appropriate research environments.
+              {shortName} is supplied in a sealed glass vial for controlled
+              handling, storage, and analytical use in appropriate research
+              environments.
             </p>
             <p>
-              Store in a cool, dry place away from direct sunlight. For
-              long-term storage, keep refrigerated at 2–8°C. Once reconstituted,
-              use within a reasonable timeframe and store refrigerated. Avoid
-              repeated freeze-thaw cycles.
+              Store refrigerated at 2–8°C upon receipt. Protect from light
+              and moisture. Avoid repeated freeze-thaw cycles.
             </p>
           </div>
         </div>
