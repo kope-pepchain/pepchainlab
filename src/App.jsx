@@ -6,19 +6,19 @@ const WC_URL = import.meta.env.VITE_WC_URL;
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
 const IMAGE_MAP = {
   retatrutide:
-    "https://pepchainlab.com/wp-content/uploads/2026/06/reta10fixed.png",
+    "https://pepchainlab.com/wp-content/uploads/2026/06/FIXED-NEW-RETA10.png",
   "retatrutide-20":
-    "https://pepchainlab.com/wp-content/uploads/2026/06/reta20fixed.png",
+    "https://pepchainlab.com/wp-content/uploads/2026/06/FIXED-NEW-RETA20.png",
   "retatrutide-30":
-    "https://pepchainlab.com/wp-content/uploads/2026/06/reta30fixed.png",
+    "https://pepchainlab.com/wp-content/uploads/2026/06/FIXED-NEW-RETA30.png",
   "ghk-cu":
     "https://pepchainlab.com/wp-content/uploads/2026/06/ghkcu50mgfixed.png",
   "mots-c": "https://pepchainlab.com/wp-content/uploads/2026/06/motscfixed.png",
   glow: "https://pepchainlab.com/wp-content/uploads/2026/06/glowblend50mgfixed.png",
   "bacteriostatic-water":
-    "https://pepchainlab.com/wp-content/uploads/2026/06/bacwater10mlfixed.png",
+    "https://pepchainlab.com/wp-content/uploads/2026/06/FIXED-NEW-CHAINH20-10ML.png",
   "bacteriostatic-water-3ml":
-    "https://pepchainlab.com/wp-content/uploads/2026/06/bacwater3mlfixed.png",
+    "https://pepchainlab.com/wp-content/uploads/2026/06/FIXED-NEW-CHAINH20-3ML.png",
   wolverine:
     "https://pepchainlab.com/wp-content/uploads/2026/06/wolverineblend10mgfixed.png",
 };
