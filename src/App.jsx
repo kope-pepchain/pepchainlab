@@ -2616,6 +2616,27 @@ export default function App() {
     return () => clearTimeout(t);
   }, [toast]);
 
+// Affiliate referral tracking — fire SliceWP's visit recorder once per session.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const aff = params.get("aff") || params.get("ref");
+    if (!aff) return;
+    const guardKey = `pcAffTracked_${aff}`;
+    if (sessionStorage.getItem(guardKey)) return;
+    const body = new URLSearchParams();
+    body.set("action", "slicewp_register_visit");
+    body.set("aff", aff);
+    body.set("url", window.location.href);
+    fetch(`${import.meta.env.VITE_WC_URL}/wp-admin/admin-ajax.php`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString(),
+    })
+      .then(() => sessionStorage.setItem(guardKey, "1"))
+      .catch(() => {});
+  }, []);
+
   // wallet balance + user id for navbar/top-up — single /me call (was two)
   useEffect(() => {
     fetch(`${import.meta.env.VITE_WC_URL}/wp-json/pepchain/v1/me`, {
